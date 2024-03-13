@@ -6,8 +6,10 @@
   "min_range_holders": 2,
   "max_range_holders": 10,
   "max_dim_datasets": 20,
-  "T": 0.1,
-  "C": 0.08,
+  "V": 0.6,
+  "EDIT":2,
+  "T": 0.08,
+  "C": 0.1,
   "bic_country_codes": 
     ["AF", "AX", "AL", "DZ", "AS", "AD", "AO", "AI", "AQ", "AG", "AR",
     "AM", "AW", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE",

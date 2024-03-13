@@ -12,6 +12,7 @@ import pandas as pd
 from tqdm import tqdm
 from faker import Faker
 from datetime import datetime
+from lib.permutations import generate_permutations
 
 
 __name__ = "__main__"
@@ -37,10 +38,10 @@ MAX_RANGE_ENTRY = parameters["max_range_entry"]
 MIN_RANGE_HOLDERS = parameters["min_range_holders"]
 MAX_RANGE_HOLDERS = parameters["max_range_holders"]
 
-# Temperature factor ---> controlla il fattore di distorsione di una stringa
-T = parameters["T"]
-# Changeable factor ---> controlla il fattore di aggiunta di spazi bianchi e romozione di parole
-C = parameters["C"]
+T = parameters["T"]         # Temperature factor ---> controlla il fattore di distorsione di una stringa
+C = parameters["C"]         # Changeable factor ---> controlla il fattore di aggiunta di spazi bianchi e romozione di parole
+V = parameters["V"]         # Variability factor ---> controlla il fattore di modifica delle parti societarie
+EDIT = parameters["EDIT"]   # Edit distance ---> controlla l'avvicinamento con le parti societarie a partire da una lista nota
 
 BIC_COUNTRY_CODES = parameters["bic_country_codes"]
 FAKER_COUNTRY_CODES = parameters["faker_country_codes"]
@@ -102,96 +103,6 @@ def companies_info_generator(country_code, num_companies):
 
 
 
-def generate_permutations(name, rowNumber):
-  """ Generate aliases by introducing transcription errors.
-      The number of the aliases generated depends by the
-      rowNumber parametes """
-
-  words = name.split()
-  aliases = []
-  newT = T
-
-  # The name is made by more than 1 word
-  if len(words) > 1:
-    for i in range(rowNumber):
-      check = True
-      for j in range(len(words)):
-
-        # Add additional spaces
-        if check and random.random() < C:
-          check = False
-          alias_with_spaces = list(words)
-          alias_with_spaces.insert(j, '')
-          aliases.append(' '.join(alias_with_spaces))
-          break
-
-        # Remove a word
-        if check and random.random() < C:
-          check = False
-          alias_without_word = list(words)
-          del alias_without_word[j]
-          aliases.append(' '.join(alias_without_word))
-          break
-
-      if check: aliases.append(name)
-
-  # The name is a single word
-  else:
-    aliases = [name for i in range(rowNumber)]
-    newT = T + (0.3 * T)
-
-
-  # Introduce transcription errors based on T (Temperature) value
-  for j,alias in enumerate(aliases):
-    word = list(alias)
-    random_positions = random.sample(range(len(word)), random.randint(0, len(word) // 2))
-    for i in random_positions:
-        if random.random() < newT: word[i] = random.choice([' ', '.', ',', '&', '-', '+'])
-    aliases[j] = ''.join(word)
-
-  aliases[0] = name
-  return aliases
-
-
-
-def generate_permutations_by_name_length(name):
-  """ Generate aliases by introducing transcription errors.
-      The number of the aliases generated depends by the
-      length of name parametes """
-
-  words = name.split()
-  aliases = []
-
-  for i in range(len(words)):
-    for j in range(i+1, len(words)):
-
-      # Add additional spaces
-      if random.random() < C:
-        alias_with_spaces = list(words)
-        alias_with_spaces.insert(j, '')
-        aliases.append(' '.join(alias_with_spaces))
-      else: aliases.append(name)
-
-      # Remove a word
-      if random.random() < C:
-        alias_without_word = list(words)
-        del alias_without_word[j]
-        aliases.append(' '.join(alias_without_word))
-      else: aliases.append(name)
-
-
-  # Introduce transcription errors based on temperature
-  for j,alias in enumerate(aliases):
-      word = list(alias)
-      random_positions = random.sample(range(len(word)), random.randint(0, len(word)// 2))
-      for i in random_positions:
-        if random.random() < T: word[i] = random.choice([' ', '.', ',', '&', '-', '+'])
-      aliases[j] = ''.join(word)
-
-  aliases[0] = name
-  return aliases
-
-
 
 def compute_entry_range():
   """ Compute the range(min, max) of the entity """
@@ -245,7 +156,7 @@ def data_generator(dataset):
 
     for name,info in companies_info.items():
       if info["num_entry"] != 1:
-        aliases = generate_permutations(name, info["num_entry"])
+        aliases = generate_permutations(name, info["num_entry"], T, C, V, EDIT)
         for alias in aliases:
           dataset.loc[len(dataset.index)] = [bic, iban, bic_country_code, alias, companies_info[name]["address"], is_shared, name]
       else:
@@ -287,3 +198,4 @@ if __name__ == "__main__":
   print("Main...")
   main()
   print("Done...")
+  print("Dataset saved in /output foldes.")
