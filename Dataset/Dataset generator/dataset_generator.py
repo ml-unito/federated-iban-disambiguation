@@ -99,12 +99,9 @@ def companies_info_generator(country_code, num_companies):
   while num_companies_generated != num_companies:
     description = company_generator(country_code)
     if description not in companies:
-      if np.random.choice([0,1], p=[0.70,0.30]):
-        address = address_generator(country_code)
-      else:
-        address = ""
-      companies[description] = {"num_entry": 1, "address": address}
-      num_companies_generated += 1
+      address = address_generator(country_code)
+    companies[description] = {"num_entry": 1, "address": address}
+    num_companies_generated += 1
 
   return companies
 
@@ -277,9 +274,14 @@ def data_generator(dataset):
       if info["num_entry"] != 1:
         aliases = generate_permutations(name, info["num_entry"], T, C, V, EDIT)
         for alias in aliases:
-          dataset.loc[len(dataset.index)] = [bic, iban, bic_country_code, alias, companies_info[name]["address"], is_shared, name]
+          if np.random.choice([0,1], p=[0.60,0.40]):
+            new_address = change_address_format(companies_info[name]["address"], country_code)
+            dataset.loc[len(dataset.index)] = [bic, iban, bic_country_code, alias, new_address, is_shared, name]
+          else:
+            dataset.loc[len(dataset.index)] = [bic, iban, bic_country_code, alias, "", is_shared, name]
       else:
-        dataset.loc[len(dataset.index)] = [bic, iban, bic_country_code, name, companies_info[name]["address"], is_shared, name]
+        address = companies_info[name]["address"] if np.random.choice([0,1], p=[0.60,0.40]) else ""
+        dataset.loc[len(dataset.index)] = [bic, iban, bic_country_code, name, address, is_shared, name]
 
   return dataset
 
