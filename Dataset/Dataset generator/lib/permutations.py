@@ -209,6 +209,17 @@ def introduce_new_words(aliasList, nameList):
   return aliasList, False
 
 
+def check_homogeneous(name, aliasList, Edit_threshold):
+  """ Check if aliasList is homogeneous """
+
+  if len(aliasList) >= 10:
+    ris = [editdistance.eval(x, name) <= Edit_threshold for x in aliasList]
+    ris = sum([1 for el in ris if el == True])
+    if (ris / len(aliasList)) > 0.68: 
+      return True
+  
+  return False
+
 
 
 def generate_permutations(name, rowNumber, T, C, V, Edit_threshold):
@@ -265,6 +276,9 @@ def generate_permutations(name, rowNumber, T, C, V, Edit_threshold):
   aliases = compute_transcription_errors(aliases, newT)
   aliases = introduce_variability(aliases, abbrList, added, V)
   aliases = introduce_white_spaces(aliases, C)
+  if check_homogeneous(name, aliases, Edit_threshold):
+    #print("RETURN")
+    return generate_permutations(name, rowNumber, T*2, C, V, Edit_threshold)
 
   aliases[0] = firstName
   return aliases
