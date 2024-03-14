@@ -318,7 +318,7 @@ def get_dataset_filePath():
 
 
 def print_dataset(dataset, maxLine = 20):
-  """ """
+  """ Print first maxLine row of the datset """
   dataset = dataset.iloc[:maxLine,:]
   dataset = dataset[["AccountNumber", "Name", "Address", "IsShared"]]
   
@@ -339,7 +339,7 @@ def main():
   path = get_dataset_filePath()
   save_dataset(dataset, path)
 
-  if sys.argv[1] == "show":
+  if len(sys.argv) > 1 and sys.argv[1] == "show":
     print_dataset(dataset)
 
 

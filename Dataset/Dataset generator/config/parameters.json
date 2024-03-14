@@ -1,6 +1,6 @@
 {
   "path_output_file": "dataset.xlsx",
-  "num_iban": 100,
+  "num_iban": 10,
   "min_range_entry": 1,
   "max_range_entry": 50,
   "min_range_holders": 2,
