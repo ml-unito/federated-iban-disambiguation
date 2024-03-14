@@ -168,7 +168,7 @@ def change_address_format(address, country_code):
   action = np.random.choice([
     "symbols", "only_city", "only_country", "city_and_country", 
     "city_and_short_country", "postal_code_and_city",
-    "format1","format2","format3","original_format"]
+    "format1","format2","format3","format4","original_format"]
   ) 
   #p=[0.05,0.15,0.1,0.1,0.1,0.05,0.15,0.15,0.15])
 
@@ -206,6 +206,11 @@ def change_address_format(address, country_code):
       state = "(" + state + ")"
     country = country_code[3:] if action == "format2" else get_country(country_code)
     new_address_elems = [street, number, city, state, country]
+  elif action == "format4":
+    number = get_address_number(info_address, country_code)
+    street = get_address_street(info_address, country_code)
+    city = get_address_city(info_address, country_code)
+    new_address_elems = [number, street, city]
   elif action == "original_format":
     new_address_elems = [info if info is not None else "" for info in info_address]
 
