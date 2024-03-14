@@ -166,7 +166,7 @@ def change_address_format(address, country_code):
   action = np.random.choice([
     "symbols", "only_city", "only_country", "city_and_country", 
     "city_and_short_country", "postal_code_and_city",
-    "format1","format2","format3"]
+    "format1","format2","format3","original_format"]
   ) 
   #p=[0.05,0.15,0.1,0.1,0.1,0.05,0.15,0.15,0.15])
 
@@ -204,12 +204,17 @@ def change_address_format(address, country_code):
       state = "(" + state + ")"
     country = country_code[3:] if action == "format2" else get_country(country_code)
     new_address_elems = [street, number, city, state, country]
-  
+  elif action == "original_format":
+    new_address_elems = [info if info is not None else "" for info in info_address]
+
+
   address = ""
   for index_elem, elem in enumerate(new_address_elems):
+    if elem is None:
+      print(new_address_elems, action)
     if elem != "":
       # modifica parole
-      if not only_symbols and not elem.isnumeric() and np.random.choice([0,1], p=[0.90,0.10]):
+      if not only_symbols and not elem.isnumeric() and len(elem)!=2 and np.random.choice([0,1], p=[0.90,0.10]):
         index_char = np.random.randint(0,len(elem))
         address += elem[0:index_char]+elem[index_char+1:]
       else:
