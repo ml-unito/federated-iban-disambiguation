@@ -112,16 +112,13 @@ def companies_info_generator(country_code, num_companies):
 
 def compute_entry_range():
   """ Compute the range(min, max) of the entity """
-  new_range = []
-  for i in range(MIN_RANGE_ENTRY,MAX_RANGE_ENTRY):
-    if i < 5:
-      new_range += [i for _ in range((MAX_RANGE_ENTRY) // 2)]
-    elif i > 5 and i < 15:
-      new_range += [i for _ in range(MAX_RANGE_ENTRY)]
-    else:
-        if(i % 10 == 0): new_range.append(i)
-
-  return new_range
+  x = np.random.choice(["low","high"], p=[0.2,0.8])
+  if x == "low":
+    num = np.random.randint(MIN_RANGE_ENTRY,MAX_RANGE_ENTRY//3)
+  else:
+    num = np.random.randint(MAX_RANGE_ENTRY//3,MAX_RANGE_ENTRY+1)
+  
+  return num
 
 
 
@@ -214,7 +211,6 @@ def change_address_format(address, country_code):
   elif action == "original_format":
     new_address_elems = [info if info is not None else "" for info in info_address]
 
-
   address = ""
   for index_elem, elem in enumerate(new_address_elems):
     if elem is None:
@@ -248,8 +244,6 @@ def change_address_format(address, country_code):
 
 
 def data_generator(dataset):
-  new_range = compute_entry_range()
-
   for i in tqdm(range(NUM_IBAN)):
     # generazione BIC
     bic, bic_country_code = bic_manual_generator()
@@ -258,7 +252,7 @@ def data_generator(dataset):
     iban = iban_generator()
 
     # generazione numero di entry per questo IBAN
-    num_iban_entry = np.random.choice(new_range)
+    num_iban_entry = compute_entry_range()
 
     # scelta se IBAN è condiviso e, in caso, da quanti titolari
     is_shared = np.random.randint(0,2) if num_iban_entry != 1 else 0
