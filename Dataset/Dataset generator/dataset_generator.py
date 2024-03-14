@@ -1,21 +1,19 @@
 # install all necessary libraries
-import os
-try: import pipreqs
-except ImportError as error: os.system('pip install pipreqs')
-os.system("pip install -r ./requirements.txt")
+#import os
+#try: import pipreqs
+#except ImportError as error: os.system('pip install pipreqs')
+#os.system("pip install -r ./requirements.txt")
 
 import json
 import string
 import random
+import re
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from faker import Faker
 from datetime import datetime
 from lib.permutations import generate_permutations
-
-
-__name__ = "__main__"
 
 
 
@@ -70,7 +68,7 @@ def bic_manual_generator():
 
 
 def iban_generator():
-  country_code = random.choice(FAKER_COUNTRY_CODES)
+  country_code = random.choice(list(FAKER_COUNTRY_CODES.keys()))
   fake = Faker(country_code)
   return fake.iban()
 
@@ -82,7 +80,16 @@ def company_generator(country_code):
 
 def address_generator(country_code):
   fake = Faker(country_code)
-  return fake.address()
+  address = fake.address()
+
+  is_valid = 0
+  while not is_valid:
+    if country_code == "en_US" and ("APO" in address or "DPO" in address or "FPO" in address):
+      address = fake.address()
+    else:
+      is_valid = 1
+
+  return address
 
 
 def companies_info_generator(country_code, num_companies):
@@ -92,7 +99,7 @@ def companies_info_generator(country_code, num_companies):
   while num_companies_generated != num_companies:
     description = company_generator(country_code)
     if description not in companies:
-      if np.random.randint(0,2):
+      if np.random.choice([0,1], p=[0.70,0.30]):
         address = address_generator(country_code)
       else:
         address = ""
@@ -119,6 +126,118 @@ def compute_entry_range():
 
 
 
+def get_address_number(info_address, country_code):
+  index_number = FAKER_COUNTRY_CODES[country_code]["pos_elem"]["number"]
+  number = info_address[index_number] if index_number != 1 else None
+
+  index_extra_info = FAKER_COUNTRY_CODES[country_code]["pos_elem"]["extra_info"]
+  extra_info = info_address[index_extra_info] if index_extra_info != 1 else None
+
+  if number is not None and extra_info is not None:
+    return number + " " + extra_info
+  elif number is not None:
+    return number
+  elif extra_info is not None:
+    return extra_info
+  else:
+    return ""
+
+
+def get_address_street(info_address, country_code):
+  street = info_address[FAKER_COUNTRY_CODES[country_code]["pos_elem"]["street"]]
+  return street if street is not None else ""
+
+def get_address_city(info_address, country_code):
+  city = info_address[FAKER_COUNTRY_CODES[country_code]["pos_elem"]["city"]]
+  return city if city is not None else ""
+
+def get_address_postal_code(info_address, country_code):
+  postal_code = info_address[FAKER_COUNTRY_CODES[country_code]["pos_elem"]["postal_code"]]
+  return postal_code if postal_code is not None else ""
+
+def get_address_state(info_address, country_code):
+  index = FAKER_COUNTRY_CODES[country_code]["pos_elem"]["state"]
+  state = info_address[index] if index != -1 else None
+  return state if state is not None else ""
+
+def get_country(country_code):
+  return FAKER_COUNTRY_CODES[country_code]["country"]
+
+def change_address_format(address, country_code):
+  regex = re.compile(FAKER_COUNTRY_CODES[country_code]["regex"])
+  info_address = re.split(regex,address)[1:-1]
+  action = np.random.choice([
+    "symbols", "only_city", "only_country", "city_and_country", 
+    "city_and_short_country", "postal_code_and_city",
+    "format1","format2","format3"]
+  ) 
+  #p=[0.05,0.15,0.1,0.1,0.1,0.05,0.15,0.15,0.15])
+
+  only_symbols = False
+
+  new_address_elems = []
+  if action == "symbols":
+    only_symbols = True
+    symbols = [".","-","_","X","&","/","*","#"]
+    index_symbol = np.random.randint(0,len(symbols))
+    new_address_elems = [symbols[index_symbol] for i in range(np.random.randint(1,5))]
+  elif action == "only_city":
+    new_address_elems = [get_address_city(info_address, country_code)]
+  elif action == "only_country":
+    new_address_elems = [get_country(country_code)]
+  elif action == "city_and_country" or action == "city_and_short_country":
+    new_address_elems = [get_address_city(info_address, country_code) + " " + (country_code[3:] if action == "city_and_short_country" else get_country(country_code))]
+  elif action == "postal_code_and_city":
+    postal_code = get_address_postal_code(info_address, country_code)
+    city = get_address_city(info_address, country_code)      
+    new_address_elems = [postal_code, city]
+  elif action == "format1":
+    street = get_address_street(info_address, country_code)
+    number = get_address_number(info_address, country_code) 
+    city = get_address_city(info_address, country_code)
+    country = get_country(country_code)
+    new_address_elems = [street, number, city, country]
+  elif action == "format2" or action == "format3":
+    street = get_address_street(info_address, country_code)
+    number = get_address_number(info_address, country_code)
+    postal_code = get_address_postal_code(info_address, country_code)
+    city = get_address_city(info_address, country_code)
+    state = get_address_state(info_address, country_code)
+    if state != "" and np.random.randint(0,2):
+      state = "(" + state + ")"
+    country = country_code[3:] if action == "format2" else get_country(country_code)
+    new_address_elems = [street, number, city, state, country]
+  
+  address = ""
+  for index_elem, elem in enumerate(new_address_elems):
+    if elem != "":
+      # modifica parole
+      if not only_symbols and not elem.isnumeric() and np.random.choice([0,1], p=[0.90,0.10]):
+        index_char = np.random.randint(0,len(elem))
+        address += elem[0:index_char]+elem[index_char+1:]
+      else:
+        address += elem
+      # modifica spazi
+      if index_elem != len(new_address_elems)-1:
+        space_action = np.random.choice(["no_space","add_more_space","replace_space_with_symbol","one_space"], p=[0.1,0.20,0.30,0.40])
+        if space_action == "add_more_space":
+          address += "  "
+        elif not only_symbols and space_action == "replace_space_with_symbol":
+          symbols = ["-",",","/"]
+          symbol = np.random.choice(symbols)
+          address += symbol
+        elif space_action == "one_space":
+          address += " "
+
+  address = address[:len(address)-2] if address[len(address)-1] == " " else address
+  
+  if "'" in address and np.random.randint(0,2):
+    address = address.replace("'","")
+  
+  return address
+
+
+
 def data_generator(dataset):
   new_range = compute_entry_range()
 
@@ -140,7 +259,7 @@ def data_generator(dataset):
       num_holders = 1
 
     # generazione nome società e eventuali indirizzi
-    country_code = np.random.choice(FAKER_COUNTRY_CODES)
+    country_code = np.random.choice(list(FAKER_COUNTRY_CODES.keys()))
     companies_info = companies_info_generator(country_code, num_companies=num_holders)
 
     # scelta quante entry per ogni società
@@ -180,7 +299,7 @@ def save_dataset(dataset, filePath):
 def get_dataset_filePath():
   """ return a new dataset name including actual datetime """
   now = datetime.now()
-  return "./output/dataset_" + now.strftime("%d-%m-%Y_%H:%M:%S") + ".xlsx"
+  return "./output/dataset_" + now.strftime("%d-%m-%Y_%H-%M-%S") + ".xlsx"
 
 
 

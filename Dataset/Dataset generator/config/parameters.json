@@ -34,14 +34,46 @@
     "TH", "TL", "TG", "TK", "TO", "TT", "TN", "TR", "TM", "TC", "TV",
     "UG", "UA", "AE", "GB", "US", "UM", "UY", "UZ", "VU", "VE", "VN",
     "VG", "VI", "WF", "EH", "YE", "ZM", "ZW"],
-  "faker_country_codes": [
-    "en_US",
-    "en_GB",
-    "fr_FR",
-    "de_DE",
-    "es_ES",
-    "it_IT",
-    "pt_BR",
-    "nl_NL"
-  ]
+  "faker_country_codes": {
+    "en_US": {
+      "regex": "^(\\d+) (.+)\n(.+), (.+) (.+)$", 
+      "pos_elem": {"number":0, "extra_info":-1, "street":1, "postal_code":4, "city":2, "state":3},
+      "country": "United States"
+    },
+    "en_GB": {
+      "regex": "(?:(\\d+)|(.+))[\n ](.+)\n(.+)\n(.+)$", 
+      "pos_elem": {"number":0, "extra_info":1, "street":2, "postal_code":4, "city":3, "state":-1},
+      "country": "United Kingdom"
+    },
+    "fr_FR": {
+      "regex": "(?:^(\\d+), ){0,1}(.+)\n(\\d+) (.+)$", 
+      "pos_elem": {"number":0, "extra_info":-1, "street":1, "postal_code":2, "city":3, "state":-1},
+      "country": "France"
+    },
+    "de_DE": {
+      "regex": "^(.+) (.+)\n(\\d+) (.+)$", 
+      "pos_elem": {"number":1, "extra_info":-1, "street":0, "postal_code":2, "city":3, "state":-1},
+      "country": "Germany"
+    },
+    "es_ES": {
+      "regex": "^(.+) (.+)\n(.+), (\\d+)$", 
+      "pos_elem": {"number":1, "extra_info":-1, "street":0, "postal_code":3, "city":2, "state":-1},
+      "country": "Spain"
+    },
+    "it_IT": {
+      "regex": "^(.+), (\\d+)(?: (.+)){0,1}\n(\\d+), (.+) \\((.+)\\)$", 
+      "pos_elem": {"number":1, "extra_info":2, "street":0, "postal_code":3, "city":4, "state":5},
+      "country": "Italia"
+    },
+    "pt_BR": {
+      "regex": "^([^,\n]+)(?:, (\\d+)){0,1}\n(.+)\n(.+) \/ (.+)$", 
+      "pos_elem": {"number":1, "extra_info":-1, "street":0, "postal_code":3, "city":2, "state":4},
+      "country": "Brazil"
+    },
+    "nl_NL": {
+      "regex": "^(.+) (.+)\n(.+)\n(.+)$", 
+      "pos_elem": {"number":1, "extra_info":-1, "street":0, "postal_code":2, "city":3, "state":-1},
+      "country": "Netherlands"
+    }
+  }
 }
