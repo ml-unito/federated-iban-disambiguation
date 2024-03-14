@@ -2,14 +2,57 @@ import random
 import editdistance
 
 
+company_name_abbreviations = [
+    # international_company_words abbreviations
+    ["Group", "Grp.", "Grp", "Gr.", "Gp."],
+    ["Corporation", "Corp.", "Corp", "Corp", "Cpn.", "Cpn"],
+    ["Holdings", "Hldgs.", "Hldgs", "Hdg.", "Hdgs."],
+    ["Enterprises", "Ent.", "Ents.", "Ent", "Ents"],
+    ["International", "Intl.", "Intl", "Int.", "Int"],
+    ["Global", "Glob.", "Glob", "Glb.", "Glb"],
+    ["Solutions", "Solns.", "Solns", "Sols.", "Sols"],
+    ["Services", "Svcs.", "Svcs", "Sv.", "Sv"],
+    ["Technologies", "Tech.", "Tech", "Techs.", "Techs"],
+    ["Industries", "Inds.", "Inds", "Ind.", "Ind"],
+    ["Partners", "Ptnrs.", "Ptnrs", "Pts.", "Pts"],
+    ["Systems", "Sys.", "Sys", "Syss.", "Syss"],
+    ["Worldwide", "WW.", "WW", "Ww.", "Ww"],
+    ["Ventures", "Vntrs.", "Vntrs", "Vnts.", "Vnts"],
+    ["Enterprises", "Ents.", "Ents", "Ents.", "Ents"],
+    ["Brothers", "Bros.", "Bros", "Br.", "Br"],
+    ["Sons", "Sns.", "Sns", "S.", "S"],
+    ["Company", "Co.", "Co", "Cpny.", "Cpny"],
+    ["Associates","Assocs.", "Assocs", "Ass.", "Ass"],
+]
+
+
+
 abbreviation_variations = [
     
-    #"Società Internazionali
-    ["Corp.", "Corp", "Corpn.", "Cp."], #"Corporation": 
-    ["Inc.", "Inc", "Incorporated"], #"Incorporated": 
-    ["Ltd.", "Ltd", "Limited", "Ltée", "LTD", "LTd.", "L.t.d.", "LTT",],  #"Limited": 
-    ["Co.", "Co", "Company", "Comp."], #"Company": 
-    ["P.L.C.", "Public Limited Company", "PLC ", "plc", "pLC", "PLCC", "P.L.C", "Pvt. Ltd.", "Pvt Ltd", "Pvt. Limited", "P.L.C.", "Public Ltd.", "Pvt. Ltd"],  #"Private Limited": 
+    #Group
+    ["Group", "Grp.", "Grp", "Gr.", "Gp."],
+    
+    #"Corporation": 
+    ["Corporation", "Corp.", "Corp", "Corp", "Cpn.", "Cpn"],
+
+    #Global
+    ["Global", "Glob.", "Glob", "Glb.", "Glb"],
+
+    #Industries
+    ["Industries", "Inds.", "Inds", "Ind.", "Ind"],
+
+    #"Incorporated": 
+    ["Inc.", "Inc", "Incorporated"],
+    
+    #"Limited": 
+    ["Ltd.", "Ltd", "Limited", "Ltée", "LTD", "Ltd", "LTd.", "L.t.d.", "Ltd ", "LTT", "Ltd."],
+    
+    #"Company": 
+    ["Co.", "Co", "Company", "Comp."],
+    
+    #"Private Limited": 
+    ["P.L.C.", "Public Limited Company", "PLC ", "plc", "pLC", "PLCC", "P.L.C", "Pvt. Ltd.", "Pvt Ltd", "Pvt. Limited", "P.L.C.", "Public Ltd.", "Public", "Pvt. Ltd"],
+    
     
     #"Società Italiane
     ["S.p.A.", "SpA", "S.P.A.", "SPA", "Sp.A.", "S.P.A", "Società per Azioni", "SpA ",],
@@ -18,13 +61,13 @@ abbreviation_variations = [
     ["S.a.s.", "SAS", "S.A.S.", "S.a.s", "S.A.S"],
     ["S.c.", "S.C.", "SC", "S.c", "S.C"],
     ["S.a.", "SA", "S.A.", "S.a", "S.A"],
-    ["S.c.a.r.l.", "S.C.A.R.L.", "SCARL", "S.c.a.r.l", "S.C.A.R.L"],
+    ["S.c.a.r.l.", "S.C.A.R.L.", "SCARL", "S.c.a.r.l", "S.C.A.R.L", "S.A.R.L."],
     ["S.d.f.", "S.D.F.", "SDF", "S.d.f", "S.D.F"],
     ["S.u.", "S.U.", "SU", "S.u", "S.U"],
     ["S.N.C.", "SNC", "S.n.c", "S.N.C"],
+
 ]
 
-Transcription_errors = ['.', ',', '-', '/', '- ', ". ", " .", " - "]
 international_company_words = [
     "Group",
     "Corporation",
@@ -48,13 +91,18 @@ international_company_words = [
     "Limited"
 ]
 
+Transcription_errors = ['.', ',', '-', '/', '- ', ". ", " .", " - "]
 
-def compute_variation_abbreviation(words, threshold):
-  """ """
+
+
+
+def compute_variation_abbreviation(words, variations, threshold):
+  """ Compute change abbreviations """
+
   newList = []
   for j in range(len(words)):
     selectedList = []
-    for abbreviations in abbreviation_variations:
+    for abbreviations in variations:
       abbrLower = [el.lower() for el in abbreviations]
       
       for ab in abbrLower:
@@ -90,7 +138,7 @@ def compute_transcription_errors(aliasList, newT):
   return aliases
 
 
-def introduce_variability(aliasList, abbrList, V):
+def introduce_variability(aliasList, abbrList, added, V):
   """  Introduce variability in companies abbreviations """
 
   aliases = aliasList
@@ -100,6 +148,8 @@ def introduce_variability(aliasList, abbrList, V):
       elemList = random.choice(elem[1])
       if random.random() < V:
         aliases[j] = aliases[j].replace(elem[0], elemList)
+      elif added:
+        continue
       else:
           newAlias = aliases[j].split(elem[0])
           if newAlias[0] != "": aliases[j] = newAlias[0].strip()
@@ -125,21 +175,61 @@ def introduce_white_spaces(aliasList, C):
   
   return aliases
 
+
+def introduce_white_spaces(aliasList, C):
+  """ """
+
+  aliases = aliasList
+  # Add additional spaces
+  for j,alias in enumerate(aliases):
+    if random.random() < C:
+      alias_with_spaces = list(alias)
+      voidPositions = [k for k,q in enumerate(alias_with_spaces) if q == ' ']
+      if len(voidPositions) > 0:
+        el = random.choice(voidPositions)
+        alias_with_spaces.insert(el, ' ')
+        aliases[j] = ''.join(alias_with_spaces)
+  
+  return aliases
+
+
+
+def introduce_new_words(aliasList, nameList):
+  """ Add new words in aliasList is big and all names are single word names"""
+
+  if len(aliasList) > 7 and all(x == aliasList[0] for x in aliasList):
+    #print("NEW WORD ADDED !")
+    aliases = aliasList
+    addWord = ""
+    for j,_ in enumerate(aliases):
+      if addWord == "": addWord = random.choice(nameList)
+      aliases[j] += " " + addWord
+    return aliases, True
+  
+  return aliasList, False
+
+
+
+
 def generate_permutations(name, rowNumber, T, C, V, Edit_threshold):
   """ Generate aliases by introducing transcription errors.
       The number of the aliases generated depends by the
       rowNumber parametes """
 
+  
   words = name.split()
+  variations = abbreviation_variations
+  firstName = name
   if "-" in name:
-    name = name.replace("-", "")
+    name = name.replace("-", " ")
     words = name.split("-")
   aliases = []
   newT = T
+  added = False
 
   # The name is made by more than 1 word
   if len(words) > 2:
-    for i in range(rowNumber):
+    for _ in range(rowNumber):
       check = True
       for j in range(len(words)):
         
@@ -156,17 +246,25 @@ def generate_permutations(name, rowNumber, T, C, V, Edit_threshold):
 
   # The name is a single word
   else:
+    newT = T + (T * 0.8)
     if random.random() < V:
       ab = random.choice(abbreviation_variations)
       name += " " + random.choice(ab)
       words = name.split()
+      
     aliases = [name for _ in range(rowNumber)]
-    newT = T + (T * 0.8)
+    w = name.split()
+    if (len(w) == 1):
+      aliases, added = introduce_new_words(aliases, international_company_words)
+      if added: 
+        words = aliases[0].split()
+        variations = company_name_abbreviations
+        
 
-  abbrList = compute_variation_abbreviation(words, Edit_threshold)
+  abbrList = compute_variation_abbreviation(words, variations, Edit_threshold)
   aliases = compute_transcription_errors(aliases, newT)
-  aliases = introduce_variability(aliases, abbrList, V)
+  aliases = introduce_variability(aliases, abbrList, added, V)
   aliases = introduce_white_spaces(aliases, C)
 
-  aliases[0] = name
+  aliases[0] = firstName
   return aliases

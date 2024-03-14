@@ -4,15 +4,17 @@
 #except ImportError as error: os.system('pip install pipreqs')
 #os.system("pip install -r ./requirements.txt")
 
+import re
+import sys
 import json
 import string
 import random
-import re
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from faker import Faker
 from datetime import datetime
+from IPython.display import display
 from lib.permutations import generate_permutations
 
 
@@ -310,15 +312,35 @@ def get_dataset_filePath():
 
 
 
+def print_dataset(dataset, maxLine = 20):
+  """ """
+  dataset = dataset.iloc[:maxLine,:]
+  dataset = dataset[["AccountNumber", "Name", "Address", "IsShared"]]
+  
+  pd.set_option('display.max_rows', None)
+  pd.set_option('display.max_columns', None)
+  pd.set_option('display.width', 1000)
+  pd.set_option('display.colheader_justify', 'center')
+  pd.set_option('display.precision', 3)
+  print("\n\n")
+  display(dataset)
+  print("\n\n")
+
+
+
 def main():
   emptyDataset = create_dataset()
   dataset = data_generator(emptyDataset)
   path = get_dataset_filePath()
   save_dataset(dataset, path)
 
+  if sys.argv[1] == "show":
+    print_dataset(dataset)
+
 
 
 if __name__ == "__main__":
+  print("\nTYPE: \t 'python dataset_generator.py show'  for a preview of the dataset .........\n")
   print("Check parameter...")
   check_parameters()
   print("Main...")
