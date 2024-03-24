@@ -28,7 +28,7 @@ PATH_OUTPUT_FILE = parameters["path_output_file"]
 MAX_DIM_DATASETS = parameters["max_dim_datasets"]
 
 # numero di iban
-NUM_IBAN = parameters["num_iban"] #MAX_DIM_DATASETS // 10
+NUM_IBAN = parameters["num_iban"]
 
 # range numero entry per iban
 MIN_RANGE_ENTRY = parameters["min_range_entry"]
@@ -59,7 +59,6 @@ def check_parameters():
     raise Exception("Exception: max_range_holders must be grater that min_range_holders.")
   if MIN_RANGE_HOLDERS <= 0 or MAX_RANGE_HOLDERS <=0:
     raise Exception("Exception: max_range_holders and min_range_holders must be positive number.")
-
 
 
 def bic_manual_generator():
@@ -108,8 +107,6 @@ def companies_info_generator(country_code, num_companies):
   return companies
 
 
-
-
 def compute_entry_range():
   """ Compute the range(min, max) of the entity """
   x = np.random.choice(["low","high"], p=[0.2,0.8])
@@ -119,7 +116,6 @@ def compute_entry_range():
     num = np.random.randint(MAX_RANGE_ENTRY//3,MAX_RANGE_ENTRY+1)
   
   return num
-
 
 
 def get_address_number(info_address, country_code):
@@ -143,21 +139,26 @@ def get_address_street(info_address, country_code):
   street = info_address[FAKER_COUNTRY_CODES[country_code]["pos_elem"]["street"]]
   return street if street is not None else ""
 
+
 def get_address_city(info_address, country_code):
   city = info_address[FAKER_COUNTRY_CODES[country_code]["pos_elem"]["city"]]
   return city if city is not None else ""
 
+
 def get_address_postal_code(info_address, country_code):
   postal_code = info_address[FAKER_COUNTRY_CODES[country_code]["pos_elem"]["postal_code"]]
   return postal_code if postal_code is not None else ""
+
 
 def get_address_state(info_address, country_code):
   index = FAKER_COUNTRY_CODES[country_code]["pos_elem"]["state"]
   state = info_address[index] if index != -1 else None
   return state if state is not None else ""
 
+
 def get_country(country_code):
   return FAKER_COUNTRY_CODES[country_code]["country"]
+
 
 def change_address_format(address, country_code):
   regex = re.compile(FAKER_COUNTRY_CODES[country_code]["regex"])
@@ -165,8 +166,9 @@ def change_address_format(address, country_code):
   action = np.random.choice([
     "symbols", "only_city", "only_country", "city_and_country", 
     "city_and_short_country", "postal_code_and_city",
-    "format1","format2","format3","format4","original_format"]
-  ) 
+    "format1","format2","format3","format4",
+    "original_format"
+    ]) 
   #p=[0.05,0.15,0.1,0.1,0.1,0.05,0.15,0.15,0.15])
 
   only_symbols = False
@@ -240,7 +242,6 @@ def change_address_format(address, country_code):
   return address
 
 
-
 def data_generator(dataset):
   for i in tqdm(range(NUM_IBAN)):
     # generazione BIC
@@ -284,16 +285,14 @@ def data_generator(dataset):
           else:
             dataset.loc[len(dataset.index)] = [bic, iban, bic_country_code, alias, "", is_shared, name]
       else:
-        address = companies_info[name]["address"] if np.random.choice([0,1], p=[0.60,0.40]) else ""
+        address = change_address_format(companies_info[name]["address"], country_code) if np.random.choice([0,1], p=[0.60,0.40]) else ""
         dataset.loc[len(dataset.index)] = [bic, iban, bic_country_code, name, address, is_shared, name]
 
   return dataset
 
 
-
 def create_dataset():
   return pd.DataFrame(columns=["BIC", "AccountNumber", "CTRYbnk", "Name", "Address", "IsShared", "Holder"])
-
 
 
 def save_dataset(dataset, filePath):
@@ -301,12 +300,10 @@ def save_dataset(dataset, filePath):
   dataset.to_excel(filePath)
 
 
-
 def get_dataset_filePath():
   """ return a new dataset name including actual datetime """
   now = datetime.now()
   return "./output/dataset_" + now.strftime("%d-%m-%Y_%H-%M-%S") + ".xlsx"
-
 
 
 def print_dataset(dataset, maxLine = 20):
@@ -324,7 +321,6 @@ def print_dataset(dataset, maxLine = 20):
   print("\n\n")
 
 
-
 def main():
   emptyDataset = create_dataset()
   dataset = data_generator(emptyDataset)
@@ -333,7 +329,6 @@ def main():
 
   if len(sys.argv) > 1 and sys.argv[1] == "show":
     print_dataset(dataset)
-
 
 
 if __name__ == "__main__":
