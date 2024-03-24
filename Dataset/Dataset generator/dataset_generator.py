@@ -213,8 +213,6 @@ def change_address_format(address, country_code):
 
   address = ""
   for index_elem, elem in enumerate(new_address_elems):
-    if elem is None:
-      print(new_address_elems, action)
     if elem != "":
       # modifica parole
       if not only_symbols and not elem.isnumeric() and len(elem)!=2 and np.random.choice([0,1], p=[0.90,0.10]):
