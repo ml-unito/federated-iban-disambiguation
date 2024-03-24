@@ -94,6 +94,8 @@ def address_generator(country_code):
 
 
 def companies_info_generator(country_code, num_companies):
+  ''' Generates company names and their addresses, based on the country code
+    and the number of companies specified in parameters.'''
   companies = dict()
   num_companies_generated = 0
 
@@ -118,6 +120,8 @@ def generate_entry_number():
 
 
 def get_address_number(info_address, country_code):
+  ''' It returns the address number and/or more information about that from the
+    address if it is present, otherwise the empty string. '''
   index_number = FAKER_COUNTRY_CODES[country_code]["pos_elem"]["number"]
   number = info_address[index_number] if index_number != 1 else None
 
@@ -135,44 +139,52 @@ def get_address_number(info_address, country_code):
 
 
 def get_address_street(info_address, country_code):
+  ''' It returns the address street if it is present, otherwise the empty string. '''
   street = info_address[FAKER_COUNTRY_CODES[country_code]["pos_elem"]["street"]]
   return street if street is not None else ""
 
 
 def get_address_city(info_address, country_code):
+  ''' It returns the address city if it is present, otherwise the empty string. '''
   city = info_address[FAKER_COUNTRY_CODES[country_code]["pos_elem"]["city"]]
   return city if city is not None else ""
 
 
 def get_address_postal_code(info_address, country_code):
+  ''' It returns the address postal code if it is present, otherwise the empty string. '''
   postal_code = info_address[FAKER_COUNTRY_CODES[country_code]["pos_elem"]["postal_code"]]
   return postal_code if postal_code is not None else ""
 
 
 def get_address_state(info_address, country_code):
+  ''' It returns the address state if it is present, otherwise the empty string. '''
   index = FAKER_COUNTRY_CODES[country_code]["pos_elem"]["state"]
   state = info_address[index] if index != -1 else None
   return state if state is not None else ""
 
 
 def get_country(country_code):
+  ''' It returns the name of the country from country code. '''
   return FAKER_COUNTRY_CODES[country_code]["country"]
 
 
 def change_address_format(address, country_code):
+  ''' Randomly it changes the address format and possibly introduces write errors. '''
+
+  # With regular expression, it extracts all informations from the address.
   regex = re.compile(FAKER_COUNTRY_CODES[country_code]["regex"])
   info_address = re.split(regex,address)[1:-1]
+
+  # Choose randomly the type of new format of the address.
   action = np.random.choice([
     "symbols", "only_city", "only_country", "city_and_country", 
     "city_and_short_country", "postal_code_and_city",
     "format1","format2","format3","format4",
     "original_format"
-    ]) 
-  #p=[0.05,0.15,0.1,0.1,0.1,0.05,0.15,0.15,0.15])
-
+    ]) #p=[0.05,0.15,0.1,0.1,0.1,0.05,0.15,0.15,0.15])
   only_symbols = False
-
   new_address_elems = []
+
   if action == "symbols":
     only_symbols = True
     symbols = [".","-","_","X","&","/","*","#"]
@@ -212,18 +224,22 @@ def change_address_format(address, country_code):
   elif action == "original_format":
     new_address_elems = [info if info is not None else "" for info in info_address]
 
+  # Random introduction of write error in the address, such as removing
+  # characters, introducing symbols, or adding/removing spaces between words.
   address = ""
   for index_elem, elem in enumerate(new_address_elems):
     if elem != "":
-      # modifica parole
       if not only_symbols and not elem.isnumeric() and len(elem)!=2 and np.random.choice([0,1], p=[0.90,0.10]):
         index_char = np.random.randint(0,len(elem))
         address += elem[0:index_char]+elem[index_char+1:]
       else:
         address += elem
-      # modifica spazi
+      
       if index_elem != len(new_address_elems)-1:
-        space_action = np.random.choice(["no_space","add_more_space","replace_space_with_symbol","one_space"], p=[0.1,0.20,0.30,0.40])
+        space_action = np.random.choice(
+          ["no_space","add_more_space","replace_space_with_symbol","one_space"], 
+          p=[0.1,0.20,0.30,0.40]
+        )
         if space_action == "add_more_space":
           address += "  "
         elif not only_symbols and space_action == "replace_space_with_symbol":
@@ -232,7 +248,6 @@ def change_address_format(address, country_code):
           address += symbol
         elif space_action == "one_space":
           address += " "
-
   address = address[:len(address)-2] if address[len(address)-1] == " " else address
   
   if "'" in address and np.random.randint(0,2):
