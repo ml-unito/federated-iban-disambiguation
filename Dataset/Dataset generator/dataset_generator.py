@@ -107,14 +107,13 @@ def companies_info_generator(country_code, num_companies):
   return companies
 
 
-def compute_entry_range():
-  """ Compute the range(min, max) of the entity """
-  x = np.random.choice(["low","high"], p=[0.2,0.8])
-  if x == "low":
-    num = np.random.randint(MIN_RANGE_ENTRY,MAX_RANGE_ENTRY//3)
+def generate_entry_number():
+  """ Random generation of the number of entries to be included in the dataset for a specific iban """
+  type_entry_number = np.random.choice(["low","high"], p=[0.2,0.8])
+  if type_entry_number == "low":
+    num = np.random.randint(MIN_RANGE_ENTRY, MAX_RANGE_ENTRY//3)
   else:
-    num = np.random.randint(MAX_RANGE_ENTRY//3,MAX_RANGE_ENTRY+1)
-  
+    num = np.random.randint(MAX_RANGE_ENTRY//3, MAX_RANGE_ENTRY+1)
   return num
 
 
@@ -251,7 +250,7 @@ def data_generator(dataset):
     iban = iban_generator()
 
     # generazione numero di entry per questo IBAN
-    num_iban_entry = compute_entry_range()
+    num_iban_entry = generate_entry_number()
 
     # scelta se IBAN è condiviso e, in caso, da quanti titolari
     is_shared = np.random.randint(0,2) if num_iban_entry != 1 else 0
