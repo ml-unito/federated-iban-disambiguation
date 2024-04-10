@@ -1,0 +1,38 @@
+ ---- Preview Dataset ---- 
+
+| BIC_anon   | AccountNumber_anon            | CTRYbnk   | Name_anon                           |
+|:-----------|:------------------------------|:----------|:------------------------------------|
+| GTCMAEDU   | AE3111DDEMAU67747941437329611 | AE        | AL CAUT AL RUTTI GEN TR. CO. LLC    |
+| GTCMAEDU   | AE3111DDEMAU67747941437329611 | AE        | AL CAUT AL RUTTI GEN TRD CO LLC     |
+| GTCMAEDU   | AE3111DDEMAU67747941437329611 | AE        | AL CAUT AL RUTTI GEN TRD CO LLC POB |
+| GTCMAEDU   | AE3111DDEMAU67747941437329611 | AE        | AL CAUT AL RUTTI GEN.TRD.CO.LLC.    |
+| GTCMAEDU   | AE3111DDEMAU67747941437329611 | AE        | Al Caut Al Russi Gen Tr.Co.LLC      |
+| QEWMAEDU   | AE3116CWYEIG78399111887121211 | AE        | DARK MOON BEACH RESORT LLC          |
+| QEWMAEDU   | AE3116CWYEIG78399111887121211 | AE        | DARK MOO BEACH RESORT LLC           |
+| PDITATTT   | AT3119WUKWAD19331273786117611 | AT        | FM FLOGARIE MARKT SRL               |
+| PDITATTT   | AT3119WUKWAD19331273786117611 | AT        | FM FLOGERIE MARKET SRL              |
+| PDITATTT   | AT3119WUKWAD19331273786117611 | AT        | FL FLOGERIE MARKT S.R.L.            |
+
+
+
+ ---- Dataset statistics ---- 
+
+|        | AccountNumber_anon            | CTRYbnk   | Name_anon              |
+|:-------|:------------------------------|:----------|:-----------------------|
+| count  | 200                           | 200       | 200                    |
+| unique | 37                            | 9         | 199                    |
+| top    | BE3243NAXJCS78978371911679611 | DE        | BIDDONI CONSULTING LLC |
+| freq   | 11                            | 58        | 2                      |
+
+
+ ---- Group Iban ---- 
+
+|    |   mean |   median |   mode |   std_dev |   skewness |      kurt |
+|---:|-------:|---------:|-------:|----------:|-----------:|----------:|
+|  0 |    3.7 |      3.5 |      2 |   2.28254 |   0.169525 | -0.697559 |
+
+
+Number row: 200
+Number of unique IBAN: 37
+Min Number of transaction: 2.0
+Max Number of transaction: 11.0
