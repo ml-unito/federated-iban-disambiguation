@@ -1,0 +1,45 @@
+ ---- Preview Dataset ---- 
+
+|    | BIC      | AccountNumber               | CTRYbnk   | Name                 | Address                              |   IsShared | Holder          |
+|---:|:---------|:----------------------------|:----------|:---------------------|:-------------------------------------|-----------:|:----------------|
+|  0 | IBDUNRDI | IT09V8679568618507661108383 | NR        | Armstrong-Green      | nan                                  |          0 | Armstrong-Green |
+|  1 | IBDUNRDI | IT09V8679568618507661108383 | NR        | Armstrong Green Gr.  | Jones burg Lewisville United Kingdom |          0 | Armstrong-Green |
+|  2 | IBDUNRDI | IT09V8679568618507661108383 | NR        | Armstrong Green Gp.  | nan                                  |          0 | Armstrong-Green |
+|  3 | IBDUNRDI | IT09V8679568618507661108383 | NR        | Armstrong Green Gp.  | nan                                  |          0 | Armstrong-Green |
+|  4 | IBDUNRDI | IT09V8679568618507661108383 | NR        | Armstrong Green      | nan                                  |          0 | Armstrong-Green |
+|  5 | IBDUNRDI | IT09V8679568618507661108383 | NR        | Armstrong Green Grp  | Jones burg  LewisvilleUnited Kingdom |          0 | Armstrong-Green |
+|  6 | IBDUNRDI | IT09V8679568618507661108383 | NR        | Armstrong Green Gr.  | Lewisvile GB                         |          0 | Armstrong-Green |
+|  7 | IBDUNRDI | IT09V8679568618507661108383 | NR        | Armstrong  Green     | ** *                                 |          0 | Armstrong-Green |
+|  8 | IBDUNRDI | IT09V8679568618507661108383 | NR        | Armstrong Green  Gr. | United Kingdom                       |          0 | Armstrong-Green |
+|  9 | IBDUNRDI | IT09V8679568618507661108383 | NR        | Armstrong Green Gp.  | ... .                                |          0 | Armstrong-Green |
+
+
+
+ ---- Dataset statistics ---- 
+
+|        | BIC      | AccountNumber            | CTRYbnk   | Name      | Address   |    IsShared | Holder    |
+|:-------|:---------|:-------------------------|:----------|:----------|:----------|------------:|:----------|
+| count  | 5964     | 5964                     | 5934      | 5964      | 2424      | 5964        | 5964      |
+| unique | 1000     | 1000                     | 245       | 4289      | 2089      |  nan        | 1501      |
+| top    | HEMABYMO | ES7478302322358650774780 | SE        | Gonçalves | Italia    |  nan        | Gonçalves |
+| freq   | 11       | 11                       | 78        | 15        | 25        |  nan        | 29        |
+| mean   | nan      | nan                      | nan       | nan       | nan       |    0.503689 | nan       |
+| std    | nan      | nan                      | nan       | nan       | nan       |    0.500028 | nan       |
+| min    | nan      | nan                      | nan       | nan       | nan       |    0        | nan       |
+| 25%    | nan      | nan                      | nan       | nan       | nan       |    0        | nan       |
+| 50%    | nan      | nan                      | nan       | nan       | nan       |    1        | nan       |
+| 75%    | nan      | nan                      | nan       | nan       | nan       |    1        | nan       |
+| max    | nan      | nan                      | nan       | nan       | nan       |    1        | nan       |
+
+
+ ---- Distribution on names and address per iban ---- 
+
+|    |   mean |   median |   std_dev |   skewness |     kurt |
+|---:|-------:|---------:|----------:|-----------:|---------:|
+|  0 |  8.388 |        8 |   4.42555 |   0.237529 | -1.10067 |
+
+
+Number row: 5964
+Number of unique IBAN: 1000
+Min Number of transaction: 1.0
+Max Number of transaction: 11.0

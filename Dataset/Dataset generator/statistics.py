@@ -1,5 +1,6 @@
 from scipy.stats import skew, kurtosis
 import matplotlib.pyplot as plt
+from scipy.stats import mode
 import pandas as pd
 import numpy as np
 import sys
@@ -21,8 +22,13 @@ def main():
     if "Unnamed: 0" in dataset.columns:
         dataset = dataset.drop("Unnamed: 0", axis=1)
     
-    if "AccountNumber_anon" in dataset.columns: columnName = "AccountNumber_anon"
-    else: columnName = "AccountNumber"
+    if "AccountNumber_anon" in dataset.columns: 
+        columnName = "AccountNumber_anon"
+        Name = "Name_anon"
+
+    else: 
+        columnName = "AccountNumber"
+        Name = "Name"
 
     
     
@@ -56,25 +62,35 @@ def main():
     max_x = bins.max()
     print("Min Number of transaction: ", min_x)
     print("Max Number of transaction: ", max_x)
-    print("\nStatistics on Number of entities per Iban")
+    print()
+    print("statistics on names and address")
+    ibans = dataset[columnName].unique()
+    values = []
+    for iban in ibans:
+        names = dataset[Name].loc[dataset[columnName] == iban]
+        names = [el for el in names if not isinstance(el, float)]
+        if "Address" in dataset.columns:
+            address = dataset["Address"].loc[dataset[columnName] == iban]
+            address = [el for el in address if not isinstance(el, float)]
+            values.append(len(names) + len(address))
+        else:
+            values.append(len(names))
 
-    object = {
-        "mean": np.mean(counts),
-        "median": np.median(counts),
-        "mode":bins[np.argmax(counts)],
-        "std_dev":np.std(counts),
-        "skewness":skew(counts),
-        "kurt":kurtosis(counts)
+    object2 = {
+        "mean": np.mean(values),
+        "median": np.median(values),
+        "std_dev":np.std(values),
+        "skewness":skew(values),
+        "kurt":kurtosis(values)
     }
 
+    print("Distribution on names and address per iban:")
+    names = pd.DataFrame(object2,index=[0])
+    print(names.to_markdown())
 
-    stats = pd.DataFrame(object,index=[0])
-    print(stats.to_markdown())
 
     plt.savefig("./output_statistics/image/distribuzione_iban_" + datasetName + ".png")
     plt.show()
-    
-
 
     # WRITE ON FILE  ------------------------------------------------------------------
 
@@ -86,9 +102,9 @@ def main():
     f.write("\n\n ---- Dataset statistics ---- \n\n")
     f.write(dataset.describe(include='all').to_markdown())
     f.write("\n\n\n")
-    
-    f.write(" ---- Group Iban ---- \n\n")
-    f.write(stats.to_markdown())
+
+    f.write(" ---- Distribution on names and address per iban ---- \n\n")
+    f.write(names.to_markdown())
     f.write("\n\n\n")
 
     f.write("Number row: " + str(numberRow) + "\n")

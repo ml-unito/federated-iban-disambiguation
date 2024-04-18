@@ -1,0 +1,45 @@
+ ---- Preview Dataset ---- 
+
+|    | BIC      | AccountNumber            | CTRYbnk   | Name                                  | Address                    |   IsShared | Holder                                |
+|---:|:---------|:-------------------------|:----------|:--------------------------------------|:---------------------------|-----------:|:--------------------------------------|
+|  0 | WGJVECTH | ES1028750682641789280416 | EC        | Promociones Carballo y asociados S.L. | nan                        |          1 | Promociones Carballo y asociados S.L. |
+|  1 | WGJVECTH | ES1028750682641789280416 | EC        | Promociones Carballo y S.c            | nan                        |          1 | Promociones Carballo y asociados S.L. |
+|  2 | WGJVECTH | ES1028750682641789280416 | EC        | Mayo & Asociados S.L.L.               | nan                        |          1 | Mayo & Asociados S.L.L.               |
+|  3 | DZXVUGXO | ES6382504289266106640177 | UG        | Stone-Murphy                          | nan                        |          0 | Stone-Murphy                          |
+|  4 | DZXVUGXO | ES6382504289266106640177 | UG        | Stone Murphy                          | Hill courts Lyndashire  GB |          0 | Stone-Murphy                          |
+|  5 | DZXVUGXO | ES6382504289266106640177 | UG        | Stone Murphy                          | nan                        |          0 | Stone-Murphy                          |
+|  6 | DZXVUGXO | ES6382504289266106640177 | UG        | Stone Murphy                          | Lyndashire                 |          0 | Stone-Murphy                          |
+|  7 | MVHKBTCI | GB71PYUP79824342721639   | BT        | Gérard                                | nan                        |          0 | Gérard                                |
+|  8 | MVHKBTCI | GB71PYUP79824342721639   | BT        | Gérard                                | nan                        |          0 | Gérard                                |
+|  9 | MVHKBTCI | GB71PYUP79824342721639   | BT        | Gérard                                | nan                        |          0 | Gérard                                |
+
+
+
+ ---- Dataset statistics ---- 
+
+|        | BIC      | AccountNumber               | CTRYbnk   | Name   | Address   |    IsShared | Holder   |
+|:-------|:---------|:----------------------------|:----------|:-------|:----------|------------:|:---------|
+| count  | 6184     | 6184                        | 6161      | 6184   | 2428      | 6184        | 6184     |
+| unique | 1000     | 1000                        | 241       | 4490   | 2065      |  nan        | 1482     |
+| top    | GNUQDKDF | FR2353418588828510326885450 | VE        | Santos | Brazil    |  nan        | Rocha    |
+| freq   | 11       | 11                          | 70        | 13     | 41        |  nan        | 33       |
+| mean   | nan      | nan                         | nan       | nan    | nan       |    0.481404 | nan      |
+| std    | nan      | nan                         | nan       | nan    | nan       |    0.499694 | nan      |
+| min    | nan      | nan                         | nan       | nan    | nan       |    0        | nan      |
+| 25%    | nan      | nan                         | nan       | nan    | nan       |    0        | nan      |
+| 50%    | nan      | nan                         | nan       | nan    | nan       |    0        | nan      |
+| 75%    | nan      | nan                         | nan       | nan    | nan       |    1        | nan      |
+| max    | nan      | nan                         | nan       | nan    | nan       |    1        | nan      |
+
+
+ ---- Distribution on names and address per iban ---- 
+
+|    |   mean |   median |   std_dev |   skewness |     kurt |
+|---:|-------:|---------:|----------:|-----------:|---------:|
+|  0 |  8.612 |        9 |   4.40584 |   0.137287 | -1.12309 |
+
+
+Number row: 6184
+Number of unique IBAN: 1000
+Min Number of transaction: 2.0
+Max Number of transaction: 11.0
