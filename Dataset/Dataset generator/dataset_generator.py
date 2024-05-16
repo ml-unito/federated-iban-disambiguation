@@ -103,8 +103,8 @@ def companies_info_generator(country_code, num_companies):
     description = company_generator(country_code)
     if description not in companies:
       address = address_generator(country_code)
-    companies[description] = {"num_entry": 1, "address": address}
-    num_companies_generated += 1
+      companies[description] = {"num_entry": 1, "address": address}
+      num_companies_generated += 1
 
   return companies
 
@@ -258,27 +258,27 @@ def change_address_format(address, country_code):
 
 def data_generator(dataset):
   for i in tqdm(range(NUM_IBAN)):
-    # generazione BIC
+    # Generation of BIC code
     bic, bic_country_code = bic_manual_generator()
 
-    # generazione IBAN
+    # Generation of IBAN code and the number of related entries. Choice of whether it is a
+    # shared account and the number of associated holders.
     iban = iban_generator()
-
-    # generazione numero di entry per questo IBAN
     num_iban_entry = generate_entry_number()
-
-    # scelta se IBAN è condiviso e, in caso, da quanti titolari
     is_shared = np.random.randint(0,2) if num_iban_entry != 1 else 0
     if is_shared:
-      num_holders = np.random.randint(MIN_RANGE_HOLDERS, num_iban_entry+1 if num_iban_entry < MAX_RANGE_HOLDERS else MAX_RANGE_HOLDERS+1)
+      num_holders = np.random.randint(
+        MIN_RANGE_HOLDERS if MIN_RANGE_HOLDERS>1 else 2, 
+        num_iban_entry+1 if num_iban_entry < MAX_RANGE_HOLDERS else MAX_RANGE_HOLDERS+1
+        )
     else:
       num_holders = 1
 
-    # generazione nome società e eventuali indirizzi
+    # Generation of company names and any related addresses.
     country_code = np.random.choice(list(FAKER_COUNTRY_CODES.keys()))
     companies_info = companies_info_generator(country_code, num_companies=num_holders)
-
-    # scelta quante entry per ogni società
+    
+    # Choice number of entries for each company.
     if is_shared and num_holders != num_iban_entry:
       entry_to_generate = num_iban_entry - num_holders
       while entry_to_generate != 0:
@@ -289,6 +289,8 @@ def data_generator(dataset):
     elif not is_shared:
       companies_info[list(companies_info.keys())[0]]["num_entry"] = num_iban_entry
 
+    # Adding data generated in the dataset, possibly permuting company names
+    # and addresses.
     for name,info in companies_info.items():
       if info["num_entry"] != 1:
         aliases = generate_permutations(name, info["num_entry"], T, C, V, EDIT)
