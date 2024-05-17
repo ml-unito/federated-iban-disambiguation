@@ -3,7 +3,7 @@
   "num_iban": 1000,
   "min_range_entry": 2,
   "max_range_entry": 11,
-  "min_range_holders": 1,
+  "min_range_holders": 2,
   "max_range_holders": 4,
   "max_dim_datasets": 20,
   "V": 0.6,

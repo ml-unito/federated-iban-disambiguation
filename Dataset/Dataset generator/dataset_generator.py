@@ -59,6 +59,8 @@ def check_parameters():
     raise Exception("Exception: max_range_holders must be grater that min_range_holders.")
   if MIN_RANGE_HOLDERS <= 0 or MAX_RANGE_HOLDERS <=0:
     raise Exception("Exception: max_range_holders and min_range_holders must be positive number.")
+  if MIN_RANGE_HOLDERS < 2:
+    raise Exception("Exception: min_range_holders must be grater than 1, because it is used when IBAN is shared.")
 
 
 def bic_manual_generator():
@@ -268,7 +270,7 @@ def data_generator(dataset):
     is_shared = np.random.randint(0,2) if num_iban_entry != 1 else 0
     if is_shared:
       num_holders = np.random.randint(
-        MIN_RANGE_HOLDERS if MIN_RANGE_HOLDERS>1 else 2, 
+        MIN_RANGE_HOLDERS, 
         num_iban_entry+1 if num_iban_entry < MAX_RANGE_HOLDERS else MAX_RANGE_HOLDERS+1
         )
     else:
