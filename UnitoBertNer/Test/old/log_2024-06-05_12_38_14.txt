@@ -1,0 +1,33 @@
+Output Log 2024-06-05 12:38:14.409667
+
+Dataset loaded...
+
+
+
+Model: 
+<All keys matched successfully>
+Dataset groupped ...
+
+Dataset and model loaded...
+
+Dataset Preview
+
+|    | AccountNumber          | Name_0           | Name_1              |
+|---:|:-----------------------|:-----------------|:--------------------|
+|  0 | DE02163991583398218418 | May and Sons     | May                 |
+|  1 | DE03067655683926556999 | Dias Cohen S.A.  | Dias Cohen S.C.     |
+|  2 | DE03489038063571262449 | Dümmen Orange    | Dümmen Orange P.L.C |
+|  3 | DE04987381579902457805 | Mendoza and Sons | Mendoza Inds. Sons  |
+|  4 | DE05445128697557869021 | Jüttner          | Löffler KG          |
+
+Balanced dataset, IsShared statistics
+IsShared
+0    1034
+1     966
+dtype: int64
+Testing on test set...
+
+accuracy:0.846
+precision:0.981
+recall:0.694
+f1:0.813

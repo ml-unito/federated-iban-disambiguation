@@ -1,0 +1,33 @@
+Output Log 2024-06-05 12:40:09.964909
+
+Dataset loaded...
+
+
+
+Model: 
+<All keys matched successfully>
+Dataset groupped ...
+
+Dataset and model loaded...
+
+Dataset Preview
+
+|    | AccountNumber          | Name_0                            | Name_1                            |
+|---:|:-----------------------|:----------------------------------|:----------------------------------|
+|  0 | DE02268822904638342004 | Slagmolen & Feltzer               | Meyer Groep                       |
+|  1 | DE02536776288713024370 | Johnson, Rivera and Baker         | Johnson,- Rivera Baker            |
+|  2 | DE07627294567912325373 | Seidel Rosemann Stiftung & Co. KG | Seidel Rosemann Stiftung & .Co KG |
+|  3 | DE28850062196709039784 | Adryaens & Nollee                 | Adryaens - &-Nollee               |
+|  4 | DE30301561920355027549 | Anabel Coello Mínguez S.Coop.     | Anabel Coello Mínguez S.Coop.     |
+
+Balanced dataset, IsShared statistics
+IsShared
+0    44
+1    56
+dtype: int64
+Testing on test set...
+
+accuracy:0.99
+precision:1.0
+recall:0.982
+f1:0.991

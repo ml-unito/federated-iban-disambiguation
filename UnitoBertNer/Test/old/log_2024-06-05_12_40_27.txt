@@ -1,0 +1,33 @@
+Output Log 2024-06-05 12:40:27.225001
+
+Dataset loaded...
+
+
+
+Model: 
+<All keys matched successfully>
+Dataset groupped ...
+
+Dataset and model loaded...
+
+Dataset Preview
+
+|    | AccountNumber          | Name_0               | Name_1               |
+|---:|:-----------------------|:---------------------|:---------------------|
+|  0 | DE02076870460115154458 | Bauer-Hall           | Fry-Bailey           |
+|  1 | DE02223875448295526194 | van der Pol BV       | van der Pol BV       |
+|  2 | DE19955575817900391961 | Porto - EI           | Carvalho             |
+|  3 | DE43480447326234138827 | Coffey-Anderson      | Coffey Anderson      |
+|  4 | DE45206914733673121674 | Banco Oliver S.L.N.E | Banco Oliver S.L.N.E |
+
+Balanced dataset, IsShared statistics
+IsShared
+0    57
+1    43
+dtype: int64
+Testing on test set...
+
+accuracy:1.0
+precision:1.0
+recall:1.0
+f1:1.0

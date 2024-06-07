@@ -1,0 +1,33 @@
+Output Log 2024-06-05 12:39:59.728327
+
+Dataset loaded...
+
+
+
+Model: 
+<All keys matched successfully>
+Dataset groupped ...
+
+Dataset and model loaded...
+
+Dataset Preview
+
+|    | AccountNumber          | Name_0                  | Name_1                   |
+|---:|:-----------------------|:------------------------|:-------------------------|
+|  0 | DE10036123358051817326 | Howell-Walsh            | Howell- Walsh S.c        |
+|  1 | DE10412309252741838645 | Reijers Groep           | Reijers Grp.             |
+|  2 | DE16330613630013939464 | Aragão Gonçalves S/A    | da Luz                   |
+|  3 | DE29299066448082687896 | Ramos, Gray and Stanton | Ramos, Gray Inds Stanton |
+|  4 | DE29638709311340980593 | Veltroni Group          | Veltroni Gp. L.t.d.      |
+
+Balanced dataset, IsShared statistics
+IsShared
+0    60
+1    40
+dtype: int64
+Testing on test set...
+
+accuracy:0.97
+precision:0.951
+recall:0.975
+f1:0.963

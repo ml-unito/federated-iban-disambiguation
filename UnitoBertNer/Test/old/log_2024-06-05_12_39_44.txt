@@ -1,0 +1,33 @@
+Output Log 2024-06-05 12:39:44.899577
+
+Dataset loaded...
+
+
+
+Model: 
+<All keys matched successfully>
+Dataset groupped ...
+
+Dataset and model loaded...
+
+Dataset Preview
+
+|    | AccountNumber          | Name_0                                   | Name_1                        |
+|---:|:-----------------------|:-----------------------------------------|:------------------------------|
+|  0 | DE06423163554892700712 | Cibin e figli                            | Cibin e figli                 |
+|  1 | DE10206314811566363516 | Pizzetti-Odescalchi Group                | Pizzetti  Odescalchi Group    |
+|  2 | DE11338122282306243463 | Giammusso-Busoni s.r.l.                  | Salvemini s.r.l.              |
+|  3 | DE34693730299142917451 | Collodi, Vergassola e Monteverdi e figli | Collodi, Vergassola e e figli |
+|  4 | DE35082568310383934313 | Baldwin-Miller                           | Baldwin.Miller Co.            |
+
+Balanced dataset, IsShared statistics
+IsShared
+0    48
+1    52
+dtype: int64
+Testing on test set...
+
+accuracy:0.98
+precision:0.981
+recall:0.981
+f1:0.981
