@@ -34,7 +34,7 @@ def test_account_number(dataset, num_errors):
 def test_sharing_and_address(dataset, num_errors):
   ''' Checking for inconsistencies on sharing and holders. '''
 
-  for account_number, group in dataset.groupby(["AccountNumber"]):
+  for id, group in dataset.groupby(["AccountNumber","BIC"]):
     shared_values = set(group["IsShared"])
     if len(shared_values) > 1 :
       num_errors += 1
