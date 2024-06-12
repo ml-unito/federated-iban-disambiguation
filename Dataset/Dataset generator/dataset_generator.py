@@ -72,6 +72,14 @@ def check_parameters():
     raise Exception("Exception: the probability of an address being generated must be a number between 0 and 1.")
 
 
+def create_faker_objects():
+  faker_objects = dict()
+  for country_code in tqdm(FAKER_COUNTRY_CODES, desc="Faker objects generation"):
+    faker_objects[country_code] = Faker(country_code)
+
+  return faker_objects
+
+
 def bic_manual_generator():
   country_code = random.choice(BIC_COUNTRY_CODES)
   bank_code = "".join([random.choice(string.ascii_uppercase) for _ in range(4)])
@@ -79,19 +87,19 @@ def bic_manual_generator():
   return bank_code + country_code + location_code, country_code
 
 
-def iban_generator():
+def iban_generator(faker_objects):
   country_code = random.choice(list(FAKER_COUNTRY_CODES.keys()))
-  fake = Faker(country_code)
+  fake = faker_objects[country_code]
   return fake.iban()
 
 
-def company_generator(country_code):
-  fake = Faker(country_code)
+def company_generator(faker_objects, country_code):
+  fake = faker_objects[country_code]
   return fake.company()
 
 
-def address_generator(country_code):
-  fake = Faker(country_code)
+def address_generator(faker_objects, country_code):
+  fake = faker_objects[country_code]
   address = fake.address()
 
   is_valid = 0
@@ -104,16 +112,16 @@ def address_generator(country_code):
   return address
 
 
-def companies_info_generator(country_code, num_companies):
+def companies_info_generator(faker_objects, country_code, num_companies):
   ''' Generates company names and their addresses, based on the country code
     and the number of companies specified in parameters.'''
   companies = dict()
   num_companies_generated = 0
 
   while num_companies_generated != num_companies:
-    description = company_generator(country_code)
+    description = company_generator(faker_objects, country_code)
     if description not in companies:
-      address = address_generator(country_code)
+      address = address_generator(faker_objects, country_code)
       companies[description] = {"num_entry": 1, "address": address}
       num_companies_generated += 1
 
@@ -267,14 +275,14 @@ def change_address_format(address, country_code):
   return address
 
 
-def data_generator(dataset):
-  for i in tqdm(range(NUM_IBAN)):
+def data_generator(dataset, faker_objects):
+  for i in tqdm(range(NUM_IBAN),desc="Dataset generation"):
     # Generation of BIC code
     bic, bic_country_code = bic_manual_generator()
 
     # Generation of IBAN code and the number of related entries. Choice of whether it is a
     # shared account and the number of associated holders.
-    iban = iban_generator()
+    iban = iban_generator(faker_objects)
     num_iban_entry = generate_entry_number()
     is_shared = np.random.choice([0,1], p=[1-PROB_SHARED_ACCOUNT, PROB_SHARED_ACCOUNT]) if num_iban_entry != 1 else 0
     if is_shared:
@@ -287,7 +295,7 @@ def data_generator(dataset):
 
     # Generation of company names and any related addresses.
     country_code = np.random.choice(list(FAKER_COUNTRY_CODES.keys()))
-    companies_info = companies_info_generator(country_code, num_companies=num_holders)
+    companies_info = companies_info_generator(faker_objects, country_code, num_companies=num_holders)
     
     # Choice number of entries for each company.
     if is_shared and num_holders != num_iban_entry:
@@ -349,8 +357,9 @@ def print_dataset(dataset, maxLine = 20):
 
 
 def main():
-  emptyDataset = create_dataset()
-  dataset = data_generator(emptyDataset)
+  empty_dataset = create_dataset()
+  faker_objects = create_faker_objects()
+  dataset = data_generator(empty_dataset, faker_objects)
   path = get_dataset_filePath()
   save_dataset(dataset, path)
 
