@@ -30,6 +30,9 @@ MAX_DIM_DATASETS = parameters["max_dim_datasets"]
 # numero di iban
 NUM_IBAN = parameters["num_iban"]
 
+PROB_SHARED_ACCOUNT = parameters["prob_shared_account"]
+PROB_ADDRESS = parameters["prob_address"]
+
 # range numero entry per iban
 MIN_RANGE_ENTRY = parameters["min_range_entry"]
 MAX_RANGE_ENTRY = parameters["max_range_entry"]
@@ -61,6 +64,12 @@ def check_parameters():
     raise Exception("Exception: max_range_holders and min_range_holders must be positive number.")
   if MIN_RANGE_HOLDERS < 2:
     raise Exception("Exception: min_range_holders must be grater than 1, because it is used when IBAN is shared.")
+  
+  # Check of probability values
+  if PROB_SHARED_ACCOUNT > 1 or PROB_SHARED_ACCOUNT < 0:
+    raise Exception("Exception: the probability of an account being shared must be a number between 0 and 1.")
+  if PROB_ADDRESS > 1 or PROB_ADDRESS < 0:
+    raise Exception("Exception: the probability of an address being generated must be a number between 0 and 1.")
 
 
 def bic_manual_generator():
@@ -267,7 +276,7 @@ def data_generator(dataset):
     # shared account and the number of associated holders.
     iban = iban_generator()
     num_iban_entry = generate_entry_number()
-    is_shared = np.random.randint(0,2) if num_iban_entry != 1 else 0
+    is_shared = np.random.choice([0,1], p=[1-PROB_SHARED_ACCOUNT, PROB_SHARED_ACCOUNT]) if num_iban_entry != 1 else 0
     if is_shared:
       num_holders = np.random.randint(
         MIN_RANGE_HOLDERS, 
@@ -297,13 +306,13 @@ def data_generator(dataset):
       if info["num_entry"] != 1:
         aliases = generate_permutations(name, info["num_entry"], T, C, V, EDIT)
         for alias in aliases:
-          if np.random.choice([0,1], p=[0.60,0.40]):
+          if np.random.choice([0,1], p=[1-PROB_ADDRESS,PROB_ADDRESS]):
             new_address = change_address_format(companies_info[name]["address"], country_code)
             dataset.loc[len(dataset.index)] = [bic, iban, bic_country_code, alias, new_address, is_shared, name]
           else:
             dataset.loc[len(dataset.index)] = [bic, iban, bic_country_code, alias, "", is_shared, name]
       else:
-        address = change_address_format(companies_info[name]["address"], country_code) if np.random.choice([0,1], p=[0.60,0.40]) else ""
+        address = change_address_format(companies_info[name]["address"], country_code) if np.random.choice([0,1], p=[1-PROB_ADDRESS,PROB_ADDRESS]) else ""
         dataset.loc[len(dataset.index)] = [bic, iban, bic_country_code, name, address, is_shared, name]
 
   return dataset
