@@ -90,7 +90,7 @@ def bic_manual_generator():
 def iban_generator(faker_objects):
   country_code = random.choice(list(FAKER_COUNTRY_CODES.keys()))
   fake = faker_objects[country_code]
-  return fake.iban()
+  return fake.unique.iban()
 
 
 def company_generator(faker_objects, country_code):
