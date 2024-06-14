@@ -1,0 +1,154 @@
+Dataset: ./anonBench.csv
+
+Preview Dataset
+
+|    | AccountNumber   |   IsShared |   cluster | Holder   |
+|---:|:----------------|-----------:|----------:|:---------|
+|  0 | iban1           |          1 |         1 | a1       |
+|  1 | iban1           |          1 |         1 | a1       |
+
+
+Dataset statistics
+
+
+|        | AccountNumber   |    IsShared |    cluster | Holder   |
+|:-------|:----------------|------------:|-----------:|:---------|
+| count  | 8104            | 8103        | 2245       | 8104     |
+| unique | 1000            |  nan        |  nan       | 1708     |
+| top    | iban415         |  nan        |  nan       | a1213    |
+| freq   | 143             |  nan        |  nan       | 139      |
+| mean   | nan             |    0.277922 |    6.42049 | nan      |
+| std    | nan             |    0.448002 |   13.7814  | nan      |
+| min    | nan             |    0        |    1       | nan      |
+| 25%    | nan             |    0        |    1       | nan      |
+| 50%    | nan             |    0        |    1       | nan      |
+| 75%    | nan             |    1        |    3       | nan      |
+| max    | nan             |    1        |   98       | nan      |
+
+
+Index(['AccountNumber', 'IsShared', 'cluster', 'Holder'], dtype='object')
+Number row: 8104
+Number of unique IBAN: 1000
+Min Number of transaction: 2.0
+Max Number of transaction: 143.0
+
+
+
+STATS IBANS: 
+Statistics on number of transaction: 
+
+Number of IBAN		 Number of tranòsaction
+Group number iban: 143 	transaction: 1
+Group number iban: 141 	transaction: 1
+Group number iban: 130 	transaction: 1
+Group number iban: 111 	transaction: 1
+Group number iban: 103 	transaction: 1
+Group number iban: 102 	transaction: 1
+Group number iban: 95 	transaction: 1
+Group number iban: 85 	transaction: 1
+Group number iban: 79 	transaction: 1
+Group number iban: 78 	transaction: 1
+Group number iban: 71 	transaction: 1
+Group number iban: 69 	transaction: 1
+Group number iban: 68 	transaction: 1
+Group number iban: 64 	transaction: 1
+Group number iban: 61 	transaction: 1
+Group number iban: 58 	transaction: 1
+Group number iban: 56 	transaction: 1
+Group number iban: 54 	transaction: 1
+Group number iban: 51 	transaction: 1
+Group number iban: 50 	transaction: 1
+Group number iban: 48 	transaction: 1
+Group number iban: 47 	transaction: 1
+Group number iban: 45 	transaction: 1
+Group number iban: 44 	transaction: 1
+Group number iban: 40 	transaction: 1
+Group number iban: 39 	transaction: 1
+Group number iban: 29 	transaction: 1
+Group number iban: 24 	transaction: 1
+Group number iban: 23 	transaction: 1
+Group number iban: 22 	transaction: 1
+Group number iban: 21 	transaction: 1
+Group number iban: 19 	transaction: 1
+Group number iban: 104 	transaction: 2
+Group number iban: 80 	transaction: 2
+Group number iban: 67 	transaction: 2
+Group number iban: 57 	transaction: 2
+Group number iban: 52 	transaction: 2
+Group number iban: 46 	transaction: 2
+Group number iban: 38 	transaction: 2
+Group number iban: 36 	transaction: 2
+Group number iban: 31 	transaction: 2
+Group number iban: 18 	transaction: 2
+Group number iban: 8 	transaction: 2
+Group number iban: 70 	transaction: 3
+Group number iban: 63 	transaction: 3
+Group number iban: 35 	transaction: 3
+Group number iban: 34 	transaction: 3
+Group number iban: 32 	transaction: 3
+Group number iban: 20 	transaction: 3
+Group number iban: 17 	transaction: 3
+Group number iban: 33 	transaction: 4
+Group number iban: 30 	transaction: 4
+Group number iban: 28 	transaction: 4
+Group number iban: 16 	transaction: 4
+Group number iban: 9 	transaction: 4
+Group number iban: 27 	transaction: 6
+Group number iban: 15 	transaction: 6
+Group number iban: 26 	transaction: 7
+Group number iban: 25 	transaction: 7
+Group number iban: 6 	transaction: 8
+Group number iban: 7 	transaction: 9
+Group number iban: 12 	transaction: 11
+Group number iban: 14 	transaction: 12
+Group number iban: 5 	transaction: 14
+Group number iban: 13 	transaction: 15
+Group number iban: 11 	transaction: 21
+Group number iban: 10 	transaction: 36
+Group number iban: 4 	transaction: 54
+Group number iban: 3 	transaction: 193
+Group number iban: 2 	transaction: 506
+
+
+
+Statistics on holder (ONLY SHARED)
+
+Distribution on Holders per iban:
+|    |   min |   max |   median |   mode |    mean |   std_dev |   skewness |    kurt |
+|---:|------:|------:|---------:|-------:|--------:|----------:|-----------:|--------:|
+|  0 |     2 |    98 |        2 |      2 | 4.88649 |    10.212 |    6.01626 | 43.1611 |
+
+STATS HOLDER: 
+Group holder number		 Total number occurrences
+holder: 11 	Number occurrence: 1
+holder: 30 	Number occurrence: 1
+holder: 29 	Number occurrence: 1
+holder: 7 	Number occurrence: 1
+holder: 28 	Number occurrence: 1
+holder: 22 	Number occurrence: 1
+holder: 19 	Number occurrence: 1
+holder: 98 	Number occurrence: 1
+holder: 62 	Number occurrence: 1
+holder: 38 	Number occurrence: 1
+holder: 12 	Number occurrence: 1
+holder: 25 	Number occurrence: 1
+holder: 13 	Number occurrence: 1
+holder: 51 	Number occurrence: 1
+holder: 14 	Number occurrence: 1
+holder: 10 	Number occurrence: 2
+holder: 8 	Number occurrence: 2
+holder: 9 	Number occurrence: 2
+holder: 5 	Number occurrence: 3
+holder: 6 	Number occurrence: 4
+holder: 4 	Number occurrence: 8
+holder: 3 	Number occurrence: 22
+holder: 2 	Number occurrence: 127
+holder: 1 	Number occurrence: 815
+
+
+
+
+Is Shared Stats:
+Num Shared: 189
+Num Not Shared: 811
+Number ibans: 1000

@@ -48,6 +48,18 @@ EDIT = parameters["EDIT"]   # Edit distance ---> controlla l'avvicinamento con l
 
 BIC_COUNTRY_CODES = parameters["bic_country_codes"]
 FAKER_COUNTRY_CODES = parameters["faker_country_codes"]
+STATS_FROM_DATASETS = parameters["stats_from_dataset"]
+
+if STATS_FROM_DATASETS:
+  try:
+    with open('./config/statistics.json', "r") as data_file:
+      statistics = json.load(data_file)
+      
+    IBAN_VALUES = statistics["iban_values"]
+    IBAN_PROBA = statistics["iban_proba"]
+  except:
+    print("Exception: can't read statistics.json file. It must be generated with extract_statistics.py")
+    exit()
 
 
 
@@ -130,12 +142,16 @@ def companies_info_generator(faker_objects, country_code, num_companies):
 
 def generate_entry_number():
   """ Random generation of the number of entries to be included in the dataset for a specific iban """
-  type_entry_number = np.random.choice(["low","high"], p=[0.2,0.8])
-  if type_entry_number == "low":
-    num = np.random.randint(MIN_RANGE_ENTRY, MAX_RANGE_ENTRY//3)
+  
+  if not STATS_FROM_DATASETS:
+    type_entry_number = np.random.choice(["low","high"], p=[0.2,0.8])
+    if type_entry_number == "low":
+      num = np.random.randint(MIN_RANGE_ENTRY, MAX_RANGE_ENTRY//3)
+    else:
+      num = np.random.randint(MAX_RANGE_ENTRY//3, MAX_RANGE_ENTRY+1)
+    return num
   else:
-    num = np.random.randint(MAX_RANGE_ENTRY//3, MAX_RANGE_ENTRY+1)
-  return num
+    return np.random.choice(IBAN_VALUES, p=IBAN_PROBA)
 
 
 def get_address_number(info_address, country_code):
@@ -332,13 +348,13 @@ def create_dataset():
 
 def save_dataset(dataset, filePath):
   """ Save the dataset generated """
-  dataset.to_excel(filePath)
+  dataset.to_csv(filePath)
 
 
 def get_dataset_filePath():
   """ return a new dataset name including actual datetime """
   now = datetime.now()
-  return "./output/dataset_" + now.strftime("%d-%m-%Y_%H-%M-%S") + ".xlsx"
+  return "./output/dataset_" + now.strftime("%d-%m-%Y_%H-%M-%S") + ".csv"
 
 
 def print_dataset(dataset, maxLine = 20):
