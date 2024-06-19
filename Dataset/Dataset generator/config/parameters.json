@@ -8,7 +8,6 @@
   "max_range_holders": 4,
   "prob_shared_account": 0.5,
   "prob_address": 0.4,
-  "max_dim_datasets": 20,
   "V": 0.6,
   "EDIT":2,
   "T": 0.08,
