@@ -24,9 +24,6 @@ with open('./config/parameters.json', "r") as data_file:
 
 PATH_OUTPUT_FILE = parameters["path_output_file"]
 
-# dimensione massima datasets
-MAX_DIM_DATASETS = parameters["max_dim_datasets"]
-
 # numero di iban
 NUM_IBAN = parameters["num_iban"]
 
@@ -64,8 +61,6 @@ if STATS_FROM_DATASETS:
 
 
 def check_parameters():
-  if MAX_DIM_DATASETS <= 0:
-    raise Exception("Exception: max_dim_datasets must be positive number.")
   if MAX_RANGE_ENTRY < MIN_RANGE_ENTRY:
     raise Exception("Exception: max_range_entry must be grater that min_range_entry.")
   if MIN_RANGE_ENTRY <= 0 or MAX_RANGE_ENTRY <=0:
