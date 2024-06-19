@@ -1,0 +1,202 @@
+,BIC,AccountNumber,CTRYbnk,Name,Address,IsShared,Holder
+0,CNDNIEDW,ES5236823101530736400904,IE,van der Linden & Hehl,,1,van der Linden & Hehl
+1,CNDNIEDW,ES5236823101530736400904,IE,Stichting Feenstra S.P.A.,3834CCMidlum,1,Stichting Feenstra
+2,FQLRCMPX,IT58B0706475776394429299122,CM,Lecoq,,1,Lecoq
+3,FQLRCMPX,IT58B0706475776394429299122,CM,Pages Diaz,"25 Dupuy chmin Sophie Lévêque,Dupuy",1,Pages Diaz SARL
+4,FQLRCMPX,IT58B0706475776394429299122,CM,Marchal-Grp.,,1,Marchal
+5,FQLRCMPX,IT58B0706475776394429299122,CM,Lecoq .S.A.S.SPA,,1,Lecoq S.A.S.
+6,FXDMGSRB,GB95IXYX91019138261235,GS,Ibán Valderrama Ferrán,,0,Ibán Valderrama Ferrán S.Coop.
+7,FYDTKWTP,IT27U9737911086794302085162,KW,S.A Paz,Brazil,1,da Paz
+8,FYDTKWTP,IT27U9737911086794302085162,KW,Caldeira.Peixoto,,1,Caldeira Peixoto S.A.
+9,FYDTKWTP,IT27U9737911086794302085162,KW,  - ampos,,1,Campos
+10,VNMKLYGN,GB87GMVJ10926911136330,LY,de Bock & der Kijnder,Wijcen Joshuasteeg Wijchen,1,de Bock & der Kijnder
+11,VNMKLYGN,GB87GMVJ10926911136330,LY,Royal Boddaugh,,1,Royal Boddaugh
+12,VNMKLYGN,GB87GMVJ10926911136330,LY,Koninklijke van der Strigt,,1,Koninklijke van der Strigt
+13,VNMKLYGN,GB87GMVJ10926911136330,LY,De Heus Diervoeders,Nethelands,1,De Heus Diervoeders
+14,JDDEGBTV,NL45FSFE1306012078,GB,Hermanos Bustos SA,,0,Hermanos Bustos S.A.
+15,HGCPMOPU,ES8738224417745768315777,MO,Mallet S.A.,05378 opez,0,Mallet S.A.
+16,VRYZLSBF,IT58Y8648077486650146679483,LS,Smith  Clark,Joshuaport United Kingdom,0,Smith-Clark
+17,RTLAGNQF,DE32548652723637433367,GN,Hayes Stone,United States,1,Hayes-Stone
+18,RTLAGNQF,DE32548652723637433367,GN,Copeland-,New Sethstad US,1,Copeland Ltd
+19,WCMLAFXF,IT32R6442007758362302350215,AF,Cardoso,,1,Cardoso
+20,WCMLAFXF,IT32R6442007758362302350215,AF,Ribeiro,,1,Ribeiro
+21,UKQFSKI1,GB57NHQM57923964343184,SK,Distribuciones Calzada & Asociados S.Coop.,,1,Distribuciones Calzada & Asociados S.Coop.
+22,UKQFSKI1,GB57NHQM57923964343184,SK,"Terrón &,Asociados S.C.",,1,Terrón & Asociados S.C.P
+23,AAPWITEA,NL70TSGM4125822046,IT,Triodos Bank,Warmond/Rayanweg Warmond,1,Triodos Bank
+24,AAPWITEA,NL70TSGM4125822046,IT,van Roijen Groep,,1,van Roijen Groep
+25,AAPWITEA,NL70TSGM4125822046,IT,van der Horst & Brands,Berg en Dal NL,1,van der Horst & Brands
+26,AAPWITEA,NL70TSGM4125822046,IT,Koninklijke de Marduras,,1,Koninklijke de Marduras
+27,HZBQSRWK,GB29OZAU45079010140488,SR,Aragã - ,Nova Gameleira BR,0,Aragão
+28,HFXFCHRJ,ES9331187898628005193744,CH,Hermanos Herranz S.A.,,1,Hermanos Herranz S.A.
+29,HFXFCHRJ,ES9331187898628005193744,CH,Grupo Gárate S.L.,Lugo Spain,1,Grupo Gárate S.L.
+30,HFXFCHRJ,ES9331187898628005193744,CH,Inversiones Taboada y asociados S.Coop.,Spain,1,Inversiones Taboada y asociados S.Coop.
+31,KSUMATPA,GB65CFNW96059783622176,AT,Correia,"Vale de Pires 78,Marieta 3ª Seção  07547630 Pires  PE",1,Correia
+32,KSUMATPA,GB65CFNW96059783622176,AT,da Luz Almeida - EI,Maria Gretti Brazil,1,da Luz Almeida - EI
+33,KSUMATPA,GB65CFNW96059783622176,AT,Cavalcanti,Feira Ana Clara Lopes 91 Vila Fumec 26589-434 Rezende de Barbosa RJ,1,Cavalcanti
+34,HHDTNOEW,DE90070108645993249906,NO,Rodrigues,,0,Rodrigues
+35,IJLIKRKE,NL06ANKI2416577355,KR,Carvalho e Filhos,Camponesa 2ª Seção,0,Carvalho e Filhos
+36,MXIHTKXO,IT33J9819551497114581587169,TK,de Vrome Groep,,1,de Vrome Groep
+37,MXIHTKXO,IT33J9819551497114581587169,TK,Vial NV- S.d.f,,1,Vial NV
+38,TMWVEEGW,IT72I0611821944493143017294,EE,Alemany y S.p.A.,,1,Alemany y Carreño S.A.
+39,TMWVEEGW,IT72I0611821944493143017294,EE,Servicios UR- S.C.,,1,Servicios UR S.A.
+40,JBZPPLS0,ES1541176990808204741939,PL,Omar  Villalonga S.L.N.E,,0,Omar Villalonga Jordán S.L.N.E
+41,VNEJCVRJ,GB52APOE15361377185564,CV,Bejarano y asociados S.C.,Callejón umberto Cáceres 88 Apt. 04 León 01455,1,Bejarano y asociados S.C.P
+42,VNEJCVRJ,GB52APOE15361377185564,CV,Mate y asociados S.Coop.,41479 Pasadizo de Toni Mendoza 38 Puerta Santa Cruz de Tenerife,1,Mate y asociados S.Coop.
+43,VNEJCVRJ,GB52APOE15361377185564,CV,Agullo y asociados S.Coop.,,1,Agullo y asociados S.Coop.
+44,VNEJCVRJ,GB52APOE15361377185564,CV,Adolfo Heras Carrillo S.Coop.,,1,Adolfo Heras Carrillo S.Coop.
+45,SWPXKYVF,GB61BVKR14925635333735,KY,"Smith, Baker Inds Jones",,0,"Smith, Baker and Jones"
+46,PLOASJYS,IT44A2947226336917071240954,SJ,Dufour Bonnet S.A.S.,,1,Dufour Bonnet S.A.S.
+47,PLOASJYS,IT44A2947226336917071240954,SJ,Pichon,,1,Pichon SA
+48,QZPYBOVC,IT78G7520873395561720414280,BO,Dias  .S.P.A,Favela de Castro-20  Pirineus  53755-394 MartinsCE,0,Dias S.A.
+49,RLBANREO,ES3312774339693143013246,NR,Green Ltd ,,0,Green Ltd
+50,GXWPGLQY,DE77615927934752358274,GL,Hartung,Weißenfels-Kadeplatz  Weißenfels,1,Hartung
+51,GXWPGLQY,DE77615927934752358274,GL,Hauffer Bähr Stiftung & Co. KG,,1,Hauffer Bähr Stiftung & Co. KG
+52,VLBMERIW,IT50A6192692227315106150432,ER,Koch KGaA,,0,Koch KGaA
+53,MIUNGDTQ,GB32IXDX15994331415350,GD,Jones.Reed,Port Michaelchester US,0,Jones-Reed
+54,OGIDZWNV,DE75525914509517857068,ZW,Knight and Sons,,1,Knight and Sons
+55,OGIDZWNV,DE75525914509517857068,ZW,Harding-Morris,E5U 9SD  South Cameronberg,1,Harding-Morris
+56,TECSPAKJ,GB16AFND90341899125239,PA,Patberg Ents.,85102 Helmstedt,0,Patberg
+57,TCOUEHJE,FR8787856157528179864358471,EH,Grupo Pino-S.P.A,,1,Grupo Pino S.A.
+58,TCOUEHJE,FR8787856157528179864358471,EH,Grupo Blanch Società per Azioni,Paseo de Evangelina Bertrán 06097/Guipúzcoa  Spain,1,Grupo Blanch S.A.
+59,WHILBWFE,GB77MASO54987784652256,BW,van Saksen & van Horst,Netherlands,0,van Saksen & van der Horst
+60,MTWYNOH0,FR8903614776012383115248146,NO,Rust/GmbH S.C.A.R.L,,1,Rust GmbH
+61,MTWYNOH0,FR8903614776012383115248146,NO,Noack,,1,Noack
+62,MTWYNOH0,FR8903614776012383115248146,NO,Hellwig,,1,Hellwig
+63,MTWYNOH0,FR8903614776012383115248146,NO,Segebahn,,1,Segebahn
+64,HVJLUMMS,NL36FNYQ6214122018,UM,Grau y asociados S.L.N.E,,0,Grau y asociados S.L.N.E
+65,FMGZGMCC,GB35UBAO61739442958473,GM,Coppola e figli,,1,Coppola e figli
+66,FMGZGMCC,GB35UBAO61739442958473,GM,Ceri-Finotto e figli,,1,Ceri-Finotto e figli
+67,WNXSCZIL,NL33TPJY8673196586,CZ,Grupo Carrillo SA,,1,Grupo Carrillo S.A.
+68,WNXSCZIL,NL33TPJY8673196586,CZ,Hermanos  Dominguez,C. de Cirino Seco/50703Lugo Spain,1,Hermanos Dominguez S.A.D
+69,IAQHSSSR,GB66YQCX72229563053724,SS,Mainfreight,,0,Mainfreight
+70,WXVGCZZR,DE02265934485228033995,CZ,Sweco SAPA,***,1,Sweco
+71,WXVGCZZR,DE02265934485228033995,CZ,Detailresult,Schinnen Netherlands,1,Detailresult
+72,WXVGCZZR,DE02265934485228033995,CZ,Wutke BV,,1,Wutke BV
+73,OIZNBNZO,IT72U2248395918085498334207,BN,"Green, Smith Industries Diaz",&&&&,0,"Green, Smith and Diaz"
+74,OBYPBOYX,GB28KEZP67807313675866,BO,Aldobrandi e figli,,1,Aldobrandi e figli
+75,OBYPBOYX,GB28KEZP67807313675866,BO,Ferrara Gabba .e figli,Appartamento 9-Incrocio Galeati  Agnosine,1,Ferrara-Gabba e figli
+76,OBYPBOYX,GB28KEZP67807313675866,BO,"Combi, Camiscione e Emo Group",Contrada Santoro TorinoItalia,1,"Combi, Camiscione e Emo Group"
+77,GYOITGHR,FR2164573618307285008709142,TG,Marchal Tanguy SA,"46 Fischer,avenue de Faure  Fischer",1,Marchal Tanguy SA
+78,GYOITGHR,FR2164573618307285008709142,TG,Peron,France,1,Peron
+79,AXIVIEAW,NL66BBUK8352669828,IE,David Fleury/,,0,David Fleury SA
+80,RCRJGYUN,IT54C3558510024581422933162,GY,Servicios Españolas S.Com.,Acceso Mamen Torrecilla 09017 Ciudad/ES,1,Servicios Españolas S.Com.
+81,RCRJGYUN,IT54C3558510024581422933162,GY,Amaya & Asociados,,1,Amaya & Asociados S.A.
+82,XKMPQAGB,GB21FXAN89120438466867,QA,Söding e.G. SA,,0,Söding e.G.
+83,YLXBASJK,ES7698840921743223076461,AS,van Orleans,ynkedreef  Garsthuizen Garsthuizen-Netherlands,1,van Orleans BV
+84,YLXBASJK,ES7698840921743223076461,AS,Dow Benelux,,1,Dow Benelux
+85,YLXBASJK,ES7698840921743223076461,AS,Lijn BV Inds.,,1,Lijn BV
+86,YLXBASJK,ES7698840921743223076461,AS,CBRE Group,,1,CBRE Group
+87,VNEYGEST,DE79838712789474541818,GE,Rezende Limited,ALEsplanada Isadora Freitas Conjunto Bonsucsso,0,Rezende
+88,KDATNOTJ,NL55BNHH7721541724,NO,Etzold Rosemann OHG mbH,,0,Etzold Rosemann OHG mbH
+89,OYLUBJKO,IT84W9360944864124281005056,BJ,Berengario Group,--,1,Berengario Group
+90,OYLUBJKO,IT84W9360944864124281005056,BJ,"Mazzanti, Bocca e Caccianemico e figli","Piazza Manuel Piano 6,Collecalcioni-Italia",1,"Mazzanti, Bocca e Caccianemico e figli"
+91,OYLUBJKO,IT84W9360944864124281005056,BJ,Benedetti-Ferragamo Group,,1,Benedetti-Ferragamo Group
+92,MXQNAZG1,IT34F5265396958175608571808,AZ,Breton SNC,,0,Breton
+93,EVZKKHNR,GB53ZANL05840511068246,KH,da Cunha Cunha Ltda.,Guarani Brazil,1,da Cunha Cunha Ltda.
+94,EVZKKHNR,GB53ZANL05840511068246,KH,Vieira da Cruz - EI,Santa Rita BR,1,Vieira da Cruz - EI
+95,EVZKKHNR,GB53ZANL05840511068246,KH,Peixoto S.A. Co.,,1,Peixoto S.A.
+96,EVZKKHNR,GB53ZANL05840511068246,KH,Monteiro/da Luz,,1,Monteiro da Luz Ltda.
+97,NDYYECKG,ES9552921009280402962427,EC,Melchor Sobrino Segura,,0,Melchor Sobrino Segura S.A.
+98,NUSESNAX,GB77GZRK19058060734279,SN,Kusch,,1,Kusch
+99,NUSESNAX,GB77GZRK19058060734279,SN,Röhrdanz Zirme GbR,,1,Röhrdanz Zirme GbR
+100,NUSESNAX,GB77GZRK19058060734279,SN,Scheel AG & Comp.,,1,Scheel AG & Co. KGaA
+101,NUSESNAX,GB77GZRK19058060734279,SN,Heinrich GmbH & Co. KG,,1,Heinrich GmbH & Co. KG
+102,ORBFVAKS,ES8579159723460456756343,VA,Ortmann  Corp,30388 Rosenheim,0,Ortmann
+103,IBSXOMOH,IT78J8767416728046021214995,OM,Cichorius e.V.,,1,Cichorius e.V.
+104,IBSXOMOH,IT78J8767416728046021214995,OM,Franke KG,,1,Franke KG
+105,IBSXOMOH,IT78J8767416728046021214995,OM,Renner Dietz GmbH,,1,Renner Dietz GmbH
+106,IBSXOMOH,IT78J8767416728046021214995,OM,Gutknecht,Lindauweg 52 00389Füssen,1,Gutknecht
+107,DXOBAZS2,GB31DHJE02183082867996,AZ,Garcia Ltd,,1,Garcia Ltd
+108,DXOBAZS2,GB31DHJE02183082867996,AZ,Kelly Inc,335-Angela and  South Matthew MI 28893,1,Kelly Inc
+109,DXOBAZS2,GB31DHJE02183082867996,AZ,"Kelley, Allen Ind. Shelton","Browning Corners Apt. 911,5875 12118 South Jeffery  OK United States",1,"Kelley, Allen and Shelton"
+110,LFCYECMW,FR3205081726080424550252051,EC,"Zetticci, Galilei e Vento s.r.l.",,1,"Zetticci, Galilei e Vento s.r.l."
+111,LFCYECMW,FR3205081726080424550252051,EC,"Lopresti, Favata e Platini Group",Italia,1,"Lopresti, Favata e Platini Group"
+112,EGYDCYCI,GB77PVDJ99374265027569,CY,Lima,"Jardim Laís Freitas,BA,Aguas Claras  (BA)  BR",1,Lima
+113,EGYDCYCI,GB77PVDJ99374265027569,CY,Almeida  .ME,,1,Almeida - ME
+114,CCLRVUAX,DE49444727706797208022,VU,Couturier Hamon et Fils,Ledouxsur-Goncalves,1,Couturier Hamon et Fils
+115,CCLRVUAX,DE49444727706797208022,VU,David Mercier et Fils,BarbeBourg Franc,1,David Mercier et Fils
+116,CCLRVUAX,DE49444727706797208022,VU,Bousquet,France,1,Bousquet
+117,CCLRVUAX,DE49444727706797208022,VU,Roussel,,1,Roussel
+118,XWHROMQW,GB70PXAM48449911682700,OM,Williams,,0,Williams Ltd
+119,QXGIPMJO,GB86WOOV36529607472105,PM,"Taylor, Walker",,0,"Taylor, Walker and Holt"
+120,PJVCNUXU,FR6354235071968907634784061,NU,Vieira Dias e Filhos,,0,Vieira Dias e Filhos
+121,CDANSDMX,NL31EIMQ9341051992,SD,"Boulanger,Group",GilletBourg France,0,Boulanger
+122,ZZMQCLP0,GB26CLZF65738161982964,CL,Melo Vieira -  ME,Vila Piratininga Venda Nova BR,0,Melo Vieira - ME
+123,AKHLVNIW,FR5225296443837639261514889,VN,Vinci Energies,,1,Vinci Energies
+124,AKHLVNIW,FR5225296443837639261514889,VN,Olympia  uitzendbureau -,Alem  Boboulevard Alem,1,Olympia uitzendbureau
+125,AKHLVNIW,FR5225296443837639261514889,VN,Ardagh Group,Aidenlaan 2/8113VR/Aerdenhout,1,Ardagh Group
+126,AKHLVNIW,FR5225296443837639261514889,VN,'s Gravensande & van Nimwegen,,1,'s Gravensande & van Nimwegen
+127,KJTGDMRK,DE35617515679796651347,DM,Pinto Viana/  EI,,1,Pinto Viana - EI
+128,KJTGDMRK,DE35617515679796651347,DM,Lopes /- ME,,1,Lopes - ME
+129,RUSVBSXE,NL46RFZT0234472804,BS,Logística del Noroeste S.C.,,1,Logística del Noroeste S.L.
+130,RUSVBSXE,NL46RFZT0234472804,BS,Banca Privada Moll S.L.,Palncia Spain,1,Banca Privada Moll S.L.
+131,RUSVBSXE,NL46RFZT0234472804,BS,"Familia  Arce,SC",Lleida ES,1,Familia Arce S.L.
+132,RUSVBSXE,NL46RFZT0234472804,BS,Hotel RI S.L.,Vizcaya Spain,1,Hotel RI S.L.
+133,DGKXGRUT,FR9050162966437380182186067,GR,Kühnert,Eisleben,1,Kühnert
+134,DGKXGRUT,FR9050162966437380182186067,GR,Söding,,1,Söding
+135,DGKXGRUT,FR9050162966437380182186067,GR,Zimmer Berger GmbH,& & &  &,1,Zimmer Berger GmbH
+136,AUMLTKZA,IT36C4562010258621156715931,TK,Suministros ZJDU S.L.N.E,,0,Suministros ZJDU S.L.N.E
+137,WWRRGTTD,NL48YAUG2917105971,GT,Aviko,Isabelledreef Santpoort-Zuid-Santpoort-Zuid/NL,1,Aviko
+138,WWRRGTTD,NL48YAUG2917105971,GT,NautaDutilh,,1,NautaDutilh
+139,UGXTNCGV,GB15LPEZ65668104718396,NC,Lagarde,Hoareau-sur-Gaudin,1,Lagarde
+140,UGXTNCGV,GB15LPEZ65668104718396,NC,Poulain,"avenue Augustin Foucher 907 Sainte Constance,Sainte Constance,FR",1,Poulain
+141,YFGPCDYV,IT16F4657130549466466038982,CD,Carlier S.A.R.L.,,1,Carlier S.A.R.L.
+142,YFGPCDYV,IT16F4657130549466466038982,CD,François,boulevard Emmanuel Lesage/81 BenarBenard-Frnce,1,François
+143,ZNYBBAFE,ES4931386583083671408974,BA,Fábrica Integrales S.Coop.,Murcia ES,0,Fábrica Integrales S.Coop.
+144,EBYAGLXS,GB18TTNP75640161853833,GL,"Walls, Prince",,1,"Walls, Prince and Lee"
+145,EBYAGLXS,GB18TTNP75640161853833,GL,"Alvarado, Dixon and Brown",688 12296 Green IslandsPort James,1,"Alvarado, Dixon and Brown"
+146,NPILTTUJ,GB96VXFD20386926368102,TT,Cardoso,"RR,Ladeira Sales  Vila Piratininga Venda Nova",1,Cardoso
+147,NPILTTUJ,GB96VXFD20386926368102,TT,Lima SAPA,,1,Lima
+148,SKEPCWNT,GB45HNSO77689684319081,CW,"Newton, Lyons and Roberts",49039 East Shannonhaven,1,"Newton, Lyons and Roberts"
+149,SKEPCWNT,GB45HNSO77689684319081,CW,"Smith, Byrd Industries Gordon",,1,"Smith, Byrd and Gordon"
+150,SKEPCWNT,GB45HNSO77689684319081,CW,"Davis, Washington and Rodriguez",,1,"Davis, Washington and Rodriguez"
+151,QBQBSKEX,NL92WSNC2342685930,SK,McDonalds Associates,Noord-Sleen  Boweg Noord-Sleen,0,McDonalds
+152,IMYJIRBL,NL23OURY6189301212,IR,Claassen & Pieters van der Maes,,1,Claassen & Pieters van der Maes
+153,IMYJIRBL,NL23OURY6189301212,IR,SBS Broadcasting,,1,SBS Broadcasting
+154,RASEGFWX,GB70KBZR17781163786010,GF,Lübs Plath AG,,1,Lübs Plath AG
+155,RASEGFWX,GB70KBZR17781163786010,GF,Berger Gerlach AG,,1,Berger Gerlach AG
+156,GVYRMAZJ,GB64EVTY90550015818294,MA,"Martin, Frost",,0,"Martin, Frost and Hunt"
+157,TIXQGSJL,GB60GXXG50146093947420,GS,Brown Public Limited Company,,0,Brown PLC
+158,CKZAGMUK,GB49KELW22299605396720,GM,Schomber KG,,1,Schomber KG
+159,CKZAGMUK,GB49KELW22299605396720,GM,Ehlert OHG mbH,,1,Ehlert OHG mbH
+160,EMDCCAVN,GB36YHUW59719361166636,CA,Vaillant,,1,Vaillant
+161,EMDCCAVN,GB36YHUW59719361166636,CA,Ferrand,,1,Ferrand
+162,EMDCCAVN,GB36YHUW59719361166636,CA,Weiss Chauvin SA,,1,Weiss Chauvin SA
+163,EMDCCAVN,GB36YHUW59719361166636,CA,Besnard S.A.P.A.,,1,Besnard
+164,MMBFVGXM,IT56K8243778270468158776693,VG,"Rodriguez, Castillo Inds.- Montes",325 59967  Corey Common Suite 932  North Heatherhaven,0,"Rodriguez, Castillo and Montes"
+165,KERHCNZX,GB55MERZ85395044452683,CN,Geisler AG & Co. KG,,1,Geisler AG & Co. KG
+166,KERHCNZX,GB55MERZ85395044452683,CN,Keudel-Pvt. Ltd,Silinde-Neureuther-Weg/Grevesmühlen Grevesmühlen/DE,1,Keudel
+167,KERHCNZX,GB55MERZ85395044452683,CN,Junck AG,,1,Junck AG
+168,BENSCGGO,GB17YMJP55252334921690,CG,"Green, Charlton Inds. Payne",Philip crescent/West MauriceshireUnited Kingdom,0,"Green, Charlton and Payne"
+169,KSPTCDDB,ES3766653485704928887820,CD,Stichting van den.Nieuwenhuijsen,,0,Stichting van den Nieuwenhuijsen
+170,LTXEUZZJ,GB82WVSY51711643456350,UZ,Schottin Pohl AG,Radischgasse Weienfels Weißenfels DE,1,Schottin Pohl AG
+171,LTXEUZZJ,GB82WVSY51711643456350,UZ,Weiß GmbH & Comp. KG,Ruppersbergerstraße-Hannover  Hannover  Germany,1,Weiß GmbH & Co. KG
+172,LTXEUZZJ,GB82WVSY51711643456350,UZ,Sölzer AG,,1,Sölzer AG
+173,LTXEUZZJ,GB82WVSY51711643456350,UZ,Pieper KG,Mike-Hesse-RingPfaffenhofen an der Ilm Pfaffenhofen an der Ilm  DE,1,Pieper KG
+174,STHTSAWY,GB18ZYQM54254620761390,SA,Logística Salom & Asociados SAS,,1,Logística Salom & Asociados S.A.T.
+175,STHTSAWY,GB18ZYQM54254620761390,SA,Gutierrez y SA,,1,Gutierrez y Pou S.L.
+176,STHTSAWY,GB18ZYQM54254620761390,SA,Morata & Asociados S.L.L.,"Calle Narcisa Bolaños 43757,Madrid ES",1,Morata & Asociados S.L.L.
+177,CKEAPGUR,DE62838987627867530255,PG,Weerdenburg BV SAS,,0,Weerdenburg BV
+178,PWJCTHUY,ES5024954343219821024759,TH,"Harris, Turner and Jones",North Justinport United Kingdom,1,"Harris, Turner and Jones"
+179,PWJCTHUY,ES5024954343219821024759,TH,Kirby LLC,"Stevens loop-18  Garystad,United Kngdom",1,Kirby LLC
+180,PWJCTHUY,ES5024954343219821024759,TH,Thomas Carr,,1,Thomas-Carr
+181,PWJCTHUY,ES5024954343219821024759,TH,Grant,Crolinebury United Kingdom,1,Grant Inc
+182,YHKCLUQH,GB17IDNM80950834897892,LU,Silveira SA,Brazil,0,Silveira S/A
+183,OJOAKYFJ,FR6555278419625790939530321,KY,Hölzenbecher Mosemann AG & KGaA,Perleberg,0,Hölzenbecher Mosemann AG & Co. KGaA
+184,NWODMQPD,IT43K7416717817386055090026,MQ,"Johnson, Perkins Inds Phillips",,0,"Johnson, Perkins and Phillips"
+185,NJSQTNDW,FR7951281852655883389205265,TN,"Travia, Manacorda e Anguissola e figli",Positano,0,"Travia, Manacorda e Anguissola e figli"
+186,LUGLKYKY,GB03PJQP42990702019516,KY,Mcguire- Frost Co,,1,Mcguire-Frost
+187,LUGLKYKY,GB03PJQP42990702019516,KY,"Shelton, Watson and Taylor",Heather Manor Apt. 662 14448 17721North Michaelport-FL-US,1,"Shelton, Watson and Taylor"
+188,LUGLKYKY,GB03PJQP42990702019516,KY,Woods PLC,1451 66837Gutierrez Ville Suite 115 North Adammouth,1,Woods PLC
+189,LUGLKYKY,GB03PJQP42990702019516,KY,Short Inds Sons,32635 Lake Monicahaven,1,Short and Sons
+190,JZADKMEA,FR9586042395336420466657209,KM,Royal  Wolfswinkel,,0,Royal Wolfswinkel
+191,BRYOSHXV,FR7363755076114165823286709,SH,Pavarotti e  figli,Incrocio Claudia 6 Piano 939040Pinzon BZ,0,Pavarotti e figli
+192,RLNDBBVO,GB05SUSB18640235120366,BB,"Hill, Garcia and Lopez",,1,"Hill, Garcia and Lopez"
+193,RLNDBBVO,GB05SUSB18640235120366,BB,"Ortiz, Choi and Jenkins",United States,1,"Ortiz, Choi and Jenkins"
+194,RLNDBBVO,GB05SUSB18640235120366,BB,"Moody, Norman King",Lake Williamville,1,"Moody, Norman and King"
+195,RLNDBBVO,GB05SUSB18640235120366,BB,Garza and Sons,,1,Garza and Sons
+196,UCIMKEHZ,GB67QYKA80505980491583,KE,S.a - Luz Melo S/A,,0,da Luz Melo S/A
+197,LOQWPMFG,ES1826077050859757693232,PM,Bodin et Fils,Saint Louise France,1,Bodin et Fils
+198,LOQWPMFG,ES1826077050859757693232,PM,Renault Bigot S.A.R.L.,,1,Renault Bigot S.A.R.L.
+199,LOQWPMFG,ES1826077050859757693232,PM,Ollivier et Fils,,1,Ollivier et Fils
+200,LOQWPMFG,ES1826077050859757693232,PM,Blanchard S.A.,"5 PetitVille rue de Garnier,PetitVille",1,Blanchard S.A.
