@@ -322,21 +322,21 @@ def data_generator(dataset, faker_objects):
     # Adding data generated in the dataset, possibly permuting company names
     # and addresses.
     iban_dataframe = create_dataset()
-    len_iban_dataframe = 0
+    size_iban_dataframe = 0
     for name,info in companies_info.items():
       if info["num_entry"] != 1:
         aliases = generate_permutations(name, info["num_entry"], T, C, V, EDIT)
         for alias in aliases:
           if np.random.choice([0,1], p=[1-PROB_ADDRESS,PROB_ADDRESS]):
             new_address = change_address_format(companies_info[name]["address"], country_code)
-            iban_dataframe.loc[len_iban_dataframe] = [bic, iban, bic_country_code, alias, new_address, is_shared, name]
+            iban_dataframe.loc[size_iban_dataframe] = [bic, iban, bic_country_code, alias, new_address, is_shared, name]
           else:
-            iban_dataframe.loc[len_iban_dataframe] = [bic, iban, bic_country_code, alias, "", is_shared, name]
+            iban_dataframe.loc[size_iban_dataframe] = [bic, iban, bic_country_code, alias, "", is_shared, name]
       else:
         address = change_address_format(companies_info[name]["address"], country_code) if np.random.choice([0,1], p=[1-PROB_ADDRESS,PROB_ADDRESS]) else ""
-        iban_dataframe.loc[len_iban_dataframe] = [bic, iban, bic_country_code, name, address, is_shared, name]
+        iban_dataframe.loc[size_iban_dataframe] = [bic, iban, bic_country_code, name, address, is_shared, name]
       
-      len_iban_dataframe += 1
+      size_iban_dataframe += 1
     
     dataset = pd.concat([dataset, iban_dataframe], ignore_index=True)
 
