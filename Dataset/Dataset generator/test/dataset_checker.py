@@ -1,5 +1,6 @@
 import pandas as pd
 import sys
+import json
 
 PRINT_ERRORS = True
 
@@ -11,6 +12,57 @@ def print_result(num_errors):
   else:
     print("\nDataset is not correct. Total errors: " + str(num_errors))
 
+
+def test_parameters(dataset, parameters_file_path, num_errors):
+  with open(parameters_file_path, "r") as data_file:
+    parameters = json.load(data_file)
+  
+  param_num_iban = parameters["num_iban"]
+  param_min_range_entry = parameters["min_range_entry"]
+  param_max_range_entry = parameters["max_range_entry"]
+  param_min_range_holders = parameters["min_range_holders"]
+  param_max_range_holders = parameters["max_range_holders"]
+
+  real_num_iban = 0
+  num_min_entry = float("inf")
+  num_max_entry = 0
+  num_min_holders = float("inf")
+  num_max_holders = 0
+  for id, group in dataset.groupby(["AccountNumber"]):
+    real_num_iban += 1
+
+    num_entry = len(group)
+    if num_entry < num_min_entry:
+      num_min_entry = num_entry
+    if num_entry > num_max_entry:
+      num_max_entry = num_entry
+    
+    is_shared = set(group["IsShared"]).pop()
+    if is_shared:
+      num_holders = len(set(group["Holder"]))
+      if num_holders < num_min_holders:
+        num_min_holders = num_holders
+      if num_holders > num_max_holders:
+        num_max_holders = num_holders
+
+  if real_num_iban != param_num_iban:
+    num_errors += 1
+    print("\nError "+str(num_errors)+": there are " + str(real_num_iban) + " IBANs but " + str(param_num_iban) + " were required.")
+  if num_min_entry < param_min_range_entry:
+    num_errors += 1
+    print("\nError "+str(num_errors)+": the minimum entry number are " + str(num_min_entry) + " but " + str(param_min_range_entry) + " were required.")
+  if num_max_entry > param_max_range_entry:
+    num_errors += 1
+    print("\nError "+str(num_errors)+": the maximum entry number are " + str(num_max_entry) + " but " + str(param_max_range_entry) + " were required.")
+  if num_min_holders < param_min_range_holders:
+    num_errors += 1
+    print("\nError "+str(num_errors)+": the minimum holders number when account is shared are " + str(num_min_holders) + " but " + str(param_min_range_holders) + " were required.")
+  if num_max_holders > param_max_range_holders:
+    num_errors += 1
+    print("\nError "+str(num_errors)+": the maximum holders number when account is shared are " + str(num_min_holders) + " but " + str(param_min_range_holders) + " were required.")
+  
+  return num_errors
+  
 
 def test_account_number(dataset, num_errors):
   ''' Checking for inconsistencies on account number. '''
@@ -67,15 +119,20 @@ def open_dataset(file_path):
     return pd.read_excel(file_path, engine='openpyxl')
 
 
-def main(file_path):
-  dataset = open_dataset(file_path)
+def main(dataset_file_path, parameters_file_path):
+  dataset = open_dataset(dataset_file_path)
   
   num_errors = test_account_number(dataset, num_errors=0)
   num_errors = test_sharing_and_address(dataset, num_errors=num_errors)
-
+  
+  if parameters_file_path is not None:
+    num_errors = test_parameters(dataset, parameters_file_path, num_errors)
+  
   print_result(num_errors)
   
 
 if __name__ == "__main__":
-  file_path = sys.argv[1]
-  main(file_path)
+  dataset_file_path = sys.argv[1]
+  parameters_file_path = sys.argv[2] if len(sys.argv) > 2 else None
+
+  main(dataset_file_path, parameters_file_path)
