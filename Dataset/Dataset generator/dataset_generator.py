@@ -139,12 +139,15 @@ def generate_entry_number():
   """ Random generation of the number of entries to be included in the dataset for a specific iban """
   
   if not STATS_FROM_DATASETS:
-    type_entry_number = np.random.choice(["low","high"], p=[0.2,0.8])
-    if type_entry_number == "low":
-      num = np.random.randint(MIN_RANGE_ENTRY, MAX_RANGE_ENTRY//3)
+    if MAX_RANGE_ENTRY > MIN_RANGE_ENTRY*3:
+      type_entry_number = np.random.choice(["low","high"], p=[0.2,0.8])
+      if type_entry_number == "low":
+        num = np.random.randint(MIN_RANGE_ENTRY, MAX_RANGE_ENTRY//3 if MAX_RANGE_ENTRY//3 != 1 else 2)
+      else:
+        num = np.random.randint(MAX_RANGE_ENTRY//3, MAX_RANGE_ENTRY+1)
+      return num
     else:
-      num = np.random.randint(MAX_RANGE_ENTRY//3, MAX_RANGE_ENTRY+1)
-    return num
+      return np.random.randint(MIN_RANGE_ENTRY, MAX_RANGE_ENTRY+1)
   else:
     return np.random.choice(IBAN_VALUES, p=IBAN_PROBA)
 
@@ -327,16 +330,13 @@ def data_generator(dataset, faker_objects):
       if info["num_entry"] != 1:
         aliases = generate_permutations(name, info["num_entry"], T, C, V, EDIT)
         for alias in aliases:
-          if np.random.choice([0,1], p=[1-PROB_ADDRESS,PROB_ADDRESS]):
-            new_address = change_address_format(companies_info[name]["address"], country_code)
-            iban_dataframe.loc[size_iban_dataframe] = [bic, iban, bic_country_code, alias, new_address, is_shared, name]
-          else:
-            iban_dataframe.loc[size_iban_dataframe] = [bic, iban, bic_country_code, alias, "", is_shared, name]
+          new_address = change_address_format(companies_info[name]["address"], country_code) if np.random.choice([0,1], p=[1-PROB_ADDRESS,PROB_ADDRESS]) else ""
+          iban_dataframe.loc[size_iban_dataframe] = [bic, iban, bic_country_code, alias, new_address, is_shared, name]
+          size_iban_dataframe += 1
       else:
         address = change_address_format(companies_info[name]["address"], country_code) if np.random.choice([0,1], p=[1-PROB_ADDRESS,PROB_ADDRESS]) else ""
         iban_dataframe.loc[size_iban_dataframe] = [bic, iban, bic_country_code, name, address, is_shared, name]
-      
-      size_iban_dataframe += 1
+        size_iban_dataframe += 1
     
     dataset = pd.concat([dataset, iban_dataframe], ignore_index=True)
 
