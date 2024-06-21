@@ -111,6 +111,19 @@ def test_sharing_and_address(dataset, num_errors):
   return num_errors
 
 
+def test_empty_values(dataset, num_errors):
+  name_columns = ["BIC","AccountNumber","CTRYbnk","Name","IsShared","Holder"]
+
+  for name_column in name_columns:
+    values = [str(elem).replace(" ","") for elem in list(dataset[name_column])]
+    empty_values = values.count("") + values.count(None)
+    if empty_values != 0:
+      num_errors += 1
+      print("\nError "+str(num_errors)+": there are " + empty_values + " empty "+name_column+".")
+
+  return num_errors
+
+
 def open_dataset(file_path):
   file_path = sys.argv[1]
   if file_path[-3:] == "csv":
@@ -122,7 +135,8 @@ def open_dataset(file_path):
 def main(dataset_file_path, parameters_file_path):
   dataset = open_dataset(dataset_file_path)
   
-  num_errors = test_account_number(dataset, num_errors=0)
+  num_errors = test_empty_values(dataset, num_errors=0)
+  num_errors = test_account_number(dataset, num_errors)
   num_errors = test_sharing_and_address(dataset, num_errors=num_errors)
   
   if parameters_file_path is not None:
