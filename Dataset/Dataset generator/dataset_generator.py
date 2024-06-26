@@ -155,37 +155,38 @@ def generate_entry_number():
 def generate_holder_number(num_entries):
   max_low = 4
   max_middle = 10
-  list_type = ["low","middle","high"]
   new_max_holders = MAX_RANGE_HOLDERS if MAX_RANGE_HOLDERS < num_entries else num_entries
 
-  if new_max_holders <= max_low or MIN_RANGE_HOLDERS > max_middle:
+  if new_max_holders <= max_low+1 or MIN_RANGE_HOLDERS > max_middle or (new_max_holders <= max_middle and MIN_RANGE_HOLDERS > max_low):
     num_holders = np.random.randint(MIN_RANGE_HOLDERS, new_max_holders+1)
     return num_holders
-  elif new_max_holders <= max_middle:
-    list_type.remove("high")
-  if MIN_RANGE_HOLDERS > max_low:
-    list_type.remove("low")
+  else:
+    list_type = ["low","middle","high"]
+    if new_max_holders <= max_middle:
+      list_type.remove("high")
+    elif MIN_RANGE_HOLDERS > max_low:
+      list_type.remove("low")
 
-  prob = [0.6,0.3,0.1] if len(list_type) > 2 else [0.7,0.3]
-  type_co_headings = np.random.choice(list_type, p=prob)
+    prob = [0.6,0.3,0.1] if len(list_type) > 2 else [0.7,0.3]
+    type_co_headings = np.random.choice(list_type, p=prob)
 
-  if type_co_headings == "low":
-    num_holders = np.random.randint(
-      MIN_RANGE_HOLDERS, 
-      max_low+1 if new_max_holders > max_low else new_max_holders+1
-    )
-  elif type_co_headings == "middle":
-    num_holders = np.random.randint(
-      max_low+1 if new_max_holders >= max_low+1 and MIN_RANGE_HOLDERS <= max_low+1 else MIN_RANGE_HOLDERS,
-      max_middle+1 if new_max_holders > max_middle else new_max_holders
-    )
-  else:    
-    num_holders = np.random.randint(
-      max_middle+1 if new_max_holders >= max_middle+1 and MIN_RANGE_HOLDERS <= max_middle+1 else MIN_RANGE_HOLDERS,
-      new_max_holders+1
-    )
-  
-  return num_holders
+    if type_co_headings == "low":
+      num_holders = np.random.randint(
+        MIN_RANGE_HOLDERS, 
+        max_low+1 if new_max_holders > max_low else new_max_holders+1
+      )
+    elif type_co_headings == "middle":
+      num_holders = np.random.randint(
+        max_low+1 if new_max_holders >= max_low+1 and MIN_RANGE_HOLDERS <= max_low+1 else MIN_RANGE_HOLDERS,
+        max_middle+1 if new_max_holders > max_middle else new_max_holders
+      )
+    else:    
+      num_holders = np.random.randint(
+        max_middle+1 if new_max_holders >= max_middle+1 and MIN_RANGE_HOLDERS <= max_middle+1 else MIN_RANGE_HOLDERS,
+        new_max_holders+1
+      )
+    
+    return num_holders
 
 
 def get_address_number(info_address, country_code):
@@ -336,6 +337,8 @@ def data_generator(dataset, faker_objects):
     num_iban_entry = generate_entry_number()
     is_shared = np.random.choice([0,1], p=[1-PROB_SHARED_ACCOUNT, PROB_SHARED_ACCOUNT]) if num_iban_entry != 1 else 0
     if is_shared:
+      if num_iban_entry < MIN_RANGE_HOLDERS:
+        num_iban_entry = MIN_RANGE_HOLDERS
       num_holders = generate_holder_number(num_iban_entry)
     else:
       num_holders = 1
