@@ -116,7 +116,6 @@ def compute_variation_abbreviation(words, variations, threshold):
   return newList
 
 
-
 def compute_transcription_errors(aliasList, newT):
   """ Introduce transcription errors based on T (Temperature) value """
 
@@ -176,24 +175,6 @@ def introduce_white_spaces(aliasList, C):
   return aliases
 
 
-def introduce_white_spaces(aliasList, C):
-  """ """
-
-  aliases = aliasList
-  # Add additional spaces
-  for j,alias in enumerate(aliases):
-    if random.random() < C:
-      alias_with_spaces = list(alias)
-      voidPositions = [k for k,q in enumerate(alias_with_spaces) if q == ' ']
-      if len(voidPositions) > 0:
-        el = random.choice(voidPositions)
-        alias_with_spaces.insert(el, ' ')
-        aliases[j] = ''.join(alias_with_spaces)
-  
-  return aliases
-
-
-
 def introduce_new_words(aliasList, nameList):
   """ Add new words in aliasList is big and all names are single word names"""
 
@@ -219,7 +200,6 @@ def check_homogeneous(name, aliasList, Edit_threshold):
       return True
   
   return False
-
 
 
 def generate_permutations(name, rowNumber, T, C, V, Edit_threshold):
