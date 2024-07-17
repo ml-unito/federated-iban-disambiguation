@@ -18,7 +18,7 @@ model = CharacterBertForClassification()
 model.to(device)
 
 # test name
-DATE_NAME = str(datetime.now()).split(".")[0].replace(" ", "_") 
+DATE_NAME = str(datetime.now()).split(".")[0].replace(" ", "_").replace(":","_")
 LOG_NAME = "link_prediction_test_log_" + DATE_NAME + ".txt"
 PLOT_NAME = "./Plot/link_prediction_CM_matrix_" + DATE_NAME + ".png"
 JSON_NAME = "./Clusters/Clusters_" + DATE_NAME + ".json"
