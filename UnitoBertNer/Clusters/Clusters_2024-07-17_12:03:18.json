@@ -1,0 +1,3248 @@
+{
+    "DE18759058059811935168": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Gierschner Ackermann GmbH"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Gierschner .Ackermann/GmbH",
+                "names_list": [
+                    "Gierschner/Ackermann",
+                    "Gierschner Ackermann-GmbH",
+                    "Gierschner/Ackermann GmbH",
+                    "Gierschner,Ackermann GmbH",
+                    "Gierschner Ackermann GmbH",
+                    "Gierschner Ackermann",
+                    "Gierschner .Ackermann/GmbH",
+                    "Gierschner-Ackermann"
+                ],
+                "holder_from_cluster_name": "Gierschner Ackermann GmbH"
+            }
+        ]
+    },
+    "DE28758518175354761639": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Fields, Bright and Hogan",
+            "Garcia, Perry and Martin"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Garcia, Perry  Inds. .Martin",
+                "names_list": [
+                    "Garcia, Perry Ind. Martin",
+                    "Garcia, Perry and Martin",
+                    "Garcia, Perry",
+                    "Garcia, Perry  Inds. .Martin"
+                ],
+                "holder_from_cluster_name": "Garcia, Perry and Martin"
+            },
+            {
+                "cluster_name": "Fields, Bright and Hogan",
+                "names_list": [
+                    "Fields, Bright and Hogan"
+                ],
+                "holder_from_cluster_name": "Fields, Bright and Hogan"
+            }
+        ]
+    },
+    "DE36080522146032647643": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Riccardi-Ferrara e figli"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Riccardi Ferrara e figli - S.D.F.",
+                "names_list": [
+                    "Riccardi-Ferrara-e figli S.D.F",
+                    "Riccardi Ferrara e.figli S.D.F.",
+                    "Riccardi Ferrara e figli S.d.f",
+                    "Riccardi Ferrara  e figli S.D.F",
+                    "Riccardi Ferrara e figli",
+                    "Riccardi Ferrara e figli S.D.F.",
+                    "Riccardi Ferrara e/figli S.d.f",
+                    "Riccardi  Ferrara e. figli",
+                    "Riccardi Ferrara  e figli",
+                    "Riccardi Ferrara e/figli",
+                    "Riccardi- Ferrara e figli",
+                    "Riccardi Ferrara e figli - S.D.F.",
+                    "Riccardi-Ferrara e figli",
+                    "Riccardi. Ferrara e figli-"
+                ],
+                "holder_from_cluster_name": "Riccardi-Ferrara e figli"
+            }
+        ]
+    },
+    "DE42672396255041079561": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Sales"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Sales Global",
+                "names_list": [
+                    "Sales Glb",
+                    "Sales",
+                    "Sales Glb.",
+                    "Sales Global"
+                ],
+                "holder_from_cluster_name": "Sales"
+            }
+        ]
+    },
+    "DE43726239860206618755": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Barsanti SPA"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Barsanti S.P.A",
+                "names_list": [
+                    "Barsanti SPA",
+                    "Barsanti S.P.A"
+                ],
+                "holder_from_cluster_name": "Barsanti SPA"
+            }
+        ]
+    },
+    "DE50063147360539489383": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "van der Dussen",
+            "Holt Trommler KG",
+            "Trüb Lindau OHG mbH"
+        ],
+        "holders": [
+            {
+                "cluster_name": "van der Dussen",
+                "names_list": [
+                    "van der Dussen"
+                ],
+                "holder_from_cluster_name": "van der Dussen"
+            },
+            {
+                "cluster_name": "Holt Trommler KG",
+                "names_list": [
+                    "Holt Trommler KG"
+                ],
+                "holder_from_cluster_name": "Holt Trommler KG"
+            },
+            {
+                "cluster_name": "Trüb Lindau OHG mbH",
+                "names_list": [
+                    "Trüb Lindau OHG mbH"
+                ],
+                "holder_from_cluster_name": "Trüb Lindau OHG mbH"
+            }
+        ]
+    },
+    "DE52572650920169262977": {
+        "IsShared": 0,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Rivera, Hampton and Russell"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Rivera,  Hampton",
+                "names_list": [
+                    "Rivera, Hampton",
+                    "Rivera,  Hampton",
+                    "Rivera, Hampton/"
+                ],
+                "holder_from_cluster_name": "Rivera, Hampton and Russell"
+            },
+            {
+                "cluster_name": "Rivera,/Hampton Industries Russell",
+                "names_list": [
+                    "Rivera, Hampton and Russell",
+                    "Rivera, Hampton Inds. Russell",
+                    "Rivera, Hampton Ind. Russell",
+                    "Rivera, Hampton Inds.. Russell",
+                    "Rivera,/Hampton Industries Russell",
+                    "Rivera, Hampton Industries Russell",
+                    "Rivera, Hampton Inds Russell",
+                    "Rivera, Hampton/Russell"
+                ],
+                "holder_from_cluster_name": "Rivera, Hampton and Russell"
+            }
+        ]
+    },
+    "DE65914946786508255407": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Manufacturas Iberia S.L.N.E"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Manufacturas - Iberia. S.L.N.E",
+                "names_list": [
+                    "Manufacturas-Iberia,S.L.N.E",
+                    "Manufacturas .Iberia.S.L.N.E",
+                    "Manufacturas - Iberia. S.L.N.E",
+                    "Manufacturas.Iberia.S.L.N.E",
+                    "Manufacturas - Iberia-S.L.N.E",
+                    "Manufacturas-  Iberia.S.L.N.E",
+                    "Manufacturas.Iberia/S.L.N.E",
+                    "Manufacturas-  Iberia. S.L.N.E",
+                    "Manufacturas .Iberia. S.L.N.E",
+                    "Manufacturas/Iberia",
+                    "Manufacturas.Iberia. S.L.N.E",
+                    "Manufacturas- Iberia-S.L.N.E",
+                    "Manufacturas Iberia S.L.N.E",
+                    "Manufacturas - Iberia .S.L.N.E",
+                    "Manufacturas.Iberia- S.L.N.E",
+                    "Manufacturas- Iberia - S.L.N.E",
+                    "Manufacturas,Iberia.S.L.N.E",
+                    "Manufacturas- Iberia/S.L.N.E"
+                ],
+                "holder_from_cluster_name": "Manufacturas Iberia S.L.N.E"
+            }
+        ]
+    },
+    "DE66005526857082277591": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Sanchez",
+            "Torres",
+            "De Sousa Marchand S.A.R.L.",
+            "Poulain"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Poulain",
+                "names_list": [
+                    "Poulain"
+                ],
+                "holder_from_cluster_name": "Poulain"
+            },
+            {
+                "cluster_name": "Sanchez Corporation",
+                "names_list": [
+                    "Sanchez Corp",
+                    "Sanchez Corporation",
+                    "Sanchez",
+                    "Sanchez Cpn",
+                    "Sanchez."
+                ],
+                "holder_from_cluster_name": "Sanchez"
+            },
+            {
+                "cluster_name": "De Sousa Marchand S.A.R.L.",
+                "names_list": [
+                    "De Sousa Marchand S.A.R.L."
+                ],
+                "holder_from_cluster_name": "De Sousa Marchand S.A.R.L."
+            },
+            {
+                "cluster_name": "Torres",
+                "names_list": [
+                    "Torres"
+                ],
+                "holder_from_cluster_name": "Torres"
+            }
+        ]
+    },
+    "DE77715447174990008606": {
+        "IsShared": 0,
+        "predicted_shared": 1,
+        "real_holders": [
+            "da Cruz da Conceição - EI"
+        ],
+        "holders": [
+            {
+                "cluster_name": "S.a. Cruz S.a. .Conceição   - EI Comp.",
+                "names_list": [
+                    "da Cruz da Conceição   EI .Cpn",
+                    "S.A. Cruz S.A. Conceição  ,EI Comp.",
+                    "da Cruz da Conceição   EI",
+                    "da Cruz .da Conceição   EI. Corp",
+                    "S.A Cruz S.A Conceição/   - EI Comp.",
+                    "S.A Cruz S.A Conceição  . EI Comp.",
+                    "da Cruz da.Conceição   EI-Corp",
+                    "S.a Cruz S.a Conceição  /EI Comp.",
+                    "da Cruz da Conceição - EI",
+                    "da Cruz da Conceição   EI/Corp",
+                    "S.a. Cruz S.a. .Conceição   - EI Comp.",
+                    "S.A. Cruz S.A. Conceição   EI Comp."
+                ],
+                "holder_from_cluster_name": "da Cruz da Conceição - EI"
+            },
+            {
+                "cluster_name": ". Cruz",
+                "names_list": [
+                    ". Cruz",
+                    "Cruz .",
+                    "Cruz"
+                ],
+                "holder_from_cluster_name": "da Cruz da Conceição - EI"
+            }
+        ]
+    },
+    "DE78892520776565247746": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Hänel Liebelt GbR"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Hänel  - Liebelt - GbR",
+                "names_list": [
+                    "Hänel .Liebelt- GbR",
+                    "Hänel - Liebelt.GbR",
+                    "Hänel,Liebelt- GbR",
+                    "Hänel Liebelt GbR",
+                    "Hänel.Liebelt.  GbR",
+                    "Hänel,Liebelt. GbR",
+                    "Hänel .Liebelt - GbR",
+                    "Hänel. Liebelt-GbR",
+                    "Hänel. Liebelt,GbR",
+                    "Hänel-Liebelt",
+                    "Hänel .Liebelt",
+                    "Hänel-  Liebelt. GbR",
+                    "Hänel  - Liebelt - GbR",
+                    "Hänel-Liebelt .GbR",
+                    "Hänel .Liebelt-GbR",
+                    "Hänel - Liebelt-GbR"
+                ],
+                "holder_from_cluster_name": "Hänel Liebelt GbR"
+            }
+        ]
+    },
+    "DE88567335292887083554": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Manolesso, Coppola e Strangio Group"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Manolesso, Coppola e Strangio Group",
+                "names_list": [
+                    "Manolesso, Coppola e Strangio-Grp",
+                    "Manolesso, Coppola e Strangio Group",
+                    "Manolesso, Coppola e Strangio"
+                ],
+                "holder_from_cluster_name": "Manolesso, Coppola e Strangio Group"
+            }
+        ]
+    },
+    "DE94567747415389347687": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Versace Group"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Versace.  Group S.A.P.A.",
+                "names_list": [
+                    "Versace Group S.a.p.a",
+                    "Versace Gr. S.a.p.a",
+                    "Versace,Group S.a.p.a",
+                    "Versace Group S.A.P.A.",
+                    "Versace Group S.A.P.A",
+                    "Versace Group SAPA",
+                    "Versace.  Group S.A.P.A.",
+                    "Versace Gp. S.a.p.a",
+                    "Versace Group.",
+                    "Versace Grp - S.a.p.a",
+                    "Versace Group",
+                    "Versace Group-"
+                ],
+                "holder_from_cluster_name": "Versace Group"
+            }
+        ]
+    },
+    "ES0454060805526734819113": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Ladeck Schweitzer GmbH"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Ladeck - Schweitzer. GmbH",
+                "names_list": [
+                    "Ladeck.Schweitzer.GmbH",
+                    "Ladeck - Schweitzer-GmbH",
+                    "Ladeck Schweitzer GmbH",
+                    "Ladeck - Schweitzer,GmbH",
+                    "Ladeck.  Schweitzer",
+                    "Ladeck-Schweitzer - GmbH",
+                    "Ladeck- Schweitzer .GmbH",
+                    "Ladeck - Schweitzer. GmbH",
+                    "Ladeck/Schweitzer - GmbH",
+                    "Ladeck-Schweitzer/GmbH",
+                    "Ladeck-Schweitzer.GmbH"
+                ],
+                "holder_from_cluster_name": "Ladeck Schweitzer GmbH"
+            }
+        ]
+    },
+    "ES0507246176285419942015": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Mathieu"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Mathieu .S.a.p.a",
+                "names_list": [
+                    "Mathieu .S.a.p.a",
+                    "Mathieu SAPA",
+                    "Mathieu S.A.P.A.",
+                    "Mathieu S.a.p.a",
+                    "Mathieu  SAPA",
+                    "Mathieu",
+                    "Mathieu S.a.p.a."
+                ],
+                "holder_from_cluster_name": "Mathieu"
+            }
+        ]
+    },
+    "ES1667845967728208598028": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Querini-Ginese SPA"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Querini Ginese S.p.A. S.C.",
+                "names_list": [
+                    "Querini Ginese,SPA",
+                    "Querini- Ginese SPA",
+                    "Querini Ginese S.p.A. S.C.",
+                    "Querini  Ginese SPA S.C.",
+                    "Querini/Ginese",
+                    "Querini.Ginese",
+                    "Querini Ginese-SPA S.C",
+                    "Querini- Ginese SpA  S.C.",
+                    "Querini  .Ginese SPA SA",
+                    "Querini  Ginese",
+                    "Querini .Ginese SPA",
+                    "Querini,Ginese-SPA",
+                    "Querini Ginese",
+                    "Querini Ginese SpA  S.C.",
+                    "Querini Ginese SPA S.c",
+                    "Querini-Ginese SPA"
+                ],
+                "holder_from_cluster_name": "Querini-Ginese SPA"
+            }
+        ]
+    },
+    "ES2171905723959681185071": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Vidal"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Vidal S.D.F.",
+                "names_list": [
+                    "Vidal S.D.F.",
+                    "Vidal SDF",
+                    "Vidal,S.D.F.",
+                    "Vidal S.d.f.",
+                    "Vidal S.d.f",
+                    "Vidal",
+                    "Vidal S.D.F",
+                    "Vidal.",
+                    "Vidal/S.d.f."
+                ],
+                "holder_from_cluster_name": "Vidal"
+            }
+        ]
+    },
+    "ES2569173135638959704497": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Industrias Roman S.Coop."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Industrias Roman S.Coop.",
+                "names_list": [
+                    "Industrias Roman S.Coop.",
+                    "Inds  Roman S.Coop.",
+                    "Inds Roman S.Coop.",
+                    "Inds. Roman S.Coop.",
+                    "Inds. Roman",
+                    "Ind Roman S.Coop.",
+                    "Roman S.Coop."
+                ],
+                "holder_from_cluster_name": "Industrias Roman S.Coop."
+            }
+        ]
+    },
+    "ES4611017738490693362260": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Millet Menard SARL"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Millet Menard  S.C.A.R.L.",
+                "names_list": [
+                    "Millet Menard S.r.L",
+                    "Millet Menard S r l",
+                    "Millet Menard",
+                    "Millet Menard SARL",
+                    "Millet Menard  S.R.L.",
+                    "Millet Menard  S.C.A.R.L.",
+                    "Millet  Menard",
+                    "Millet Menard S.r.l.",
+                    "Millet Menard Srl"
+                ],
+                "holder_from_cluster_name": "Millet Menard SARL"
+            }
+        ]
+    },
+    "ES4783016188021529968487": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Michaud",
+            "Boulanger S.A.S.",
+            "Da Costa"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Michaud",
+                "names_list": [
+                    "Michaud"
+                ],
+                "holder_from_cluster_name": "Michaud"
+            },
+            {
+                "cluster_name": "Boulanger S.A.S.",
+                "names_list": [
+                    "Boulanger",
+                    "Boulanger S.A.S."
+                ],
+                "holder_from_cluster_name": "Boulanger S.A.S."
+            },
+            {
+                "cluster_name": "Da Costa",
+                "names_list": [
+                    "Da Costa"
+                ],
+                "holder_from_cluster_name": "Da Costa"
+            }
+        ]
+    },
+    "ES4856003179990599637826": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Smith and Sons"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Smith Inds. Sons",
+                "names_list": [
+                    "Smith",
+                    "Smith and Sons",
+                    "Smith Ind. Sons",
+                    "Smith Inds. Sons"
+                ],
+                "holder_from_cluster_name": "Smith and Sons"
+            }
+        ]
+    },
+    "ES5357060989938417581379": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "van Dokkum & van Goerle",
+            "Carnotte Groep",
+            "Koninklijke Heymans",
+            "Loreal NV"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Carnotte .Groep S.D.F",
+                "names_list": [
+                    "Carnotte Groep",
+                    "Carnotte .Groep S.D.F",
+                    "Carnotte/",
+                    "Carnotte Gp. S.d.f",
+                    "Carnotte Grp S.d.f"
+                ],
+                "holder_from_cluster_name": "Carnotte Groep"
+            },
+            {
+                "cluster_name": "Koninklijke Heymans",
+                "names_list": [
+                    "Koninklijke Heymans"
+                ],
+                "holder_from_cluster_name": "Koninklijke Heymans"
+            },
+            {
+                "cluster_name": "Loreal NV",
+                "names_list": [
+                    "Loreal NV"
+                ],
+                "holder_from_cluster_name": "Loreal NV"
+            },
+            {
+                "cluster_name": "van Dokkum & van Goerle",
+                "names_list": [
+                    "van Dokkum & van Goerle"
+                ],
+                "holder_from_cluster_name": "van Dokkum & van Goerle"
+            }
+        ]
+    },
+    "ES5435198544925744882457": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Rezende Andrade - ME"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Rezende- Andrade   ME",
+                "names_list": [
+                    "Rezende,Andrade   ME",
+                    "Rezende Andrade.  ME",
+                    "Rezende Andrade-  ME",
+                    "Rezende- Andrade   ME",
+                    "Rezende Andrade. / ME",
+                    "Rezende Andrade - ME",
+                    "Rezende Andrade   ME"
+                ],
+                "holder_from_cluster_name": "Rezende Andrade - ME"
+            }
+        ]
+    },
+    "ES8259085770662472088183": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Fogaça"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Fogaça S.c.",
+                "names_list": [
+                    "Fogaça S.c.",
+                    "Fogaça S.C.",
+                    "Fogaça S.U.",
+                    "Fogaça SA",
+                    "Fogaça",
+                    "Fogaça S.c"
+                ],
+                "holder_from_cluster_name": "Fogaça"
+            }
+        ]
+    },
+    "ES8423897263726053453436": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Ehlert Rörricht GmbH",
+            "Hecker",
+            "Martin Peukert GmbH",
+            "Juncken AG",
+            "Radisch Gunpf KGaA",
+            "Ditschlerin",
+            "Haering GmbH & Co. KG",
+            "Girschner Henk GmbH",
+            "Heinz Lorch GmbH & Co. OHG",
+            "Johann GmbH & Co. OHG",
+            "Schacht Salz KG",
+            "Weinhold Seidel KG",
+            "Scheibe Warmer GmbH"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Hecker",
+                "names_list": [
+                    "Hecker"
+                ],
+                "holder_from_cluster_name": "Hecker"
+            },
+            {
+                "cluster_name": "Martin Peukert GmbH",
+                "names_list": [
+                    "Martin Peukert GmbH"
+                ],
+                "holder_from_cluster_name": "Martin Peukert GmbH"
+            },
+            {
+                "cluster_name": "Juncken AG",
+                "names_list": [
+                    "Juncken AG"
+                ],
+                "holder_from_cluster_name": "Juncken AG"
+            },
+            {
+                "cluster_name": "Radisch  Gunpf KGaA",
+                "names_list": [
+                    "Radisch-Gunpf KGaA",
+                    "Radisch  Gunpf KGaA",
+                    "Radisch Gunpf KGaA",
+                    "Radisch Gunpf  KGaA"
+                ],
+                "holder_from_cluster_name": "Radisch Gunpf KGaA"
+            },
+            {
+                "cluster_name": "Ditschlerin",
+                "names_list": [
+                    "Ditschlerin"
+                ],
+                "holder_from_cluster_name": "Ditschlerin"
+            },
+            {
+                "cluster_name": "Haering GmbH & Co. KG",
+                "names_list": [
+                    "Haering GmbH & Co. KG"
+                ],
+                "holder_from_cluster_name": "Haering GmbH & Co. KG"
+            },
+            {
+                "cluster_name": "Weinhold Seidel KG",
+                "names_list": [
+                    "Weinhold Seidel KG"
+                ],
+                "holder_from_cluster_name": "Weinhold Seidel KG"
+            },
+            {
+                "cluster_name": "Scheibe Warmer GmbH",
+                "names_list": [
+                    "Scheibe Warmer GmbH"
+                ],
+                "holder_from_cluster_name": "Scheibe Warmer GmbH"
+            },
+            {
+                "cluster_name": "Ehlert Rörricht GmbH",
+                "names_list": [
+                    "Ehlert Rörricht GmbH"
+                ],
+                "holder_from_cluster_name": "Ehlert Rörricht GmbH"
+            },
+            {
+                "cluster_name": "Girschner Henk GmbH",
+                "names_list": [
+                    "Girschner Henk GmbH"
+                ],
+                "holder_from_cluster_name": "Girschner Henk GmbH"
+            },
+            {
+                "cluster_name": "Heinz Lorch GmbH & Co. OHG",
+                "names_list": [
+                    "Heinz Lorch GmbH & Co. OHG"
+                ],
+                "holder_from_cluster_name": "Heinz Lorch GmbH & Co. OHG"
+            },
+            {
+                "cluster_name": "Johann GmbH & Co. OHG",
+                "names_list": [
+                    "Johann GmbH & Co. OHG"
+                ],
+                "holder_from_cluster_name": "Johann GmbH & Co. OHG"
+            },
+            {
+                "cluster_name": "Schacht Salz KG",
+                "names_list": [
+                    "Schacht Salz KG"
+                ],
+                "holder_from_cluster_name": "Schacht Salz KG"
+            }
+        ]
+    },
+    "ES9058834982428350464122": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Kallert Neureuther GmbH & Co. KG"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Kallert Neureuther .GmbH Company KG",
+                "names_list": [
+                    "Kallert Neureuther GmbH &",
+                    "Kallert Neureuther GmbH & Co. KG",
+                    "Kallert Neureuther &",
+                    "Kallert Neureuther GmbH & Co- KG",
+                    "Kallert Neureuther GmbH &.Co.  KG",
+                    "Kallert Neureuther GmbH- & Co KG",
+                    "Kallert Neureuther .GmbH Company KG"
+                ],
+                "holder_from_cluster_name": "Kallert Neureuther GmbH & Co. KG"
+            }
+        ]
+    },
+    "FR0407239520900091111922610": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Jones Ltd"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Jones Limited",
+                "names_list": [
+                    "Jones/",
+                    "Jones Ltée",
+                    "Jones-",
+                    "Jones- LTD",
+                    "Jones  .LTd.",
+                    "Jones",
+                    "Jones Ltd",
+                    "Jones Ltd.",
+                    "Jones Limited"
+                ],
+                "holder_from_cluster_name": "Jones Ltd"
+            }
+        ]
+    },
+    "FR0566236880108399324512643": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "van Tours & Mansveld"
+        ],
+        "holders": [
+            {
+                "cluster_name": "van .Tours/&- Mansveld",
+                "names_list": [
+                    "van Tours &- Mansveld",
+                    "van/Tours-&-Mansveld",
+                    "van Tours & Mansveld",
+                    "van .Tours/&- Mansveld",
+                    "van .Tours & Mansveld",
+                    "van-Tours .&-Mansveld",
+                    "van .Tours &/Mansveld",
+                    "van - Tours &.Mansveld",
+                    "van Tours - Mansveld",
+                    "van .Tours - &",
+                    "van  Tours & Mansveld",
+                    "van,Tours & Mansveld",
+                    "van - Tours & Mansveld"
+                ],
+                "holder_from_cluster_name": "van Tours & Mansveld"
+            }
+        ]
+    },
+    "FR1294714373017849589255401": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "van der Horst BV",
+            "Bierstraten BV",
+            "van Gemert BV",
+            "Boer NV",
+            "Boer Groep",
+            "Prins BV"
+        ],
+        "holders": [
+            {
+                "cluster_name": "van der Horst BV",
+                "names_list": [
+                    "van Gemert BV",
+                    "van der Horst BV"
+                ],
+                "holder_from_cluster_name": "van der Horst BV"
+            },
+            {
+                "cluster_name": "Bierstraten BV SNC",
+                "names_list": [
+                    "Bierstraten BV",
+                    "Boer Groep",
+                    "Boer NV",
+                    "Bierstraten BV SNC"
+                ],
+                "holder_from_cluster_name": "Bierstraten BV"
+            },
+            {
+                "cluster_name": "Prins BV",
+                "names_list": [
+                    "Prins BV"
+                ],
+                "holder_from_cluster_name": "Prins BV"
+            }
+        ]
+    },
+    "FR2246706438152929511598941": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Martucci SPA"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Martucci S.P.A. Incorporated",
+                "names_list": [
+                    "Martucci SPA,",
+                    "Martucci SPA",
+                    "Martucci SPA Incorporated",
+                    "Martucci S.a. Incorporated",
+                    "Martucci SPA Inc",
+                    "Martucci,",
+                    "Martucci S.P.A. Incorporated",
+                    "Martucci SPA Inc.",
+                    "Martucci SpA  Incorporated",
+                    "Martucci SpA /Incorporated",
+                    "Martucci"
+                ],
+                "holder_from_cluster_name": "Martucci SPA"
+            }
+        ]
+    },
+    "FR3237479006355975747544438": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Seifert Stiftung & Co. KG",
+            "Rogner",
+            "Kusch",
+            "Förster Warmer GmbH",
+            "Knappe GmbH & Co. OHG",
+            "Biggen Fritsch GmbH & Co. KG",
+            "Schäfer KG",
+            "Kühnert",
+            "Noack Zimmer AG & Co. KGaA",
+            "Krause GmbH & Co. KG"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Biggen Fritsch GmbH & Comp. KG",
+                "names_list": [
+                    "Biggen Fritsch .GmbH &",
+                    "Biggen Fritsch GmbH & Comp. KG",
+                    "Biggen Fritsch GmbH & Co. KG"
+                ],
+                "holder_from_cluster_name": "Biggen Fritsch GmbH & Co. KG"
+            },
+            {
+                "cluster_name": "Förster Warmer GmbH",
+                "names_list": [
+                    "Förster Warmer GmbH"
+                ],
+                "holder_from_cluster_name": "Förster Warmer GmbH"
+            },
+            {
+                "cluster_name": "Schäfer KG",
+                "names_list": [
+                    "Schäfer KG"
+                ],
+                "holder_from_cluster_name": "Schäfer KG"
+            },
+            {
+                "cluster_name": "Krause GmbH & Co. KG",
+                "names_list": [
+                    "Krause GmbH & Co. KG"
+                ],
+                "holder_from_cluster_name": "Krause GmbH & Co. KG"
+            },
+            {
+                "cluster_name": "Seifert Stiftung & Co. KG",
+                "names_list": [
+                    "Seifert Stiftung & Co. KG"
+                ],
+                "holder_from_cluster_name": "Seifert Stiftung & Co. KG"
+            },
+            {
+                "cluster_name": "Rogner",
+                "names_list": [
+                    "Rogner"
+                ],
+                "holder_from_cluster_name": "Rogner"
+            },
+            {
+                "cluster_name": "Kusch",
+                "names_list": [
+                    "Kusch"
+                ],
+                "holder_from_cluster_name": "Kusch"
+            },
+            {
+                "cluster_name": "Knappe GmbH & Co. OHG",
+                "names_list": [
+                    "Knappe GmbH & Co. OHG"
+                ],
+                "holder_from_cluster_name": "Knappe GmbH & Co. OHG"
+            },
+            {
+                "cluster_name": "Kühnert",
+                "names_list": [
+                    "Kühnert"
+                ],
+                "holder_from_cluster_name": "Kühnert"
+            },
+            {
+                "cluster_name": "Noack Zimmer AG & Co. KGaA",
+                "names_list": [
+                    "Noack Zimmer AG & Co. KGaA"
+                ],
+                "holder_from_cluster_name": "Noack Zimmer AG & Co. KGaA"
+            }
+        ]
+    },
+    "FR4281485739718093835687901": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Eriks",
+            "CZ",
+            "Fagron N.V.",
+            "Kloppert Groep",
+            "van Rheineck Groep",
+            "van Asten BV",
+            "de Bruin Groep"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Eriks",
+                "names_list": [
+                    "Eriks"
+                ],
+                "holder_from_cluster_name": "Eriks"
+            },
+            {
+                "cluster_name": "Fagron .N.V.",
+                "names_list": [
+                    "Fagron .N.V.",
+                    "Fagron N.V."
+                ],
+                "holder_from_cluster_name": "Fagron N.V."
+            },
+            {
+                "cluster_name": "CZ",
+                "names_list": [
+                    "CZ"
+                ],
+                "holder_from_cluster_name": "CZ"
+            },
+            {
+                "cluster_name": "Kloppert Groep",
+                "names_list": [
+                    "Kloppert Groep"
+                ],
+                "holder_from_cluster_name": "Kloppert Groep"
+            },
+            {
+                "cluster_name": "van Rheineck Groep",
+                "names_list": [
+                    "van Rheineck Groep"
+                ],
+                "holder_from_cluster_name": "van Rheineck Groep"
+            },
+            {
+                "cluster_name": "van Asten BV",
+                "names_list": [
+                    "van Asten BV"
+                ],
+                "holder_from_cluster_name": "van Asten BV"
+            },
+            {
+                "cluster_name": "Comp..Glb",
+                "names_list": [
+                    "Comp..Glb"
+                ],
+                "holder_from_cluster_name": "CZ"
+            },
+            {
+                "cluster_name": "de Bruin Groep",
+                "names_list": [
+                    "de Bruin Groep"
+                ],
+                "holder_from_cluster_name": "de Bruin Groep"
+            }
+        ]
+    },
+    "FR6353002832694679192779934": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Monnier SA",
+            "Robert"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Monnier SA",
+                "names_list": [
+                    "Monnier SA"
+                ],
+                "holder_from_cluster_name": "Monnier SA"
+            },
+            {
+                "cluster_name": "Robert- Brothers",
+                "names_list": [
+                    "Robert Bros",
+                    "Robert- Brothers",
+                    "Robert Brothers",
+                    "Robert  Bros",
+                    "Robert",
+                    "Robert Br."
+                ],
+                "holder_from_cluster_name": "Robert"
+            }
+        ]
+    },
+    "FR6457069278800648658790969": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Ledoux"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Ledoux S.p.A.",
+                "names_list": [
+                    "Ledoux",
+                    "Ledoux S.p.A.",
+                    "Ledoux S.P.A.",
+                    "Ledoux.",
+                    "Ledoux S.C.",
+                    "Ledoux S.u.",
+                    "Ledoux Sp.A.",
+                    "Ledoux  SA",
+                    "Ledoux SA",
+                    "Ledoux SPA"
+                ],
+                "holder_from_cluster_name": "Ledoux"
+            }
+        ]
+    },
+    "FR9324994330997394360541540": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Carriera e figli",
+            "Donini-Rizzoli SPA",
+            "Pellico, Bondumier e Mazzi s.r.l.",
+            "Milanesi s.r.l.",
+            "Campanella, Dalla e Pizzamano s.r.l.",
+            "Giannuzzi e figli",
+            "Polesel, Gargallo e Morosini s.r.l.",
+            "Totino-Micheletti Group",
+            "Gasperi-Orlando Group",
+            "Scaduto-Montesano e figli",
+            "Murialdo-Endrizzi s.r.l.",
+            "Majewski Group",
+            "Scamarcio e figli"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Carriera e figli",
+                "names_list": [
+                    "Carriera e figli"
+                ],
+                "holder_from_cluster_name": "Carriera e figli"
+            },
+            {
+                "cluster_name": "Totino-Micheletti Group",
+                "names_list": [
+                    "Totino-Micheletti Group"
+                ],
+                "holder_from_cluster_name": "Totino-Micheletti Group"
+            },
+            {
+                "cluster_name": "Giannuzzi e figli",
+                "names_list": [
+                    "Giannuzzi e figli"
+                ],
+                "holder_from_cluster_name": "Giannuzzi e figli"
+            },
+            {
+                "cluster_name": "Majewski Group S.P.A.",
+                "names_list": [
+                    "Majewski Group S.P.A.",
+                    "Majewski Group SpA",
+                    "Majewski",
+                    "Majewski - Group SpA ",
+                    "Majewski Group SPA",
+                    "Majewski Group",
+                    "Majewski Gr. S.p.A."
+                ],
+                "holder_from_cluster_name": "Majewski Group"
+            },
+            {
+                "cluster_name": "Pellico, Bondumier e Mazzi s.r.l.",
+                "names_list": [
+                    "Pellico, Bondumier e Mazzi s.r.l."
+                ],
+                "holder_from_cluster_name": "Pellico, Bondumier e Mazzi s.r.l."
+            },
+            {
+                "cluster_name": "Donini-Rizzoli SPA",
+                "names_list": [
+                    "Donini-Rizzoli SPA"
+                ],
+                "holder_from_cluster_name": "Donini-Rizzoli SPA"
+            },
+            {
+                "cluster_name": "Milanesi s.r.l.",
+                "names_list": [
+                    "Milanesi s.r.l."
+                ],
+                "holder_from_cluster_name": "Milanesi s.r.l."
+            },
+            {
+                "cluster_name": "Campanella, Dalla e Pizzamano s.r.l.",
+                "names_list": [
+                    "Campanella, Dalla e Pizzamano s.r.l."
+                ],
+                "holder_from_cluster_name": "Campanella, Dalla e Pizzamano s.r.l."
+            },
+            {
+                "cluster_name": "Polesel, Gargallo e Morosini s.r.l.",
+                "names_list": [
+                    "Polesel, Gargallo e Morosini s.r.l."
+                ],
+                "holder_from_cluster_name": "Polesel, Gargallo e Morosini s.r.l."
+            },
+            {
+                "cluster_name": "Gasperi-Orlando Group",
+                "names_list": [
+                    "Gasperi-Orlando Group"
+                ],
+                "holder_from_cluster_name": "Gasperi-Orlando Group"
+            },
+            {
+                "cluster_name": "Scaduto-Montesano e figli",
+                "names_list": [
+                    "Scaduto-Montesano e figli"
+                ],
+                "holder_from_cluster_name": "Scaduto-Montesano e figli"
+            },
+            {
+                "cluster_name": "Murialdo-Endrizzi s.r.l.",
+                "names_list": [
+                    "Murialdo-Endrizzi s.r.l."
+                ],
+                "holder_from_cluster_name": "Murialdo-Endrizzi s.r.l."
+            },
+            {
+                "cluster_name": "Scamarcio e figli",
+                "names_list": [
+                    "Scamarcio e figli"
+                ],
+                "holder_from_cluster_name": "Scamarcio e figli"
+            }
+        ]
+    },
+    "FR9865070657668358980273164": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Cassiano Barros Ltda."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Cassiano Barros Ltda.",
+                "names_list": [
+                    "Cassiano Barros Ltda.",
+                    "Cassiano Barros Ltd ",
+                    "Cassiano Barros Ltd",
+                    "Cassiano Barros Ltée",
+                    "Cassiano Barros LTd.",
+                    "Cassiano.Barros LTD",
+                    "Cassiano Barros,LTD",
+                    "Cassiano Barros",
+                    "Cassiano Barros  LTD",
+                    "Cassiano Barros LTT"
+                ],
+                "holder_from_cluster_name": "Cassiano Barros Ltda."
+            }
+        ]
+    },
+    "GB04IXYT76937119751310": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Winkler Kühnert AG & Co. OHG"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Winkler Kühnert AG & Company OHG",
+                "names_list": [
+                    "Winkler Kühnert & Company OHG",
+                    "Winkler Kühnert  AG Comp. OHG",
+                    "Winkler Kühnert AG &.OHG",
+                    "Winkler Kühnert &",
+                    "Winkler Kühnert AG & Co. OHG",
+                    "Winkler Kühnert AG &",
+                    "Winkler Kühnert AG & OHG",
+                    "Winkler Kühnert AG & Company OHG",
+                    "Winkler Kühnert AG",
+                    "Winkler Kühnert .&",
+                    "Winkler Kühnert &-"
+                ],
+                "holder_from_cluster_name": "Winkler Kühnert AG & Co. OHG"
+            }
+        ]
+    },
+    "GB17RAPY95021995650855": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Hermanos Bravo S.L.",
+            "Castell & Asociados S.Coop.",
+            "Hermanos Noriega S.A."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Hermanos Noriega S.A.",
+                "names_list": [
+                    "Hermanos Noriega S.A.",
+                    "Hermanos Bravo S.L.",
+                    "Hermanos  Bravo",
+                    "Hermanos,Noriega",
+                    "Hermanos Bravo S.C.",
+                    "Hermanos Bravo"
+                ],
+                "holder_from_cluster_name": "Hermanos Noriega S.A."
+            },
+            {
+                "cluster_name": "Castell & - Asociados S.Coop.",
+                "names_list": [
+                    "Castell & Asociados S.Coop.",
+                    "Castell & - Asociados S.Coop."
+                ],
+                "holder_from_cluster_name": "Castell & Asociados S.Coop."
+            }
+        ]
+    },
+    "GB19FDJW14098212942393": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Smith, Hernandez and Ramos",
+            "Richmond Group"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Smith, Hernandez and Ramos",
+                "names_list": [
+                    "Smith, Hernandez and Ramos"
+                ],
+                "holder_from_cluster_name": "Smith, Hernandez and Ramos"
+            },
+            {
+                "cluster_name": "Richmond Group",
+                "names_list": [
+                    "Richmond Group"
+                ],
+                "holder_from_cluster_name": "Richmond Group"
+            }
+        ]
+    },
+    "GB20PWBT87921873980758": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "das Neves",
+            "Porto e Filhos",
+            "Rocha"
+        ],
+        "holders": [
+            {
+                "cluster_name": "S.a.s. Neves Società per Azioni",
+                "names_list": [
+                    "S.a.s. Neves Società per Azioni",
+                    "Rocha S.u.",
+                    "Rocha",
+                    "Rocha SA",
+                    "- Neves Società per- Azioni",
+                    "Rocha S.C.",
+                    "S.A.S. Neves Società per Azioni",
+                    "das Neves"
+                ],
+                "holder_from_cluster_name": "das Neves"
+            },
+            {
+                "cluster_name": "Porto e Filhos",
+                "names_list": [
+                    "Porto e Filhos"
+                ],
+                "holder_from_cluster_name": "Porto e Filhos"
+            }
+        ]
+    },
+    "GB20TDLW84219016295215": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Henk GbR"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Henk GbR - S.C.",
+                "names_list": [
+                    "Henk GbR - S.C.",
+                    "Henk. GbR  S.U.",
+                    "Henk - GbR S.u.",
+                    "Henk GbR",
+                    "Henk  GbR-",
+                    "Henk GbR.S.U.",
+                    "Henk GbR S.C.",
+                    "Henk GbR,",
+                    "Henk GbR-"
+                ],
+                "holder_from_cluster_name": "Henk GbR"
+            }
+        ]
+    },
+    "GB22LZCO43635422740047": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Didier Dupré S.A.R.L.",
+            "Munoz",
+            "Valette",
+            "Toussaint",
+            "Texier SA",
+            "Mercier SA",
+            "Leroy"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Valette- S.N.C.",
+                "names_list": [
+                    "Valette- S.N.C.",
+                    "Valette Ind.",
+                    "Valette Inds.",
+                    "Valette Inds",
+                    "Valette",
+                    "Valette .Inds"
+                ],
+                "holder_from_cluster_name": "Valette"
+            },
+            {
+                "cluster_name": "Munoz Ind",
+                "names_list": [
+                    "Munoz Ind",
+                    "Munoz"
+                ],
+                "holder_from_cluster_name": "Munoz"
+            },
+            {
+                "cluster_name": "Toussaint",
+                "names_list": [
+                    "Toussaint"
+                ],
+                "holder_from_cluster_name": "Toussaint SA"
+            },
+            {
+                "cluster_name": "Didier Dupré S.A.R.L.",
+                "names_list": [
+                    "Didier Dupré S.A.R.L.",
+                    "Mercier SA"
+                ],
+                "holder_from_cluster_name": "Didier Dupré S.A.R.L."
+            },
+            {
+                "cluster_name": "Texier SA",
+                "names_list": [
+                    "Texier SA"
+                ],
+                "holder_from_cluster_name": "Texier SA"
+            },
+            {
+                "cluster_name": "Leroy",
+                "names_list": [
+                    "Leroy"
+                ],
+                "holder_from_cluster_name": "Leroy"
+            }
+        ]
+    },
+    "GB22ZIKY72499252914504": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "White, Diaz and Stevens"
+        ],
+        "holders": [
+            {
+                "cluster_name": "White,. Diaz,Industries Stevens",
+                "names_list": [
+                    "White, Diaz and Stevens",
+                    "White, Diaz Industries Stevens",
+                    "White, Diaz Ind. Stevens",
+                    "White, - Diaz",
+                    "White, Diaz",
+                    "White,. Diaz,Industries Stevens"
+                ],
+                "holder_from_cluster_name": "White, Diaz and Stevens"
+            }
+        ]
+    },
+    "GB27GLVJ94335018646402": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Petrocelli-Rizzo e figli"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Petrocelli-  Rizzo. e figli",
+                "names_list": [
+                    "Petrocelli,Rizzo-e",
+                    "Petrocelli Rizzo e figli",
+                    "Petrocelli/Rizzo.figli",
+                    "Petrocelli/Rizzo. e- figli",
+                    "Petrocelli. Rizzo,e figli",
+                    "Petrocelli - Rizzo/e figli",
+                    "Petrocelli,Rizzo.e figli",
+                    "Petrocelli-  Rizzo. e figli",
+                    "Petrocelli,Rizzo. e .figli",
+                    "Petrocelli/Rizzo.e. figli",
+                    "Petrocelli  Rizzo/e",
+                    "Petrocelli-Rizzo,e/figli",
+                    "Petrocelli/Rizzo  figli"
+                ],
+                "holder_from_cluster_name": "Petrocelli-Rizzo e figli"
+            }
+        ]
+    },
+    "GB27ZTJR50380774828387": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Eimer Schuster GbR"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Eimer - Schuster. GbR",
+                "names_list": [
+                    "Eimer/Schuster-GbR",
+                    "Eimer. Schuster/GbR",
+                    "Eimer - Schuster",
+                    "Eimer- Schuster.GbR",
+                    "Eimer,Schuster-GbR",
+                    "Eimer,Schuster",
+                    "Eimer - Schuster,GbR",
+                    "Eimer - Schuster-GbR",
+                    "Eimer/Schuster. GbR",
+                    "Eimer/Schuster- GbR",
+                    "Eimer - Schuster.GbR",
+                    "Eimer,Schuster.GbR",
+                    "Eimer - Schuster. GbR",
+                    "Eimer Schuster GbR"
+                ],
+                "holder_from_cluster_name": "Eimer Schuster GbR"
+            }
+        ]
+    },
+    "GB28CMKI80506665784692": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Pinto",
+            "Moreira da Rocha S/A",
+            "Moreira Macedo S.A."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Moreira Macedo Società per Azioni",
+                "names_list": [
+                    "Moreira S.a. Rocha S/A",
+                    "Moreira da Rocha",
+                    "Moreira da Società per Azioni",
+                    "Moreira Macedo Società per Azioni",
+                    "Moreira S.A Rocha S/A",
+                    "Moreira",
+                    "Moreira da Rocha S/A",
+                    "Moreira Macedo S.A.",
+                    "Moreira S.A Rocha .S/A",
+                    "Moreira,da - Rocha",
+                    "Moreira S.A. Rocha S/A"
+                ],
+                "holder_from_cluster_name": "Moreira Macedo S.A."
+            },
+            {
+                "cluster_name": "Pinto",
+                "names_list": [
+                    "Pinto"
+                ],
+                "holder_from_cluster_name": "Pinto"
+            }
+        ]
+    },
+    "GB30HXXL95453636572916": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Austermühle Dippel Stiftung & Co. KG",
+            "Biggen",
+            "Gertz",
+            "Schomber GmbH & Co. OHG"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Austermühle Dippel Stiftung & Co. KG",
+                "names_list": [
+                    "Austermühle Dippel Stiftung & Co. KG"
+                ],
+                "holder_from_cluster_name": "Austermühle Dippel Stiftung & Co. KG"
+            },
+            {
+                "cluster_name": "Gertz Industries",
+                "names_list": [
+                    "Gertz Inds.",
+                    "Gertz Industries",
+                    "Gertz"
+                ],
+                "holder_from_cluster_name": "Gertz"
+            },
+            {
+                "cluster_name": "Biggen",
+                "names_list": [
+                    "Biggen"
+                ],
+                "holder_from_cluster_name": "Biggen"
+            },
+            {
+                "cluster_name": "Schomber GmbH & Co. OHG",
+                "names_list": [
+                    "Schomber GmbH & Co. OHG"
+                ],
+                "holder_from_cluster_name": "Schomber GmbH & Co. OHG"
+            }
+        ]
+    },
+    "GB33HHEY17874475891136": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Vigliotti-Bignardi s.r.l."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Vigliotti-Bignardi s.r.l.",
+                "names_list": [
+                    "Vigliotti-Bignardi s.r.l.",
+                    "Vigliotti Bignardi s.r.l."
+                ],
+                "holder_from_cluster_name": "Vigliotti-Bignardi s.r.l."
+            }
+        ]
+    },
+    "GB37HALV07459889303920": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Mediamarkt"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Mediamarkt S.C.",
+                "names_list": [
+                    "Mediamarkt S.C.",
+                    "Mediamarkt S.C",
+                    "Mediamarkt",
+                    "Mediamarkt S.c"
+                ],
+                "holder_from_cluster_name": "Mediamarkt"
+            }
+        ]
+    },
+    "GB39EHRV01576764058656": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Zwijsen Groep"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Zwijsen Groep",
+                "names_list": [
+                    "Zwijsen Groep",
+                    "Zwijsen",
+                    "Zwijsen.",
+                    "Zwijsen Grp."
+                ],
+                "holder_from_cluster_name": "Zwijsen Groep"
+            }
+        ]
+    },
+    "GB40JYCC67375179776814": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Schmidtke"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Schmidtke Public Limited Company",
+                "names_list": [
+                    "Schmidtke",
+                    "Schmidtke Pvt Ltd",
+                    "Schmidtke P.L.C.",
+                    "Schmidtke  Public",
+                    "Schmidtke Public Limited Company",
+                    "Schmidtke PLCC",
+                    "Schmidtke P.L.C"
+                ],
+                "holder_from_cluster_name": "Schmidtke"
+            }
+        ]
+    },
+    "GB43KSMP95300445468598": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Gauthier"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Gauthier,Group",
+                "names_list": [
+                    "Gauthier,Group",
+                    "Gauthier  Grp",
+                    "Gauthier",
+                    "Gauthier Grp."
+                ],
+                "holder_from_cluster_name": "Gauthier"
+            }
+        ]
+    },
+    "GB50ULXZ13528688233840": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "da Mota S.A.",
+            "Pires",
+            "Cassiano",
+            "Câmara"
+        ],
+        "holders": [
+            {
+                "cluster_name": "S.A.  Mota S.A.",
+                "names_list": [
+                    "da Mota S.A.",
+                    "da Mota S.C.",
+                    "Mota .S.A.",
+                    "S.A.  Mota S.A.",
+                    "S.A. Mota S.A.",
+                    "-Mota S.A.",
+                    "da Mota S.a.s.",
+                    "S.a Mota .S.A.",
+                    "da Mota",
+                    "Mota S.A.",
+                    "Câm .ra",
+                    "da Mota S.P.A.",
+                    "Câmara"
+                ],
+                "holder_from_cluster_name": "da Mota S.A."
+            },
+            {
+                "cluster_name": "Cassiano - Glob.",
+                "names_list": [
+                    "Cassiano",
+                    "Cassiano - Glob."
+                ],
+                "holder_from_cluster_name": "Cassiano"
+            },
+            {
+                "cluster_name": "Pires",
+                "names_list": [
+                    "Pires"
+                ],
+                "holder_from_cluster_name": "Pires"
+            }
+        ]
+    },
+    "GB55FECT84780369501400": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Soluciones Española S.Com."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Soluciones- Española S.Com.",
+                "names_list": [
+                    "Soluciones- Española S.Com.",
+                    "Soluciones Española .S.Com.",
+                    "Soluciones Española S.Com.",
+                    "Soluciones-Española S.Com."
+                ],
+                "holder_from_cluster_name": "Soluciones Española S.Com."
+            }
+        ]
+    },
+    "GB59IPXL70136584269760": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Pineda & Asociados S.A.",
+            "Rocamora y asociados S.Com.",
+            "Perera y asociados S.Com.",
+            "Comercial Costa S.L."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Pineda & Asociados S.P.A.",
+                "names_list": [
+                    "Pineda  &",
+                    "Pineda & Asociados SpA ",
+                    "Pineda & Asociados SAS",
+                    "Pineda & Asociados",
+                    "Pineda & Asociados S.A.",
+                    "Pineda & Asociados S.P.A."
+                ],
+                "holder_from_cluster_name": "Pineda & Asociados S.A."
+            },
+            {
+                "cluster_name": "Rocamora y asociados S.Com.",
+                "names_list": [
+                    "Perera y asociados S.Com.",
+                    "Rocamora y asociados S.Com."
+                ],
+                "holder_from_cluster_name": "Rocamora y asociados S.Com."
+            },
+            {
+                "cluster_name": "Comercial Costa S.L.",
+                "names_list": [
+                    "Comercial Costa S.L."
+                ],
+                "holder_from_cluster_name": "Comercial Costa S.L."
+            }
+        ]
+    },
+    "GB60GUCB29107718001615": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Priscila Salvà Robles S.Com.",
+            "Aura Ribas Julián S.L.",
+            "Hnos Castrillo S.L.N.E",
+            "Banca Privada Bonet & Asociados S.A.T."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Priscila Salvà Robles S.Com.",
+                "names_list": [
+                    "Hnos Castrillo S.L.N.E",
+                    "Hnos Castrillo  S.L.N.E",
+                    "Priscila Salvà Robles S.Com."
+                ],
+                "holder_from_cluster_name": "Priscila Salvà Robles S.Com."
+            },
+            {
+                "cluster_name": "Aura .Ribas Julián .S.U.",
+                "names_list": [
+                    "Aura Ribas Julián S.L.",
+                    "Aura .Ribas Julián .S.U."
+                ],
+                "holder_from_cluster_name": "Aura Ribas Julián S.L."
+            },
+            {
+                "cluster_name": "Banca Privada Bonet & Asociados S.A.T.",
+                "names_list": [
+                    "Banca Privada Bonet & Asociados S.A.T."
+                ],
+                "holder_from_cluster_name": "Banca Privada Bonet & Asociados S.A.T."
+            }
+        ]
+    },
+    "GB64PRBR89706403009174": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "da Luz"
+        ],
+        "holders": [
+            {
+                "cluster_name": "da Luz S.P.A.",
+                "names_list": [
+                    "S.a Luz SA",
+                    "da Luz S.P.A.",
+                    "da Luz",
+                    "Luz SA",
+                    "da Luz S.p.A.",
+                    "S.a. Luz SA"
+                ],
+                "holder_from_cluster_name": "da Luz"
+            }
+        ]
+    },
+    "GB65MJAB34511818647917": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Anderson, Taylor and Chambers",
+            "Pacheco, Beasley and Ramirez",
+            "Garcia PLC"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Anderson, Taylor Ind.  Chambers",
+                "names_list": [
+                    "Anderson, Taylor and Chambers",
+                    "Anderson, Taylor Ind.  Chambers"
+                ],
+                "holder_from_cluster_name": "Anderson, Taylor and Chambers"
+            },
+            {
+                "cluster_name": "Pacheco, Beasley and Ramirez",
+                "names_list": [
+                    "Pacheco, Beasley and Ramirez"
+                ],
+                "holder_from_cluster_name": "Pacheco, Beasley and Ramirez"
+            },
+            {
+                "cluster_name": "Garcia PLC",
+                "names_list": [
+                    "Garcia PLC"
+                ],
+                "holder_from_cluster_name": "Garcia PLC"
+            }
+        ]
+    },
+    "GB65RZZS21904254820890": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Koninklijke van Dongen"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Koninklijke.van Dongen",
+                "names_list": [
+                    "Koninklijke van",
+                    "Koninklijke.van Dongen",
+                    "Koninklijke van Dongen",
+                    "Koninklijke van,Dongen"
+                ],
+                "holder_from_cluster_name": "Koninklijke van Dongen"
+            }
+        ]
+    },
+    "GB67TJFK39729839892591": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Swift, Faulkner and Jackson"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Swift, Faulkner Inds. Jackson",
+                "names_list": [
+                    "Swift, Faulkner Jackson",
+                    "Swift, Faulkner Inds. Jackson",
+                    "Swift, Faulkner Inds Jackson",
+                    "Swift, Faulkner .",
+                    "Swift, Faulkner and Jackson",
+                    "Swift, Faulkner"
+                ],
+                "holder_from_cluster_name": "Swift, Faulkner and Jackson"
+            }
+        ]
+    },
+    "GB67TTCB18951051650286": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Soffici-Togliatti e figli"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Soffici Togliatti e figli - Group",
+                "names_list": [
+                    "Soffici Togliatti,e figli Group",
+                    "Soffici-Togliatti e figli",
+                    "Soffici Togliatti .e figli Grp.",
+                    "Soffici.Togliatti e figli Grp.",
+                    "Soffici.Togliatti .e figli Gp.",
+                    "Soffici Togliatti e figli-Grp",
+                    "Soffici Togliatti e figli .Group",
+                    "Soffici - Togliatti e figli",
+                    "Soffici Togliatti e figli - Group",
+                    "Soffici Togliatti e - figli",
+                    "Soffici Togliatti e figli",
+                    "Soffici Togliatti e figli Grp.",
+                    "Soffici Togliatti e.figli.",
+                    "Soffici Togliatti e figli  Group",
+                    "Soffici Togliatti e.figli-Group"
+                ],
+                "holder_from_cluster_name": "Soffici-Togliatti e figli"
+            }
+        ]
+    },
+    "GB72YXSJ73094038055259": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Cannizzaro, Sbarbaro e Pigafetta s.r.l."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Cannizzaro, Sbarbaro e Pigafetta - S r l",
+                "names_list": [
+                    "Cannizzaro, Sbarbaro e Pigafetta - S r l",
+                    "Cannizzaro, Sbarbaro e SRL",
+                    "Cannizzaro, Sbarbaro e  Pigafetta",
+                    "Cannizzaro, Sbarbaro e Pigafetta",
+                    "Cannizzaro, Sbarbaro e Pigafetta-S.R.L.",
+                    "Cannizzaro, Sbarbaro,e Pigafetta",
+                    "Cannizzaro, Sbarbaro e Pigafetta s.r.l."
+                ],
+                "holder_from_cluster_name": "Cannizzaro, Sbarbaro e Pigafetta s.r.l."
+            }
+        ]
+    },
+    "GB77JEIX08818260204103": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Gallego y Fuertes S.Com."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Gallego.y.Fuertes - S.Com.",
+                "names_list": [
+                    "Gallego-y .Fuertes",
+                    "Gallego y Fuertes S.Com.",
+                    "Gallego.y.Fuertes - S.Com.",
+                    "Gallego/y Fuertes S.Com.",
+                    "Gallego y Fuertes",
+                    "Gallego y S.Com.",
+                    "Gallego/y-Fuertes - S.Com.",
+                    "Gallego y-Fuertes,S.Com.",
+                    "Gallego-y. Fuertes.S.Com.",
+                    "Gallego y- Fuertes S.Com."
+                ],
+                "holder_from_cluster_name": "Gallego y Fuertes S.Com."
+            }
+        ]
+    },
+    "GB78OXKT12551831115165": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Duarte Macedo - ME"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Duarte Macedo   ME S.N.C.",
+                "names_list": [
+                    "Duarte Macedo   ME SNC",
+                    "Duarte Macedo .  ME SNC",
+                    "Duarte Macedo,  ME SNC",
+                    "Duarte Macedo   .ME",
+                    "Duarte Macedo- -  ME SNC",
+                    "Duarte Macedo  . ME -",
+                    "Duarte  Macedo   ME",
+                    "Duarte Macedo   ME S.N.C.",
+                    "Duarte Macedo - ME",
+                    "Duarte Macedo   ME S.N.C",
+                    "Duarte Macedo .,ME S.N.C",
+                    "Duarte Macedo . ME/"
+                ],
+                "holder_from_cluster_name": "Duarte Macedo - ME"
+            }
+        ]
+    },
+    "GB79YIMX87234290375671": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Ellis, Parkin and Wilson"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Ellis,  Parkin Industries Wilson",
+                "names_list": [
+                    "Ellis, Parkin  Ind. Wilson",
+                    "Ellis,/Parkin Inds Wilson",
+                    "Ellis,  Parkin Inds.",
+                    "Ellis,  Parkin Industries Wilson",
+                    "Ellis, Parkin and Wilson",
+                    "Ellis, Parkin.",
+                    "Ellis, Parkin Ind. Wilson",
+                    "Ellis, Parkin Inds.  Wilson",
+                    "Ellis, Parkin Industries Wilson",
+                    "Ellis, Parkin"
+                ],
+                "holder_from_cluster_name": "Ellis, Parkin and Wilson"
+            }
+        ]
+    },
+    "GB84WXDP51414467078476": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Papetti s.r.l.",
+            "Marconi, Cusano e Tomasetti SPA",
+            "Zetticci SPA",
+            "Caccioppoli-Civaschi SPA",
+            "Greco, Roncalli e Nugnes e figli",
+            "Piacentini s.r.l."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Papetti s.r.l.",
+                "names_list": [
+                    "Papetti s.r.l."
+                ],
+                "holder_from_cluster_name": "Papetti s.r.l."
+            },
+            {
+                "cluster_name": "Marconi, Cusano e Tomasetti S.a.",
+                "names_list": [
+                    "Marconi, Cusano e Tomasetti S.a.",
+                    "Marconi, Cusano e Tomasetti SPA"
+                ],
+                "holder_from_cluster_name": "Marconi, Cusano e Tomasetti SPA"
+            },
+            {
+                "cluster_name": "Caccioppoli-Civaschi SPA",
+                "names_list": [
+                    "Zetticci SPA",
+                    "Caccioppoli-Civaschi SPA"
+                ],
+                "holder_from_cluster_name": "Caccioppoli-Civaschi SPA"
+            },
+            {
+                "cluster_name": "Greco, Roncalli e Nugnes e figli",
+                "names_list": [
+                    "Greco, Roncalli e Nugnes e figli"
+                ],
+                "holder_from_cluster_name": "Greco, Roncalli e Nugnes e figli"
+            },
+            {
+                "cluster_name": "Piacentini s.r.l.",
+                "names_list": [
+                    "Piacentini s.r.l."
+                ],
+                "holder_from_cluster_name": "Piacentini s.r.l."
+            }
+        ]
+    },
+    "GB89UJRG21228408622692": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Toussaint SA",
+            "Couturier SARL",
+            "Dupré"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Toussaint Società per Azioni",
+                "names_list": [
+                    "Toussaint SA",
+                    "Toussaint",
+                    "Toussaint Società per Azioni"
+                ],
+                "holder_from_cluster_name": "Toussaint SA"
+            },
+            {
+                "cluster_name": "Dupré-S.a.s.",
+                "names_list": [
+                    "Dupré",
+                    "Dupré-S.a.s.",
+                    "Dupré S.P.A",
+                    "Dupré SpA",
+                    "Dupré S.a.s."
+                ],
+                "holder_from_cluster_name": "Dupré"
+            },
+            {
+                "cluster_name": "Couturier SARL S.P.A. ",
+                "names_list": [
+                    "Couturier SARL",
+                    "Couturier.",
+                    "Couturier .SARL",
+                    "Couturier SARL S.P.A. ",
+                    "Couturier"
+                ],
+                "holder_from_cluster_name": "Couturier SARL"
+            }
+        ]
+    },
+    "GB91AUNA07466758542259": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "van der Noot & Scholten"
+        ],
+        "holders": [
+            {
+                "cluster_name": "van der Noot & .Scholten",
+                "names_list": [
+                    "van der Noot & .Scholten",
+                    "van der Noot & Scholten",
+                    "van der- & Scholten",
+                    "van der Noot Scholten",
+                    "van der Noot &"
+                ],
+                "holder_from_cluster_name": "van der Noot & Scholten"
+            }
+        ]
+    },
+    "GB91GFQC94967205304387": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Gaudin",
+            "Rodriguez",
+            "Grondin Boutin SA",
+            "Lebon S.A.R.L."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Grondin Boutin S.c.",
+                "names_list": [
+                    "Grondin Boutin",
+                    "Lebon S.A.R.L.",
+                    "Grondin Boutin SA",
+                    "Grondin Boutin S.c."
+                ],
+                "holder_from_cluster_name": "Grondin Boutin SA"
+            },
+            {
+                "cluster_name": "Gaudin",
+                "names_list": [
+                    "Gaudin"
+                ],
+                "holder_from_cluster_name": "Gaudin"
+            },
+            {
+                "cluster_name": "Rodriguez",
+                "names_list": [
+                    "Rodriguez"
+                ],
+                "holder_from_cluster_name": "Rodriguez"
+            }
+        ]
+    },
+    "GB94TWWL25662238459742": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Andre Schneider SA",
+            "Delahaye et Fils",
+            "Besnard Monnier S.A.",
+            "Lopez Diallo et Fils",
+            "Martineau Gauthier S.A.",
+            "Gaillard"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Andre Schneider,S.c.",
+                "names_list": [
+                    "Andre Schneider SA",
+                    "Andre Schneider,S.c.",
+                    "Andre Schneider S.a."
+                ],
+                "holder_from_cluster_name": "Andre Schneider SA"
+            },
+            {
+                "cluster_name": "Delahaye et Fils",
+                "names_list": [
+                    "Delahaye et Fils"
+                ],
+                "holder_from_cluster_name": "Delahaye et Fils"
+            },
+            {
+                "cluster_name": "Besnard Monnier S.A.",
+                "names_list": [
+                    "Besnard Monnier S.A."
+                ],
+                "holder_from_cluster_name": "Besnard Monnier S.A."
+            },
+            {
+                "cluster_name": "Lopez Diallo et Fils",
+                "names_list": [
+                    "Lopez Diallo et Fils"
+                ],
+                "holder_from_cluster_name": "Lopez Diallo et Fils"
+            },
+            {
+                "cluster_name": "Martineau Gauthier S.A.",
+                "names_list": [
+                    "Martineau Gauthier S.A."
+                ],
+                "holder_from_cluster_name": "Martineau Gauthier S.A."
+            },
+            {
+                "cluster_name": "Gaillard",
+                "names_list": [
+                    "Gaillard"
+                ],
+                "holder_from_cluster_name": "Gaillard"
+            }
+        ]
+    },
+    "GB94XAVF65857461042162": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Pimenta"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Pimenta Partners",
+                "names_list": [
+                    "Pimenta Partners",
+                    "Pimenta Ptnrs.",
+                    "Pimenta,Pts.",
+                    "Pimenta. Pts.",
+                    "Pimenta"
+                ],
+                "holder_from_cluster_name": "Pimenta"
+            }
+        ]
+    },
+    "GB96OTFM38287408502799": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Tarchetti-Fiorucci Group"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Tarchetti,Fiorucci Group Group",
+                "names_list": [
+                    "Tarchetti-Fiorucci Group",
+                    "Tarchetti - Fiorucci Group/",
+                    "Tarchetti Fiorucci Group",
+                    "Tarchetti Fiorucci Group.Grp.",
+                    "Tarchetti,Fiorucci Group Group",
+                    "Tarchetti Fiorucci Gp. Grp.",
+                    "Tarchetti Fiorucci Group Gr.",
+                    "Tarchetti.Fiorucci-",
+                    "Tarchetti Fiorucci Gr. Grp.",
+                    "Tarchetti Fiorucci Group. Grp.",
+                    "Tarchetti Fiorucci. Group",
+                    "Tarchetti. Fiorucci Gr. Grp."
+                ],
+                "holder_from_cluster_name": "Tarchetti-Fiorucci Group"
+            }
+        ]
+    },
+    "GB96WHAZ18994218618953": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Black-Wang",
+            "Clark PLC",
+            "Hall-Lewis"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Black-Wang",
+                "names_list": [
+                    "Black-Wang"
+                ],
+                "holder_from_cluster_name": "Black-Wang"
+            },
+            {
+                "cluster_name": "Clark PLC",
+                "names_list": [
+                    "Clark PLC"
+                ],
+                "holder_from_cluster_name": "Clark PLC"
+            },
+            {
+                "cluster_name": "Hall-Lewis",
+                "names_list": [
+                    "Hall-Lewis"
+                ],
+                "holder_from_cluster_name": "Hall-Lewis"
+            }
+        ]
+    },
+    "GB98KQQU11378713533268": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "de Leeuw NV"
+        ],
+        "holders": [
+            {
+                "cluster_name": "de  - Leeuw .NV",
+                "names_list": [
+                    "de. Leeuw/NV",
+                    "de-Leeuw",
+                    "de,Leeuw - NV",
+                    "de. Leeuw .NV",
+                    "de  - Leeuw .NV",
+                    "de/Leeuw.NV",
+                    "de. Leeuw - NV",
+                    "de. Leeuw- NV",
+                    "de-Leeuw. NV",
+                    "de/Leeuw- NV",
+                    "de,Leeuw,NV",
+                    "de/Leeuw.  NV",
+                    "de .Leeuw .NV",
+                    "de - Leeuw",
+                    "de -  Leeuw .NV",
+                    "de/Leeuw-NV",
+                    "de Leeuw NV"
+                ],
+                "holder_from_cluster_name": "de Leeuw NV"
+            }
+        ]
+    },
+    "IT09U3566198552905874638531": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Tiepolo-Bonolis s.r.l.",
+            "Petralli-Eco SPA"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Tiepolo-Bonolis s.r.l.",
+                "names_list": [
+                    "Tiepolo-Bonolis s.r.l."
+                ],
+                "holder_from_cluster_name": "Tiepolo-Bonolis s.r.l."
+            },
+            {
+                "cluster_name": "Petralli-Eco SPA",
+                "names_list": [
+                    "Petralli-Eco SPA"
+                ],
+                "holder_from_cluster_name": "Petralli-Eco SPA"
+            }
+        ]
+    },
+    "IT11O3930733552394881212135": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Kleybrink NV",
+            "Damen Shipyard"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Kleybrink NV",
+                "names_list": [
+                    "Kleybrink NV"
+                ],
+                "holder_from_cluster_name": "Kleybrink NV"
+            },
+            {
+                "cluster_name": "Damen Shipyard",
+                "names_list": [
+                    "Damen Shipyard"
+                ],
+                "holder_from_cluster_name": "Damen Shipyard"
+            }
+        ]
+    },
+    "IT13X0914339813087273395432": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Zamorani, Scaduto e Carocci Group"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Zamorani, Scaduto e Carocci Group",
+                "names_list": [
+                    "Zamorani, Scaduto Carocci Gr.",
+                    "Zamorani, Scaduto e Gr.",
+                    "Zamorani, Scaduto e Carocci Group",
+                    "Zamorani, Scaduto e Carocci",
+                    "Zamorani, Scaduto e Carocci Grp",
+                    "Zamorani,  Scaduto e Carocci",
+                    "Zamorani, Scaduto e  Carocci-Grp"
+                ],
+                "holder_from_cluster_name": "Zamorani, Scaduto e Carocci Group"
+            }
+        ]
+    },
+    "IT17M0088640398398696821601": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Bakker Logistiek"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Bakker.  Logistiek- S.U.",
+                "names_list": [
+                    "Bakker,Logistiek- S.U.",
+                    "Bakker.  Logistiek- S.U.",
+                    "Bakker.Logistiek.",
+                    "Bakker.Logistiek-",
+                    "Bakker Logistiek .",
+                    "Bakker .Logistiek S.C",
+                    "Bakker Logistiek",
+                    "Bakker - Logistiek",
+                    "Bakker Logistiek S.C",
+                    "Bakker Logistiek SA",
+                    "Bakker Logistiek S.U.",
+                    "Bakker Logistiek- S.u."
+                ],
+                "holder_from_cluster_name": "Bakker Logistiek"
+            }
+        ]
+    },
+    "IT23L9326588485896343980877": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Hermanos Carnero S.A."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Hermanos,Carnero  S.p.A.",
+                "names_list": [
+                    "Hermanos Carnero S.A.",
+                    "Hermanos Carnero SpA",
+                    "Hermanos Carnero S.a.",
+                    "Hermanos Carnero SAS",
+                    "Hermanos,Carnero  S.p.A.",
+                    "Hermanos Carnero",
+                    "Hermanos Carnero S.U."
+                ],
+                "holder_from_cluster_name": "Hermanos Carnero S.A."
+            }
+        ]
+    },
+    "IT33D5758848662011490158450": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Dufour SA",
+            "Munoz et Fils",
+            "Lefort Petit S.A.R.L.",
+            "Godard",
+            "Boulay",
+            "De Sousa S.A.",
+            "Picard SARL"
+        ],
+        "holders": [
+            {
+                "cluster_name": "De- Sousa S.a.s.",
+                "names_list": [
+                    "Dufour SA",
+                    "De  Sousa S.C.",
+                    "De Sousa - S.U.",
+                    "De Sousa S.A.",
+                    "De- Sousa S.a.s.",
+                    "De Sousa"
+                ],
+                "holder_from_cluster_name": "De Sousa S.A."
+            },
+            {
+                "cluster_name": "Lefort Petit S.A.R.L.",
+                "names_list": [
+                    "Lefort Petit S.A.R.L."
+                ],
+                "holder_from_cluster_name": "Lefort Petit S.A.R.L."
+            },
+            {
+                "cluster_name": "Picard SARL",
+                "names_list": [
+                    "Picard SARL"
+                ],
+                "holder_from_cluster_name": "Picard SARL"
+            },
+            {
+                "cluster_name": "Munoz et Fils",
+                "names_list": [
+                    "Munoz et Fils"
+                ],
+                "holder_from_cluster_name": "Munoz et Fils"
+            },
+            {
+                "cluster_name": "Godard",
+                "names_list": [
+                    "Godard"
+                ],
+                "holder_from_cluster_name": "Godard"
+            },
+            {
+                "cluster_name": "Boulay",
+                "names_list": [
+                    "Boulay"
+                ],
+                "holder_from_cluster_name": "Boulay"
+            }
+        ]
+    },
+    "IT35S8507192004122460420974": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "María José Comas Corominas S.C.P",
+            "Cobos y asociados S.Coop.",
+            "Edelmiro Román Valls S.L.",
+            "Supermercados JTH S.Com."
+        ],
+        "holders": [
+            {
+                "cluster_name": "María José Comas Corominas S.C.P",
+                "names_list": [
+                    "María José Comas Corominas S.C.P"
+                ],
+                "holder_from_cluster_name": "María José Comas Corominas S.C.P"
+            },
+            {
+                "cluster_name": "Supermercados JTH S.Com.",
+                "names_list": [
+                    "Supermercados JTH S.Com."
+                ],
+                "holder_from_cluster_name": "Supermercados JTH S.Com."
+            },
+            {
+                "cluster_name": "Cobos y asociados S.Coop.",
+                "names_list": [
+                    "Cobos y asociados S.Coop."
+                ],
+                "holder_from_cluster_name": "Cobos y asociados S.Coop."
+            },
+            {
+                "cluster_name": "Edelmiro Román Valls S.L.",
+                "names_list": [
+                    "Edelmiro Román Valls S.L."
+                ],
+                "holder_from_cluster_name": "Edelmiro Román Valls S.L."
+            }
+        ]
+    },
+    "IT43D9741930748238042146752": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Gnatz AG"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Gnatz .AG Corp.",
+                "names_list": [
+                    "Gnatz AG Corp.",
+                    "Gnatz.AG",
+                    "Gnatz AG  Cpn.",
+                    "Gnatz AG",
+                    "Gnatz AG.",
+                    "Gnatz .AG Corp.",
+                    "Gnatz-AG Co."
+                ],
+                "holder_from_cluster_name": "Gnatz AG"
+            }
+        ]
+    },
+    "IT51E6392234439188398710288": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Chotzen BV"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Chotzen  BV",
+                "names_list": [
+                    "Chotzen BV",
+                    "Chotzen-BV",
+                    "Chotzen  BV",
+                    "Chotzen. BV"
+                ],
+                "holder_from_cluster_name": "Chotzen BV"
+            }
+        ]
+    },
+    "IT53P5248945907725059869222": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Ferreira Rezende - ME",
+            "Pacheco",
+            "Vargas Castro Ltda.",
+            "Vargas",
+            "Fogaça",
+            "Melo"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Fogaça Company",
+                "names_list": [
+                    "Fogaça.",
+                    "Fogaça Company",
+                    "Fogaça",
+                    "Fogaça Comp."
+                ],
+                "holder_from_cluster_name": "Fogaça"
+            },
+            {
+                "cluster_name": "Ferreira Rezende-   ME",
+                "names_list": [
+                    "Ferreira Rezende - ME",
+                    "Ferreira Rezende-   ME"
+                ],
+                "holder_from_cluster_name": "Ferreira Rezende - ME"
+            },
+            {
+                "cluster_name": "Vargas Castro Ltda.",
+                "names_list": [
+                    "Vargas",
+                    "Vargas Castro Ltda.",
+                    "Vargas P.L.C"
+                ],
+                "holder_from_cluster_name": "Vargas Castro Ltda."
+            },
+            {
+                "cluster_name": "Melo",
+                "names_list": [
+                    "Melo"
+                ],
+                "holder_from_cluster_name": "Melo"
+            },
+            {
+                "cluster_name": "Pacheco",
+                "names_list": [
+                    "Pacheco"
+                ],
+                "holder_from_cluster_name": "Pacheco"
+            }
+        ]
+    },
+    "IT85E5928713634076862095676": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Matthäi e.G."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Matthäi e.G. S.c.a.r.l",
+                "names_list": [
+                    "Matthäi e.G. S.c.a.r.l",
+                    "Matthäi e.G.",
+                    "Matthäi e.G. S.A.R.L.",
+                    "Matthäi,e.G. S.C.A.R.L",
+                    "Matthäi e.G. S.C.A.R.L",
+                    "Matthäi e.G.-"
+                ],
+                "holder_from_cluster_name": "Matthäi e.G."
+            }
+        ]
+    },
+    "IT87A8314860348155888116797": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Bonolis-Cherubini s.r.l.",
+            "Polizzi, Mantegazza e Morpurgo e figli",
+            "Priuli e figli",
+            "Crispi SPA",
+            "Niggli, Canali e Gagliano SPA",
+            "Taliercio, Grisoni e Capuana s.r.l.",
+            "Gottardi-Argentero SPA",
+            "Marangoni, Modigliani e Frescobaldi Group"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Gottardi .Argentero S.a.p.a.",
+                "names_list": [
+                    "Gottardi .Argentero S.a.p.a.",
+                    "Gottardi Argentero S.a.",
+                    "Gottardi Argentero SPA",
+                    "Gottardi Argentero SA",
+                    "Gottardi Argentero,",
+                    "Gottardi Argentero S.P.A",
+                    "Gottardi Argentero",
+                    "Gottardi Argentero S.P.A."
+                ],
+                "holder_from_cluster_name": "Gottardi-Argentero SPA"
+            },
+            {
+                "cluster_name": "Polizzi, - Mantegazza e Morpurgo e figli",
+                "names_list": [
+                    "Polizzi, Mantegazza e Morpurgo e figli",
+                    "Polizzi, - Mantegazza e Morpurgo e figli"
+                ],
+                "holder_from_cluster_name": "Polizzi, Mantegazza e Morpurgo e figli"
+            },
+            {
+                "cluster_name": "Priuli e figli",
+                "names_list": [
+                    "Priuli e figli"
+                ],
+                "holder_from_cluster_name": "Priuli e figli"
+            },
+            {
+                "cluster_name": "Crispi SPA",
+                "names_list": [
+                    "Crispi SPA"
+                ],
+                "holder_from_cluster_name": "Crispi SPA"
+            },
+            {
+                "cluster_name": "Taliercio, Grisoni e Capuana s.r.l.",
+                "names_list": [
+                    "Taliercio, Grisoni e Capuana s.r.l."
+                ],
+                "holder_from_cluster_name": "Taliercio, Grisoni e Capuana s.r.l."
+            },
+            {
+                "cluster_name": "Marangoni, Modigliani e Frescobaldi Group",
+                "names_list": [
+                    "Marangoni, Modigliani e Frescobaldi Group"
+                ],
+                "holder_from_cluster_name": "Marangoni, Modigliani e Frescobaldi Group"
+            },
+            {
+                "cluster_name": "Bonolis-Cherubini s.r.l.",
+                "names_list": [
+                    "Bonolis-Cherubini s.r.l."
+                ],
+                "holder_from_cluster_name": "Bonolis-Cherubini s.r.l."
+            },
+            {
+                "cluster_name": "Niggli, Canali e Gagliano SPA",
+                "names_list": [
+                    "Niggli, Canali e Gagliano SPA"
+                ],
+                "holder_from_cluster_name": "Niggli, Canali e Gagliano SPA"
+            }
+        ]
+    },
+    "IT91N3858560380944695187825": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Brito - EI"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Brito   EI  Global",
+                "names_list": [
+                    "Brito . ,EI Glob.",
+                    "Brito  - EI",
+                    "Brito   EI",
+                    "Brito   EI Global",
+                    "Brito   EI Glb.",
+                    "Brito-   EI",
+                    "Brito   EI  Global",
+                    "Brito   EI Glob.",
+                    "Brito  .EI Glb.",
+                    "Brito   EI.",
+                    "Brito - EI"
+                ],
+                "holder_from_cluster_name": "Brito - EI"
+            }
+        ]
+    },
+    "NL05DHPE8463360250": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Lagerweij Groep",
+            "van der Mast & Vallenduuk",
+            "Libéma",
+            "Deen",
+            "Unit4",
+            "van Duvenvoirde & de Jong"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Lagerweij Groep",
+                "names_list": [
+                    "Lagerweij Groep"
+                ],
+                "holder_from_cluster_name": "Lagerweij Groep"
+            },
+            {
+                "cluster_name": "van der Mast & Vallenduuk",
+                "names_list": [
+                    "van der Mast & Vallenduuk"
+                ],
+                "holder_from_cluster_name": "van der Mast & Vallenduuk"
+            },
+            {
+                "cluster_name": "Libéma",
+                "names_list": [
+                    "Libéma"
+                ],
+                "holder_from_cluster_name": "Libéma"
+            },
+            {
+                "cluster_name": "Unit4. Industries",
+                "names_list": [
+                    "Unit4 Ind.",
+                    "Unit4 Industries",
+                    "Unit4",
+                    "Unit4 Inds",
+                    "Unit4 Ind",
+                    "Unit4. Industries"
+                ],
+                "holder_from_cluster_name": "Unit4"
+            },
+            {
+                "cluster_name": "Deen",
+                "names_list": [
+                    "Deen"
+                ],
+                "holder_from_cluster_name": "Deen"
+            },
+            {
+                "cluster_name": "van Duvenvoirde & de Jong",
+                "names_list": [
+                    "van Duvenvoirde & de Jong"
+                ],
+                "holder_from_cluster_name": "van Duvenvoirde & de Jong"
+            }
+        ]
+    },
+    "NL14KZID9762863928": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Transportes XK S.L.N.E"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Transportes.  XK. S.L.N.E",
+                "names_list": [
+                    "Transportes.XK",
+                    "Transportes-XK  .S.L.N.E",
+                    "Transportes,XK-S.L.N.E",
+                    "Transportes XK S.L.N.E",
+                    "Transportes/XK- S.L.N.E",
+                    "Transportes .XK,S.L.N.E",
+                    "Transportes,XK,S.L.N.E",
+                    "Transportes.XK-S.L.N.E",
+                    "Transportes/XK. S.L.N.E",
+                    "Transportes. XK",
+                    "Transportes.  XK. S.L.N.E",
+                    "Transportes  .XK .S.L.N.E",
+                    "Transportes - XK-S.L.N.E",
+                    "Transportes .XK",
+                    "Transportes.XK,S.L.N.E",
+                    "Transportes - XK. S.L.N.E",
+                    "Transportes- XK-S.L.N.E",
+                    "Transportes.XK - S.L.N.E"
+                ],
+                "holder_from_cluster_name": "Transportes XK S.L.N.E"
+            }
+        ]
+    },
+    "NL18VREW1141435452": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Foster and Sons"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Foster Inds. Sons",
+                "names_list": [
+                    "Foster Inds. Sons",
+                    "Foster and Sons"
+                ],
+                "holder_from_cluster_name": "Foster and Sons"
+            }
+        ]
+    },
+    "NL34BNSM1928407106": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Camargo S.A."
+        ],
+        "holders": [
+            {
+                "cluster_name": "Camargo S.A.",
+                "names_list": [
+                    "Camargo",
+                    "Camargo S.A.",
+                    "Camargo SpA ",
+                    "Camargo SA",
+                    "Camargo- SA",
+                    "Camargo S.a."
+                ],
+                "holder_from_cluster_name": "Camargo S.A."
+            }
+        ]
+    },
+    "NL34RIFG8471544360": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Mendonça S/A",
+            "Novaes"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Mendonça S/A",
+                "names_list": [
+                    "Mendonça S/A"
+                ],
+                "holder_from_cluster_name": "Mendonça S/A"
+            },
+            {
+                "cluster_name": "Novaes  Corporation",
+                "names_list": [
+                    "Novaes- Corp",
+                    "Novaes Corp",
+                    "Novaes .Corp.",
+                    "Novaes-",
+                    "Novaes  Corporation",
+                    "Novaes",
+                    "Novaes Corporation"
+                ],
+                "holder_from_cluster_name": "Novaes"
+            }
+        ]
+    },
+    "NL34WLBY6986814552": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Thompson, Farrell and Ford",
+            "Bell Group"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Thompson, Farrell Inds.- Ford",
+                "names_list": [
+                    "Thompson, Farrell Inds.- Ford",
+                    "Thompson, Farrell Inds. Ford",
+                    "Thompson, Farrell Ford",
+                    "Thompson, Farrell",
+                    "Thompson, Farrell and Ford",
+                    "Thompson, Farrell Ind. Ford"
+                ],
+                "holder_from_cluster_name": "Thompson, Farrell and Ford"
+            },
+            {
+                "cluster_name": "Bell  Group S.c.a.r.l.",
+                "names_list": [
+                    "Bell  Group S.c.a.r.l.",
+                    "Bell",
+                    "Bell Group",
+                    "Bell - Gp. S.c.a.r.l",
+                    "Bell Group S.c.a.r.l.",
+                    "Bell Gr. S.c.a.r.l"
+                ],
+                "holder_from_cluster_name": "Bell Group"
+            }
+        ]
+    },
+    "NL49BMAF5838071023": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Hansen-Stewart"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Hansen,Stewart  Group",
+                "names_list": [
+                    "Hansen,Stewart  Group",
+                    "Hansen Stewart-Group",
+                    "Hansen/Stewart",
+                    "Hansen Stewart",
+                    "Hansen-Stewart"
+                ],
+                "holder_from_cluster_name": "Hansen-Stewart"
+            }
+        ]
+    },
+    "NL61FDEP0307603415": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Wilson Ltd",
+            "Lee-Zimmerman",
+            "Trevino, Ortiz and Johnson",
+            "Reed LLC",
+            "Berg, Baker and Cole"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Wilson Ltée",
+                "names_list": [
+                    "Wilson Ltd",
+                    "Wilson-",
+                    "Wilson",
+                    "Wilson LTD",
+                    "Wilson Ltée"
+                ],
+                "holder_from_cluster_name": "Wilson Ltd"
+            },
+            {
+                "cluster_name": "Berg, Baker and Cole",
+                "names_list": [
+                    "Lee-Zimmerman",
+                    "Berg, Baker and Cole"
+                ],
+                "holder_from_cluster_name": "Berg, Baker and Cole"
+            },
+            {
+                "cluster_name": "Trevino, Ortiz and Johnson",
+                "names_list": [
+                    "Trevino, Ortiz and Johnson"
+                ],
+                "holder_from_cluster_name": "Trevino, Ortiz and Johnson"
+            },
+            {
+                "cluster_name": "Reed LLC",
+                "names_list": [
+                    "Reed LLC"
+                ],
+                "holder_from_cluster_name": "Reed LLC"
+            }
+        ]
+    },
+    "NL62DYWN7912833741": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Ramos"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Ramos Solutions",
+                "names_list": [
+                    "Ramos  Solns.",
+                    "Ramos Solutions",
+                    "Ramos  Sons",
+                    "Ramos Sons",
+                    "Ramos",
+                    "Ramos,Solutions",
+                    "Ramos.  Sons",
+                    "Ramos Solns.",
+                    "Ramos- Sons",
+                    "Ramos Sns.",
+                    "Ramos Sols."
+                ],
+                "holder_from_cluster_name": "Ramos"
+            }
+        ]
+    },
+    "NL72UBPM4402910077": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Schroeder-Peters"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Schroeder - Peters. Group",
+                "names_list": [
+                    "Schroeder,Peters/Grp.",
+                    "Schroeder.Peters,",
+                    "Schroeder.Peters.Grp",
+                    "Schroeder - Peters-",
+                    "Schroeder-Peters,Group",
+                    "Schroeder .Peters- Group",
+                    "Schroeder.Peters. Group",
+                    "Schroeder - Peters. Group",
+                    "Schroeder. Peters/Grp",
+                    "Schroeder,Peters - Grp.",
+                    "Schroeder-  Peters,",
+                    "Schroeder.Peters- Grp",
+                    "Schroeder.Peters. Grp",
+                    "Schroeder Peters",
+                    "Schroeder-Peters.",
+                    "Schroeder - Peters/Group"
+                ],
+                "holder_from_cluster_name": "Schroeder-Peters"
+            }
+        ]
+    },
+    "NL77IXEH0006215125": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Stey"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Stey.S.n.c",
+                "names_list": [
+                    "Stey.S.n.c",
+                    "Stey SNC",
+                    "Stey S.N.C",
+                    "Stey"
+                ],
+                "holder_from_cluster_name": "Stey"
+            }
+        ]
+    },
+    "NL86JYIX4297678746": {
+        "IsShared": 0,
+        "predicted_shared": 0,
+        "real_holders": [
+            "Salvini Group"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Salvini Group S.c.",
+                "names_list": [
+                    "Salvini  Gr. S.u",
+                    "Salvini Group S.c.",
+                    "Salvini Group S.U.",
+                    "Salvini Group S.C.",
+                    "Salvini Group",
+                    "Salvini Grp S.u",
+                    "Salvini",
+                    "Salvini Gp. S.u",
+                    "Salvini Grp.,S.u",
+                    "Salvini Group S.u.",
+                    "Salvini Gp.. S.u"
+                ],
+                "holder_from_cluster_name": "Salvini Group"
+            }
+        ]
+    },
+    "NL97DQKA5096868415": {
+        "IsShared": 1,
+        "predicted_shared": 1,
+        "real_holders": [
+            "Machado",
+            "Viana"
+        ],
+        "holders": [
+            {
+                "cluster_name": "Viana Technologies",
+                "names_list": [
+                    "Viana Tech",
+                    "Viana .Techs.",
+                    "Viana Techs",
+                    "Viana Technologies",
+                    "Viana Techs.",
+                    "Viana Tech."
+                ],
+                "holder_from_cluster_name": "Viana"
+            },
+            {
+                "cluster_name": "Machado",
+                "names_list": [
+                    "Machado"
+                ],
+                "holder_from_cluster_name": "Machado"
+            },
+            {
+                "cluster_name": "Viana",
+                "names_list": [
+                    "Viana"
+                ],
+                "holder_from_cluster_name": "Viana"
+            }
+        ]
+    }
+}

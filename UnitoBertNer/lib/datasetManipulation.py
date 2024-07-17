@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from scipy.stats import skew, kurtosis
 
 def load_dataset_excel(path):
@@ -29,7 +28,7 @@ def save_dataset_excel(dataset, path):
     dataset.to_excel(path)
 
 
-def group_dataset(dataset, groupLen=10, placeholder="[NA]"):
+def group_dataset(dataset, groupLen=10, placeholder="[NA]", onlyName = False):
     """ Group the dataset """
 
     grouped = dataset.groupby('AccountNumber').agg({
@@ -40,13 +39,13 @@ def group_dataset(dataset, groupLen=10, placeholder="[NA]"):
 
     # Splitting the lists of names and addresses into separate columns
     names_df = grouped['Name'].apply(pd.Series).add_prefix('Name_')
-    addresses_df = grouped['Address'].apply(pd.Series).add_prefix('Address_')
+    if not onlyName: addresses_df = grouped['Address'].apply(pd.Series).add_prefix('Address_')
 
     # Merging the separated columns with the original DataFrame
     # adding account number and IsShared
     # filling missing values with placeholder
     expanded_df = pd.merge(grouped['AccountNumber'],  names_df, left_index=True, right_index=True)
-    expanded_df = pd.merge(expanded_df, addresses_df, left_index=True, right_index=True)
+    if not onlyName: expanded_df = pd.merge(expanded_df, addresses_df, left_index=True, right_index=True)
     expanded_df = pd.merge(expanded_df, grouped['IsShared'], left_index=True, right_index=True)
     expanded_df.fillna(placeholder, inplace=True)
 
@@ -132,4 +131,6 @@ def print_stats(dataset):
     names = pd.DataFrame(object2,index=[0])
     print(names.to_markdown())
     print()
+
+
 

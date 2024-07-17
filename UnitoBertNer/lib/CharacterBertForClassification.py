@@ -14,7 +14,7 @@ from torch.utils.data import TensorDataset, DataLoader
 from sklearn.metrics import accuracy_score, recall_score, precision_score,f1_score
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
+print("Device:", device)
 
 class CharacterBertForClassification(nn.Module):
     def __init__(self, num_labels=1):
@@ -80,13 +80,11 @@ def train(model, optimizer, train_loader, criterion, scheduler):
 def evaluate(model, test_loader, criterion):
     model.eval()
     total_loss = 0
-    total_acc = 0
     input_ids = None
     labels = None
     outputs = None
     loss = None
     predictions = None
-    val_correct = 0
     elem_list = None
     predictions = []
     total_labels = []

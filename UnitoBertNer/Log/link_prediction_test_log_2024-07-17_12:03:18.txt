@@ -1,0 +1,153 @@
+Output Log 2024-07-17 12:03:18.691026
+
+Dataset path: dataset/dataset_100_Iban_RANGE2.csv
+Model path: dataset/dataset_100_Iban_RANGE2.csv
+Loading dataset and model...
+Dataset loaded...
+
+
+
+Model: 
+<All keys matched successfully>
+Dataset and model loaded...
+
+Dataset Preview
+
+|    | BIC      | AccountNumber      | CTRYbnk   | Name                      | Address                                         |   IsShared | Holder                    |
+|---:|:---------|:-------------------|:----------|:--------------------------|:------------------------------------------------|-----------:|:--------------------------|
+|  0 | JLMSCCRT | NL05DHPE8463360250 | CC        | Deen                      | 6066JL/Helden                                   |          1 | Deen                      |
+|  1 | JLMSCCRT | NL05DHPE8463360250 | CC        | Libéma                    | Hendriksteeg  85 2394 KO Wilbertoord            |          1 | Libéma                    |
+|  2 | JLMSCCRT | NL05DHPE8463360250 | CC        | van Duvenvoirde & de Jong | Ivyweg Hooge Zwaluwe Hooge Zwaluwe  Netherlands |          1 | van Duvenvoirde & de Jong |
+|  3 | JLMSCCRT | NL05DHPE8463360250 | CC        | Lagerweij Groep           | nan                                             |          1 | Lagerweij Groep           |
+|  4 | JLMSCCRT | NL05DHPE8463360250 | CC        | van der Mast & Vallenduuk | nan                                             |          1 | van der Mast & Vallenduuk |
+Pairing dataset...
+
+dataset, IsShared statistics
+IsShared
+0    553
+1    314
+dtype: int64
+
+Dataset Preview
+
+|    | iban                   | name1                      | name2                        |   label |   IsShared |
+|---:|:-----------------------|:---------------------------|:-----------------------------|--------:|-----------:|
+|  0 | DE18759058059811935168 | Gierschner Ackermann GmbH  | Gierschner Ackermann         |       0 |          0 |
+|  1 | DE18759058059811935168 | Gierschner Ackermann GmbH  | Gierschner,Ackermann GmbH    |       0 |          0 |
+|  2 | DE18759058059811935168 | Gierschner Ackermann GmbH  | Gierschner/Ackermann         |       0 |          0 |
+|  3 | DE18759058059811935168 | Gierschner Ackermann GmbH  | Gierschner .Ackermann/GmbH   |       0 |          0 |
+|  4 | DE18759058059811935168 | Gierschner Ackermann GmbH  | Gierschner Ackermann-GmbH    |       0 |          0 |
+|  5 | DE18759058059811935168 | Gierschner Ackermann GmbH  | Gierschner-Ackermann         |       0 |          0 |
+|  6 | DE18759058059811935168 | Gierschner Ackermann GmbH  | Gierschner/Ackermann GmbH    |       0 |          0 |
+|  7 | DE18759058059811935168 | Gierschner Ackermann       | Gierschner,Ackermann GmbH    |       0 |          0 |
+|  8 | DE18759058059811935168 | Gierschner Ackermann       | Gierschner/Ackermann         |       0 |          0 |
+|  9 | DE18759058059811935168 | Gierschner Ackermann       | Gierschner .Ackermann/GmbH   |       0 |          0 |
+| 10 | DE18759058059811935168 | Gierschner Ackermann       | Gierschner Ackermann-GmbH    |       0 |          0 |
+| 11 | DE18759058059811935168 | Gierschner Ackermann       | Gierschner-Ackermann         |       0 |          0 |
+| 12 | DE18759058059811935168 | Gierschner Ackermann       | Gierschner/Ackermann GmbH    |       0 |          0 |
+| 13 | DE18759058059811935168 | Gierschner,Ackermann GmbH  | Gierschner/Ackermann         |       0 |          0 |
+| 14 | DE18759058059811935168 | Gierschner,Ackermann GmbH  | Gierschner .Ackermann/GmbH   |       0 |          0 |
+| 15 | DE18759058059811935168 | Gierschner,Ackermann GmbH  | Gierschner Ackermann-GmbH    |       0 |          0 |
+| 16 | DE18759058059811935168 | Gierschner,Ackermann GmbH  | Gierschner-Ackermann         |       0 |          0 |
+| 17 | DE18759058059811935168 | Gierschner,Ackermann GmbH  | Gierschner/Ackermann GmbH    |       0 |          0 |
+| 18 | DE18759058059811935168 | Gierschner/Ackermann       | Gierschner .Ackermann/GmbH   |       0 |          0 |
+| 19 | DE18759058059811935168 | Gierschner/Ackermann       | Gierschner Ackermann-GmbH    |       0 |          0 |
+| 20 | DE18759058059811935168 | Gierschner/Ackermann       | Gierschner-Ackermann         |       0 |          0 |
+| 21 | DE18759058059811935168 | Gierschner/Ackermann       | Gierschner/Ackermann GmbH    |       0 |          0 |
+| 22 | DE18759058059811935168 | Gierschner .Ackermann/GmbH | Gierschner Ackermann-GmbH    |       0 |          0 |
+| 23 | DE18759058059811935168 | Gierschner .Ackermann/GmbH | Gierschner-Ackermann         |       0 |          0 |
+| 24 | DE18759058059811935168 | Gierschner .Ackermann/GmbH | Gierschner/Ackermann GmbH    |       0 |          0 |
+| 25 | DE18759058059811935168 | Gierschner Ackermann-GmbH  | Gierschner-Ackermann         |       0 |          0 |
+| 26 | DE18759058059811935168 | Gierschner Ackermann-GmbH  | Gierschner/Ackermann GmbH    |       0 |          0 |
+| 27 | DE18759058059811935168 | Gierschner-Ackermann       | Gierschner/Ackermann GmbH    |       0 |          0 |
+| 28 | DE28758518175354761639 | Fields, Bright and Hogan   | Garcia, Perry and Martin     |       1 |          1 |
+| 29 | DE28758518175354761639 | Fields, Bright and Hogan   | Garcia, Perry  Inds. .Martin |       1 |          1 |
+
+dataset, Label statistics
+label
+0    3120
+1    1107
+dtype: int64
+
+Preprocessed info:
+Gierschner Ackermann GmbH @ Gierschner Ackermann
+
+
+Tokenized text:
+0    [[CLS], Gierschner Ackermann GmbH ,  Gierschne...
+1    [[CLS], Gierschner Ackermann GmbH ,  Gierschne...
+2    [[CLS], Gierschner Ackermann GmbH ,  Gierschne...
+3    [[CLS], Gierschner Ackermann GmbH ,  Gierschne...
+4    [[CLS], Gierschner Ackermann GmbH ,  Gierschne...
+5    [[CLS], Gierschner Ackermann GmbH ,  Gierschne...
+6    [[CLS], Gierschner Ackermann GmbH ,  Gierschne...
+7    [[CLS], Gierschner Ackermann ,  Gierschner,Ack...
+8    [[CLS], Gierschner Ackermann ,  Gierschner/Ack...
+9    [[CLS], Gierschner Ackermann ,  Gierschner .Ac...
+Name: text, dtype: object
+
+Evaluation of the model on test set on the differency_couples task...
+Link prediction task metrics:
+- Link prediction - accuracy:0.969
+- Link prediction - precision:0.911
+- Link prediction - recall:0.978
+- Link prediction - f1:0.943
+
+Dataset Preview
+
+|    | iban                   | name1                      | name2                        |   label |   IsShared |   predicted |
+|---:|:-----------------------|:---------------------------|:-----------------------------|--------:|-----------:|------------:|
+|  0 | DE18759058059811935168 | Gierschner Ackermann GmbH  | Gierschner Ackermann         |       0 |          0 |           0 |
+|  1 | DE18759058059811935168 | Gierschner Ackermann GmbH  | Gierschner,Ackermann GmbH    |       0 |          0 |           0 |
+|  2 | DE18759058059811935168 | Gierschner Ackermann GmbH  | Gierschner/Ackermann         |       0 |          0 |           0 |
+|  3 | DE18759058059811935168 | Gierschner Ackermann GmbH  | Gierschner .Ackermann/GmbH   |       0 |          0 |           0 |
+|  4 | DE18759058059811935168 | Gierschner Ackermann GmbH  | Gierschner Ackermann-GmbH    |       0 |          0 |           0 |
+|  5 | DE18759058059811935168 | Gierschner Ackermann GmbH  | Gierschner-Ackermann         |       0 |          0 |           0 |
+|  6 | DE18759058059811935168 | Gierschner Ackermann GmbH  | Gierschner/Ackermann GmbH    |       0 |          0 |           0 |
+|  7 | DE18759058059811935168 | Gierschner Ackermann       | Gierschner,Ackermann GmbH    |       0 |          0 |           0 |
+|  8 | DE18759058059811935168 | Gierschner Ackermann       | Gierschner/Ackermann         |       0 |          0 |           0 |
+|  9 | DE18759058059811935168 | Gierschner Ackermann       | Gierschner .Ackermann/GmbH   |       0 |          0 |           0 |
+| 10 | DE18759058059811935168 | Gierschner Ackermann       | Gierschner Ackermann-GmbH    |       0 |          0 |           0 |
+| 11 | DE18759058059811935168 | Gierschner Ackermann       | Gierschner-Ackermann         |       0 |          0 |           0 |
+| 12 | DE18759058059811935168 | Gierschner Ackermann       | Gierschner/Ackermann GmbH    |       0 |          0 |           0 |
+| 13 | DE18759058059811935168 | Gierschner,Ackermann GmbH  | Gierschner/Ackermann         |       0 |          0 |           0 |
+| 14 | DE18759058059811935168 | Gierschner,Ackermann GmbH  | Gierschner .Ackermann/GmbH   |       0 |          0 |           0 |
+| 15 | DE18759058059811935168 | Gierschner,Ackermann GmbH  | Gierschner Ackermann-GmbH    |       0 |          0 |           0 |
+| 16 | DE18759058059811935168 | Gierschner,Ackermann GmbH  | Gierschner-Ackermann         |       0 |          0 |           0 |
+| 17 | DE18759058059811935168 | Gierschner,Ackermann GmbH  | Gierschner/Ackermann GmbH    |       0 |          0 |           0 |
+| 18 | DE18759058059811935168 | Gierschner/Ackermann       | Gierschner .Ackermann/GmbH   |       0 |          0 |           0 |
+| 19 | DE18759058059811935168 | Gierschner/Ackermann       | Gierschner Ackermann-GmbH    |       0 |          0 |           0 |
+| 20 | DE18759058059811935168 | Gierschner/Ackermann       | Gierschner-Ackermann         |       0 |          0 |           0 |
+| 21 | DE18759058059811935168 | Gierschner/Ackermann       | Gierschner/Ackermann GmbH    |       0 |          0 |           0 |
+| 22 | DE18759058059811935168 | Gierschner .Ackermann/GmbH | Gierschner Ackermann-GmbH    |       0 |          0 |           0 |
+| 23 | DE18759058059811935168 | Gierschner .Ackermann/GmbH | Gierschner-Ackermann         |       0 |          0 |           0 |
+| 24 | DE18759058059811935168 | Gierschner .Ackermann/GmbH | Gierschner/Ackermann GmbH    |       0 |          0 |           0 |
+| 25 | DE18759058059811935168 | Gierschner Ackermann-GmbH  | Gierschner-Ackermann         |       0 |          0 |           0 |
+| 26 | DE18759058059811935168 | Gierschner Ackermann-GmbH  | Gierschner/Ackermann GmbH    |       0 |          0 |           0 |
+| 27 | DE18759058059811935168 | Gierschner-Ackermann       | Gierschner/Ackermann GmbH    |       0 |          0 |           0 |
+| 28 | DE28758518175354761639 | Fields, Bright and Hogan   | Garcia, Perry and Martin     |       1 |          1 |           1 |
+| 29 | DE28758518175354761639 | Fields, Bright and Hogan   | Garcia, Perry  Inds. .Martin |       1 |          1 |           1 |
+
+Evaluation of the model on the IsShared classification task...
+Number prediction IsShared OK: 98
+Number of iban: 100
+- accuracy:0.98
+- precision:0.949
+- recall:1.0
+- f1:0.974
+
+
+
+Evaluation of the model on the correct Holder prediction...
+Number of holders exactly predicted: 87
+Number of iban: 100
+- Holder Accuracy: 0.87
+
+
+
+Evaluation of the model on the correct transaction prediction...
+Number of transaction exactly predicted: 834
+Number of transaction:867
+- Transaction Holder Accuracy:0.9619377162629758
+
+Exporting clusters on json file...

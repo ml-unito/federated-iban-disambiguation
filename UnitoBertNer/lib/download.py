@@ -12,12 +12,12 @@ def check_file_exists(filePath):
 
 def download_fine_tuned_model():
     """ """
-    
+    # https://drive.google.com/file/d/1fWViT-Dbj7XmyLH4C3E6Dnrr9XJRKPjy/view?usp=sharing
     if not check_file_exists("./character_bert_model/pretrained-models/general_character_bert/pytorch_model.bin"):
         print("Downloading model fine-tuned...")
         
         try:
-            file_id = "1VygI2J7dFEazV8J2Iekk3SrqutSF8CTS"
+            file_id = "1fWViT-Dbj7XmyLH4C3E6Dnrr9XJRKPjy"
             url = f'https://drive.google.com/uc?id={file_id}'
             output = "./character_bert_model/pretrained-models/general_character_bert/pytorch_model.bin"
             gdown.download(url, output)
