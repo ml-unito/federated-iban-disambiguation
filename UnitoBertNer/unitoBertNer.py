@@ -191,8 +191,8 @@ def main():
     saveToFile("Evaluation of the model on test set on the differency_couples task...")
     criterion = nn.BCELoss()
     _, metrics, predictions, total_labels = evaluate(model, dataloader, criterion)
-    saveToFile("Link prediction task metrics:")
-    for el in metrics: saveToFile("- Link prediction - " + el +  ":" + str(metrics[el]))
+    # saveToFile("Link prediction task metrics:")
+    # for el in metrics: saveToFile("- Link prediction - " + el +  ":" + str(metrics[el]))
     #if not DEBUG_MODE: plot_confusion_matrix(total_labels, predictions, ['Same name (0)', 'Different name(1)'], (7,4), saveName=PLOT_NAME) 
     
     

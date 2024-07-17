@@ -1,0 +1,148 @@
+Output Log 2024-07-17 12:14:19.953288
+
+Dataset path: dataset/dataset_100_Iban_RANGE3.csv
+Model path: dataset/dataset_100_Iban_RANGE3.csv
+Loading dataset and model...
+Dataset loaded...
+
+
+
+Model: 
+<All keys matched successfully>
+Dataset and model loaded...
+
+Dataset Preview
+
+|    | BIC      | AccountNumber            | CTRYbnk   | Name                                     | Address                                     |   IsShared | Holder                                  |
+|---:|:---------|:-------------------------|:----------|:-----------------------------------------|:--------------------------------------------|-----------:|:----------------------------------------|
+|  0 | QSCUBQVX | ES2994596053889543542329 | BQ        | Farmaceútica Vilalta & Asociados S.Com.  | Pasaje de Cruz Montalbán 74  Zaragoza,26773 |          1 | Farmaceútica Vilalta & Asociados S.Com. |
+|  1 | QSCUBQVX | ES2994596053889543542329 | BQ        | Farmaceútica. Vilalta &.Asociados S.Com. | nan                                         |          1 | Farmaceútica Vilalta & Asociados S.Com. |
+|  2 | QSCUBQVX | ES2994596053889543542329 | BQ        | Farmaceútica Vilalta &- Asociados S.Com. | Zaragoza                                    |          1 | Farmaceútica Vilalta & Asociados S.Com. |
+|  3 | QSCUBQVX | ES2994596053889543542329 | BQ        | Farmaceútica Vilalta,& Asociados S.Com.  | Pasaje de Cruz Montalbán 74-Zaragoza  26773 |          1 | Farmaceútica Vilalta & Asociados S.Com. |
+|  4 | QSCUBQVX | ES2994596053889543542329 | BQ        | Farmaceútica-Vilalta Asociados S.Com.    | Pasaje de Cruz Montalbán 26773-Zaagoza-pain |          1 | Farmaceútica Vilalta & Asociados S.Com. |
+Pairing dataset...
+
+dataset, IsShared statistics
+IsShared
+0    852
+1    514
+dtype: int64
+
+Dataset Preview
+
+|    | iban                   | name1                             | name2                           |   label |   IsShared |
+|---:|:-----------------------|:----------------------------------|:--------------------------------|--------:|-----------:|
+|  0 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Trapani-Salandra e figli        |       1 |          1 |
+|  1 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Trapani Salandra e figli        |       1 |          1 |
+|  2 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Trapani Salandra e - figli Srl  |       1 |          1 |
+|  3 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Trapani.Salandra e .figli S.r.L |       1 |          1 |
+|  4 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Trapani Salandra e figli S.R.L. |       1 |          1 |
+|  5 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi Group    |       1 |          1 |
+|  6 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi Grp      |       1 |          1 |
+|  7 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi Grp.     |       1 |          1 |
+|  8 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi Gp.      |       1 |          1 |
+|  9 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e- Zanzi Gp.     |       1 |          1 |
+| 10 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi Gr.      |       1 |          1 |
+| 11 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi-Grp      |       1 |          1 |
+| 12 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi          |       1 |          1 |
+| 13 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e,Zanzi-Gr.      |       1 |          1 |
+| 14 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, -  Cassarà e Zanzi Grp.  |       1 |          1 |
+| 15 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro,,Cassarà e Zanzi Grp.     |       1 |          1 |
+| 16 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi.Gr.      |       1 |          1 |
+| 17 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Gr.            |       1 |          1 |
+| 18 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro,. Cassarà e               |       1 |          1 |
+| 19 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà Zanzi Grp        |       1 |          1 |
+| 20 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà - e Zanzi Grp    |       1 |          1 |
+| 21 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e                |       1 |          1 |
+| 22 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro,,Cassarà e Zanzi          |       1 |          1 |
+| 23 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e- Zanzi         |       1 |          1 |
+| 24 | DE10858224812829541352 | Trapani-Salandra e figli          | Trapani Salandra e figli        |       0 |          1 |
+| 25 | DE10858224812829541352 | Trapani-Salandra e figli          | Trapani Salandra e - figli Srl  |       0 |          1 |
+| 26 | DE10858224812829541352 | Trapani-Salandra e figli          | Trapani.Salandra e .figli S.r.L |       0 |          1 |
+| 27 | DE10858224812829541352 | Trapani-Salandra e figli          | Trapani Salandra e figli S.R.L. |       0 |          1 |
+| 28 | DE10858224812829541352 | Trapani-Salandra e figli          | Sauro, Cassarà e Zanzi Group    |       1 |          1 |
+| 29 | DE10858224812829541352 | Trapani-Salandra e figli          | Sauro, Cassarà e Zanzi Grp      |       1 |          1 |
+
+dataset, Label statistics
+label
+0    8039
+1    2976
+dtype: int64
+
+Preprocessed info:
+Nitti, Asmundo e Borsiere e figli @ Trapani-Salandra e figli
+
+
+Tokenized text:
+0    [[CLS], Nitti, Asmundo e Borsiere e figli ,  T...
+1    [[CLS], Nitti, Asmundo e Borsiere e figli ,  T...
+2    [[CLS], Nitti, Asmundo e Borsiere e figli ,  T...
+3    [[CLS], Nitti, Asmundo e Borsiere e figli ,  T...
+4    [[CLS], Nitti, Asmundo e Borsiere e figli ,  T...
+5    [[CLS], Nitti, Asmundo e Borsiere e figli ,  S...
+6    [[CLS], Nitti, Asmundo e Borsiere e figli ,  S...
+7    [[CLS], Nitti, Asmundo e Borsiere e figli ,  S...
+8    [[CLS], Nitti, Asmundo e Borsiere e figli ,  S...
+9    [[CLS], Nitti, Asmundo e Borsiere e figli ,  S...
+Name: text, dtype: object
+
+Evaluation of the model on test set on the differency_couples task...
+
+Dataset Preview
+
+|    | iban                   | name1                             | name2                           |   label |   IsShared |   predicted |
+|---:|:-----------------------|:----------------------------------|:--------------------------------|--------:|-----------:|------------:|
+|  0 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Trapani-Salandra e figli        |       1 |          1 |           1 |
+|  1 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Trapani Salandra e figli        |       1 |          1 |           1 |
+|  2 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Trapani Salandra e - figli Srl  |       1 |          1 |           1 |
+|  3 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Trapani.Salandra e .figli S.r.L |       1 |          1 |           1 |
+|  4 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Trapani Salandra e figli S.R.L. |       1 |          1 |           1 |
+|  5 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi Group    |       1 |          1 |           1 |
+|  6 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi Grp      |       1 |          1 |           1 |
+|  7 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi Grp.     |       1 |          1 |           1 |
+|  8 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi Gp.      |       1 |          1 |           1 |
+|  9 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e- Zanzi Gp.     |       1 |          1 |           1 |
+| 10 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi Gr.      |       1 |          1 |           1 |
+| 11 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi-Grp      |       1 |          1 |           1 |
+| 12 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi          |       1 |          1 |           1 |
+| 13 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e,Zanzi-Gr.      |       1 |          1 |           1 |
+| 14 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, -  Cassarà e Zanzi Grp.  |       1 |          1 |           1 |
+| 15 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro,,Cassarà e Zanzi Grp.     |       1 |          1 |           1 |
+| 16 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Zanzi.Gr.      |       1 |          1 |           1 |
+| 17 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e Gr.            |       1 |          1 |           1 |
+| 18 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro,. Cassarà e               |       1 |          1 |           1 |
+| 19 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà Zanzi Grp        |       1 |          1 |           1 |
+| 20 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà - e Zanzi Grp    |       1 |          1 |           1 |
+| 21 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e                |       1 |          1 |           1 |
+| 22 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro,,Cassarà e Zanzi          |       1 |          1 |           1 |
+| 23 | DE10858224812829541352 | Nitti, Asmundo e Borsiere e figli | Sauro, Cassarà e- Zanzi         |       1 |          1 |           1 |
+| 24 | DE10858224812829541352 | Trapani-Salandra e figli          | Trapani Salandra e figli        |       0 |          1 |           0 |
+| 25 | DE10858224812829541352 | Trapani-Salandra e figli          | Trapani Salandra e - figli Srl  |       0 |          1 |           0 |
+| 26 | DE10858224812829541352 | Trapani-Salandra e figli          | Trapani.Salandra e .figli S.r.L |       0 |          1 |           0 |
+| 27 | DE10858224812829541352 | Trapani-Salandra e figli          | Trapani Salandra e figli S.R.L. |       0 |          1 |           0 |
+| 28 | DE10858224812829541352 | Trapani-Salandra e figli          | Sauro, Cassarà e Zanzi Group    |       1 |          1 |           1 |
+| 29 | DE10858224812829541352 | Trapani-Salandra e figli          | Sauro, Cassarà e Zanzi Grp      |       1 |          1 |           1 |
+
+Evaluation of the model on the IsShared classification task...
+Number prediction IsShared OK: 100
+Number of iban: 100
+- accuracy:1.0
+- precision:1.0
+- recall:1.0
+- f1:1.0
+
+
+
+Evaluation of the model on the correct Holder prediction...
+Number of holders exactly predicted: 89
+Number of iban: 100
+- Holder Accuracy: 0.89
+
+
+
+Evaluation of the model on the correct transaction prediction...
+Number of transaction exactly predicted: 1323
+Number of transaction:1366
+- Transaction Holder Accuracy:0.9685212298682284
+
+Exporting clusters on json file...
