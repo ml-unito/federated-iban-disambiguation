@@ -6,7 +6,7 @@ import torch
 from torch import nn
 from transformers.models.bert.modeling_bert import BertPreTrainedModel, BertEncoder, BertPooler
 
-from modeling.character_cnn import CharacterCNN
+from ..modeling.character_cnn import CharacterCNN
 
 
 class BertCharacterEmbeddings(nn.Module):

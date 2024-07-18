@@ -1,4 +1,4 @@
-from lib.CharacterBertForClassification import *
+from ..lib.CharacterBertForClassification import *
 
 class CharacterBertForEmbeddingsGeneration(CharacterBertForClassification):
     def __init__(self):

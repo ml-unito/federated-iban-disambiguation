@@ -4,9 +4,9 @@ import tqdm
 import torch
 import numpy as np
 import torch.nn as nn
-sys.path.insert(0, os.path.abspath('./character_bert_model'))
-from utils.character_cnn import CharacterIndexer
-from modeling.character_bert import CharacterBertModel
+# sys.path.insert(0, os.path.abspath('./character_bert_model'))
+from ..character_bert_model.utils.character_cnn import CharacterIndexer
+from ..character_bert_model.modeling.character_bert import CharacterBertModel
 from sklearn.metrics import accuracy_score, recall_score, precision_score,f1_score
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -16,7 +16,7 @@ class CharacterBertForClassification(nn.Module):
     def __init__(self, num_labels=1):
         """ Add classification layer with a sigmoid activation function on the last level"""
         super(CharacterBertForClassification, self).__init__()
-        self.character_bert = CharacterBertModel.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
+        self.character_bert = CharacterBertModel.from_pretrained('./embedding_generator/character_bert_model/pretrained-models/general_character_bert/')
         self.dropout = nn.Dropout(0.2)
         self.classifier = nn.Linear(768, num_labels)
         self.sigmoid = nn.Sigmoid()

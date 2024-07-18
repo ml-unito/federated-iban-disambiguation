@@ -9,7 +9,7 @@ from typing import Dict, Callable
 import numpy
 import torch
 
-from utils.character_cnn import CharacterMapper, CharacterIndexer
+from ..utils.character_cnn import CharacterMapper, CharacterIndexer
 
 
 class Highway(torch.nn.Module):
