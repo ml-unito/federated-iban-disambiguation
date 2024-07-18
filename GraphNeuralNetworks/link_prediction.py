@@ -10,7 +10,6 @@ from tqdm import tqdm
 from itertools import combinations
 from gnn_model import GNN
 
-
 with open('./config/parameters.json', "r") as data_file:
 	parameters = json.load(data_file)
 
@@ -19,6 +18,7 @@ TRAIN_SIZE = parameters["train_size"]
 TRAIN_PATH = parameters["train_path"]
 TEST_PATH = parameters["test_path"]
 TRAIN = parameters["train"]
+MAX_DIM_GRAPH = parameters["max_dim_graph"]
 
 
 # TODO: da sostituire con CharacterBERT
@@ -39,10 +39,9 @@ def test(dataset):
 
 def train(dataset):
 	data_list, ground_truth_list = create_graphs(dataset)
-	print(data_list)
+	# print("data_list", data_list)
 	# data_batch = Batch.from_data_list(data_list)
-	# print(data_batch)
-	# print("Batch size " + str(data_batch.num_graphs))
+	# print("Batch (", str(data_batch.num_graphs) + ")", data_batch)
 
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 	# print(f"Device: '{device}'")
@@ -76,32 +75,26 @@ def train(dataset):
 		print(total_loss)
 
 
-def create_graphs(dataset):
-	data_list = []
-	correct_edges = []
+def generate_ground_truth(dataset_group, node_mapping):
+	is_shared = dataset_group["IsShared"].tolist()[0]
 
-	for iban, group in tqdm(dataset.groupby(["AccountNumber"]), desc="Creating graph"):
-		node, node_mapping = generate_node(group, encoders={'Name': SequenceEncoder()})
-		edge_index = generate_edges(node_mapping)
+	num_valued_nodes = len(node_mapping.keys())
+	num_empty_nodes = MAX_DIM_GRAPH - num_valued_nodes
 
-		data = Data(x=node, edge_index=edge_index.t().contiguous())
-		data.validate(raise_on_error=True)
-		data_list.append(data)
+	if not is_shared:
+		ground_truth = torch.ones(num_valued_nodes, num_valued_nodes) - torch.diag(torch.tensor([1] * num_valued_nodes))
+	else:
+		ground_truth = torch.zeros(num_valued_nodes, num_valued_nodes)
+		for node1 in node_mapping.keys():
+			for node2 in node_mapping.keys():
+				if node1 != node2 and dataset_group.loc[node1]["Holder"] == dataset_group.loc[node2]["Holder"]:
+					ground_truth[node_mapping[node1], node_mapping[node2]] = 1
 
-		is_shared = group["IsShared"].tolist()[0]
+	# Adding zeros for padding nodes
+	ground_truth = torch.cat((ground_truth, torch.zeros((num_valued_nodes, num_empty_nodes))), dim=1)
+	ground_truth = torch.cat((ground_truth, torch.zeros(num_empty_nodes, num_valued_nodes + num_empty_nodes)), dim=0)
 
-		if not is_shared:
-			ground_truth = torch.ones(data.num_nodes, data.num_nodes) - torch.diag(torch.tensor([1] * data.num_nodes))
-		else:
-			ground_truth = torch.zeros(data.num_nodes, data.num_nodes)
-			for node1 in node_mapping.keys():
-				for node2 in node_mapping.keys():
-					if node1 != node2 and group.loc[node1]["Holder"] == group.loc[node2]["Holder"]:
-						ground_truth[node_mapping[node1], node_mapping[node2]] = 1
-
-		correct_edges.append(ground_truth)
-
-	return data_list, correct_edges
+	return ground_truth
 
 
 def generate_edges(node_mapping):
@@ -121,7 +114,36 @@ def generate_node(dataset, encoders=None):
 		xs = [encoder(dataset[col]) for col, encoder in encoders.items()]
 		x = torch.cat(xs, dim=-1)
 
+	if x.shape[0] < MAX_DIM_GRAPH:
+		null_nodes = torch.zeros(size=((MAX_DIM_GRAPH - x.shape[0]), x.shape[1]))
+		x = torch.cat((x, null_nodes), dim=0)
+	if x.shape[0] > MAX_DIM_GRAPH:
+		raise Exception()
+
 	return x, mapping
+
+
+def create_graphs(dataset):
+	data_list = []
+	correct_edges = []
+
+	for iban, group in tqdm(dataset.groupby(["AccountNumber"]), desc="Creating graph"):
+		try:
+			node, node_mapping = generate_node(group, encoders={'Name': SequenceEncoder()})
+			edge_index = generate_edges(node_mapping)
+
+			data = Data(x=node, edge_index=edge_index.t().contiguous())
+			data.validate(raise_on_error=True)
+			data_list.append(data)
+
+			ground_truth = generate_ground_truth(group, node_mapping)
+			correct_edges.append(ground_truth)
+		except:
+			print("The number of nodes (" + str(len(group)) + ") is greater than the limit (" + str(MAX_DIM_GRAPH) + "). "
+						"The transactions of iban " + iban + " are not included into the graph.")
+			continue
+
+	return data_list, correct_edges
 
 
 def split_dataset():
