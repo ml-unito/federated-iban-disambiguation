@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from os.path import exists
 from tqdm import tqdm
 from itertools import combinations
-from gnn_model import GNN
+from gnn_model import GNN, GNN2
 import embedding_generator.main.embeddings_generator as embeddings_generator
 
 with open('./config/parameters.json', "r") as data_file:
@@ -21,7 +21,6 @@ TRAIN = parameters["train"]
 MAX_DIM_GRAPH = parameters["max_dim_graph"]
 
 
-# TODO: da sostituire con CharacterBERT
 class SequenceEncoder:
 	def __init__(self, model_name='all-MiniLM-L6-v2', device=None):
 		self.device = device
@@ -47,7 +46,8 @@ def train(dataset):
 	# print(f"Device: '{device}'")
 
 	node_features_dim = data_list[0].num_node_features
-	model = GNN(input_dim=node_features_dim)
+	# model = GNN(input_dim=node_features_dim)
+	model = GNN2(input_dim=node_features_dim, hidden_dim=256)
 	model = model.to(device)
 
 	optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -55,6 +55,7 @@ def train(dataset):
 	for epoch in tqdm(range(1, 6), desc="Training"):
 		optimizer.zero_grad()
 		partial_loss = 0
+		partial_accuracy = 0
 
 		for index, data in enumerate(data_list):
 			# print(data)
@@ -69,10 +70,16 @@ def train(dataset):
 
 			partial_loss = torch.add(partial_loss, loss)
 
+			result = torch.eq(pred.round(), ground_truth)
+			partial_accuracy = torch.add(partial_accuracy, (torch.sum(result) / pred.numel()))
+
 		total_loss = torch.div(partial_loss, len(data_list))
 		total_loss.backward(retain_graph=True)
 		optimizer.step()
-		print("total", total_loss)
+		accuracy = torch.div(partial_accuracy, len(data_list))
+		print("\n====== epoch " + str(epoch) + " ======")
+		print("loss:", total_loss.item())
+		print("accuracy:", accuracy.item())
 
 
 def generate_ground_truth(dataset_group, node_mapping):
@@ -144,8 +151,11 @@ def generate_nodes(dataset, field):
 def create_graphs(dataset):
 	data_list = []
 	correct_edges = []
-
+	n=0
 	for iban, group in tqdm(dataset.groupby(["AccountNumber"]), desc="Creating graph"):
+		n += 1
+		if n == 3:
+			break
 		try:
 			# node, node_mapping = generate_nodes_old(group, encoders={'Name': SequenceEncoder()})
 			node, node_mapping = generate_nodes(group, field="Name")
