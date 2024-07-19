@@ -2,13 +2,13 @@ import json
 import torch
 import pandas as pd
 from torch_geometric.data import Data, Batch
-from torch import Tensor
 from sentence_transformers import SentenceTransformer
 from sklearn.model_selection import train_test_split
 from os.path import exists
 from tqdm import tqdm
 from itertools import combinations
 from gnn_model import GNN
+import embedding_generator.main.embeddings_generator as embeddings_generator
 
 with open('./config/parameters.json', "r") as data_file:
 	parameters = json.load(data_file)
@@ -59,20 +59,20 @@ def train(dataset):
 		for index, data in enumerate(data_list):
 			# print(data)
 			pred = model.forward(data.to(device))
-			# print(pred)
+			# print("pred",pred)
+
 			ground_truth = ground_truth_list[index].to(device)
-			# print(ground_truth)
+			# print("groud",ground_truth)
 
 			loss = torch.norm(input=torch.sub(pred, ground_truth), p="fro")
-			#print(loss)
+			# print("partial_loss",loss)
 
 			partial_loss = torch.add(partial_loss, loss)
 
 		total_loss = torch.div(partial_loss, len(data_list))
-
-		total_loss.backward()
+		total_loss.backward(retain_graph=True)
 		optimizer.step()
-		print(total_loss)
+		print("total", total_loss)
 
 
 def generate_ground_truth(dataset_group, node_mapping):
@@ -106,18 +106,36 @@ def generate_edges(node_mapping):
 	return edge_index
 
 
-def generate_node(dataset, encoders=None):
+def generate_nodes_old(dataset, encoders=None):
 	mapping = {index: i for i, index in enumerate(dataset.index.unique())}
 
 	x = None
 	if encoders is not None:
 		xs = [encoder(dataset[col]) for col, encoder in encoders.items()]
 		x = torch.cat(xs, dim=-1)
+	print(x.shape[0])
+	if x.shape[0] < MAX_DIM_GRAPH:
+		null_nodes = torch.zeros(size=((MAX_DIM_GRAPH - x.shape[0]), x.shape[1]))
+		x = torch.cat((x, null_nodes), dim=0)
+	elif x.shape[0] > MAX_DIM_GRAPH:
+		raise Exception()
+
+	return x, mapping
+
+
+def generate_nodes(dataset, field):
+	mapping = {index: i for i, index in enumerate(dataset.index.unique())}
+
+	nodes_list = []
+	for elem in dataset[field]:
+		node_embedding = embeddings_generator.create_characterBERT_embeddings(elem)
+		nodes_list.append(node_embedding)
+	x = torch.cat(nodes_list, 0)
 
 	if x.shape[0] < MAX_DIM_GRAPH:
 		null_nodes = torch.zeros(size=((MAX_DIM_GRAPH - x.shape[0]), x.shape[1]))
 		x = torch.cat((x, null_nodes), dim=0)
-	if x.shape[0] > MAX_DIM_GRAPH:
+	elif x.shape[0] > MAX_DIM_GRAPH:
 		raise Exception()
 
 	return x, mapping
@@ -129,7 +147,8 @@ def create_graphs(dataset):
 
 	for iban, group in tqdm(dataset.groupby(["AccountNumber"]), desc="Creating graph"):
 		try:
-			node, node_mapping = generate_node(group, encoders={'Name': SequenceEncoder()})
+			# node, node_mapping = generate_nodes_old(group, encoders={'Name': SequenceEncoder()})
+			node, node_mapping = generate_nodes(group, field="Name")
 			edge_index = generate_edges(node_mapping)
 
 			data = Data(x=node, edge_index=edge_index.t().contiguous())
@@ -140,7 +159,7 @@ def create_graphs(dataset):
 			correct_edges.append(ground_truth)
 		except:
 			print("The number of nodes (" + str(len(group)) + ") is greater than the limit (" + str(MAX_DIM_GRAPH) + "). "
-						"The transactions of iban " + iban + " are not included into the graph.")
+						"The transactions of iban " + str(iban) + " are not included into the graph.")
 			continue
 
 	return data_list, correct_edges
