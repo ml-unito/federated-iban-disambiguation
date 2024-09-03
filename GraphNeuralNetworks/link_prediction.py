@@ -21,67 +21,6 @@ TRAIN = parameters["train"]
 MAX_DIM_GRAPH = parameters["max_dim_graph"]
 
 
-class SequenceEncoder:
-	def __init__(self, model_name='all-MiniLM-L6-v2', device=None):
-		self.device = device
-		self.model = SentenceTransformer(model_name, device=device)
-
-	@torch.no_grad()
-	def __call__(self, df):
-		x = self.model.encode(df.values, show_progress_bar=False, convert_to_tensor=True, device=self.device)
-		return x.cpu()
-
-
-def test(dataset):
-	pass
-
-
-def train(dataset):
-	data_list, ground_truth_list = create_graphs(dataset)
-	# print("data_list", data_list)
-	# data_batch = Batch.from_data_list(data_list)
-	# print("Batch (", str(data_batch.num_graphs) + ")", data_batch)
-
-	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-	# print(f"Device: '{device}'")
-
-	node_features_dim = data_list[0].num_node_features
-	# model = GNN(input_dim=node_features_dim)
-	model = GNN2(input_dim=node_features_dim, hidden_dim=256)
-	model = model.to(device)
-
-	optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-
-	for epoch in tqdm(range(1, 6), desc="Training"):
-		optimizer.zero_grad()
-		partial_loss = 0
-		partial_accuracy = 0
-
-		for index, data in enumerate(data_list):
-			# print(data)
-			pred = model.forward(data.to(device))
-			# print("pred",pred)
-
-			ground_truth = ground_truth_list[index].to(device)
-			# print("groud",ground_truth)
-
-			loss = torch.norm(input=torch.sub(pred, ground_truth), p="fro")
-			# print("partial_loss",loss)
-
-			partial_loss = torch.add(partial_loss, loss)
-
-			result = torch.eq(pred.round(), ground_truth)
-			partial_accuracy = torch.add(partial_accuracy, (torch.sum(result) / pred.numel()))
-
-		total_loss = torch.div(partial_loss, len(data_list))
-		total_loss.backward(retain_graph=True)
-		optimizer.step()
-		accuracy = torch.div(partial_accuracy, len(data_list))
-		print("\n====== epoch " + str(epoch) + " ======")
-		print("loss:", total_loss.item())
-		print("accuracy:", accuracy.item())
-
-
 def generate_ground_truth(dataset_group, node_mapping):
 	is_shared = dataset_group["IsShared"].tolist()[0]
 
@@ -113,23 +52,6 @@ def generate_edges(node_mapping):
 	return edge_index
 
 
-def generate_nodes_old(dataset, encoders=None):
-	mapping = {index: i for i, index in enumerate(dataset.index.unique())}
-
-	x = None
-	if encoders is not None:
-		xs = [encoder(dataset[col]) for col, encoder in encoders.items()]
-		x = torch.cat(xs, dim=-1)
-	print(x.shape[0])
-	if x.shape[0] < MAX_DIM_GRAPH:
-		null_nodes = torch.zeros(size=((MAX_DIM_GRAPH - x.shape[0]), x.shape[1]))
-		x = torch.cat((x, null_nodes), dim=0)
-	elif x.shape[0] > MAX_DIM_GRAPH:
-		raise Exception()
-
-	return x, mapping
-
-
 def generate_nodes(dataset, field):
 	mapping = {index: i for i, index in enumerate(dataset.index.unique())}
 
@@ -143,7 +65,8 @@ def generate_nodes(dataset, field):
 		null_nodes = torch.zeros(size=((MAX_DIM_GRAPH - x.shape[0]), x.shape[1]))
 		x = torch.cat((x, null_nodes), dim=0)
 	elif x.shape[0] > MAX_DIM_GRAPH:
-		raise Exception()
+		print("The number of nodes (" + str(x.shape[0]) + ") is greater than the limit (" + str(MAX_DIM_GRAPH) + ").")
+		# raise Exception()
 
 	return x, mapping
 
@@ -151,28 +74,78 @@ def generate_nodes(dataset, field):
 def create_graphs(dataset):
 	data_list = []
 	correct_edges = []
-	n=0
+	n = 0
 	for iban, group in tqdm(dataset.groupby(["AccountNumber"]), desc="Creating graph"):
 		n += 1
-		if n == 3:
+		if n == 5:
 			break
-		try:
-			# node, node_mapping = generate_nodes_old(group, encoders={'Name': SequenceEncoder()})
-			node, node_mapping = generate_nodes(group, field="Name")
-			edge_index = generate_edges(node_mapping)
+		# try:
+		node, node_mapping = generate_nodes(group, field="Name")
+		edge_index = generate_edges(node_mapping)
 
-			data = Data(x=node, edge_index=edge_index.t().contiguous())
-			data.validate(raise_on_error=True)
-			data_list.append(data)
+		data = Data(x=node, edge_index=edge_index.t().contiguous())
+		data.validate(raise_on_error=True)
+		data_list.append(data)
 
-			ground_truth = generate_ground_truth(group, node_mapping)
-			correct_edges.append(ground_truth)
-		except:
-			print("The number of nodes (" + str(len(group)) + ") is greater than the limit (" + str(MAX_DIM_GRAPH) + "). "
-						"The transactions of iban " + str(iban) + " are not included into the graph.")
-			continue
+		ground_truth = generate_ground_truth(group, node_mapping)
+		correct_edges.append(ground_truth)
+		# except:
+		# 	print("The number of nodes (" + str(len(group)) + ") is greater than the limit (" + str(MAX_DIM_GRAPH) + "). "
+		# 				"The transactions of iban " + str(iban) + " are not included into the graph.")
+		# 	continue
 
 	return data_list, correct_edges
+
+
+def test(dataset):
+	pass
+
+
+def train(dataset):
+	data_list, ground_truth_list = create_graphs(dataset)
+	# print("data_list", data_list)
+	# data_batch = Batch.from_data_list(data_list)
+	# print("Batch (", str(data_batch.num_graphs) + ")", data_batch)
+
+	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+	# print(f"Device: '{device}'")
+
+	node_features_dim = data_list[0].num_node_features
+	model = GNN(input_dim=node_features_dim)
+	# model = GNN2(input_dim=node_features_dim, hidden_dim=256)
+	model = model.to(device)
+
+	optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+	for epoch in tqdm(range(1, 2), desc="Training"):
+		optimizer.zero_grad()
+		partial_loss = 0
+		partial_accuracy = 0
+
+		for index, data in enumerate(data_list):
+			# print(data)
+			pred = model.forward(data.to(device))
+			# print("pred",pred)
+
+			ground_truth = ground_truth_list[index].to(device)
+			# print("groud",ground_truth)
+
+			loss = torch.norm(input=torch.sub(pred, ground_truth), p="fro")
+			# print("partial_loss",loss)
+
+			partial_loss = torch.add(partial_loss, loss)
+
+			result = torch.eq(pred.round(), ground_truth)
+			partial_accuracy = torch.add(partial_accuracy, (torch.sum(result) / pred.numel()))
+
+		total_loss = torch.div(partial_loss, len(data_list))
+		total_loss.backward(retain_graph=True)
+		optimizer.step()
+
+		accuracy = torch.div(partial_accuracy, len(data_list))
+		print("\n====== epoch " + str(epoch) + " ======")
+		print("loss:", total_loss.item())
+		print("accuracy:", accuracy.item())
 
 
 def split_dataset():
