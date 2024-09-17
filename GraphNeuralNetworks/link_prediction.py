@@ -34,17 +34,17 @@ def generate_ground_truth(dataset_group, node_mapping):
 					ground_truth[node_mapping[node1], node_mapping[node2]] = 1
 
 	# Adds values for padding nodes if needed
-	if num_valued_nodes < MAX_DIM_GRAPH:
-		num_empty_nodes = MAX_DIM_GRAPH - num_valued_nodes
-
-		top_right_tensors_padding_nodes = torch.zeros((num_valued_nodes, num_empty_nodes))
-		bottom_tensors_padding_nodes = torch.cat(
-			(torch.zeros(num_empty_nodes, num_valued_nodes), torch.ones(num_empty_nodes, num_empty_nodes)),
-			dim=1)
-
-		ground_truth = torch.cat(
-			(torch.cat((ground_truth, top_right_tensors_padding_nodes), dim=1), bottom_tensors_padding_nodes),
-			dim=0)
+	# if num_valued_nodes < MAX_DIM_GRAPH:
+	# 	num_empty_nodes = MAX_DIM_GRAPH - num_valued_nodes
+	#
+	# 	top_right_tensors_padding_nodes = torch.zeros((num_valued_nodes, num_empty_nodes))
+	# 	bottom_tensors_padding_nodes = torch.cat(
+	# 		(torch.zeros(num_empty_nodes, num_valued_nodes), torch.ones(num_empty_nodes, num_empty_nodes)),
+	# 		dim=1)
+	#
+	# 	ground_truth = torch.cat(
+	# 		(torch.cat((ground_truth, top_right_tensors_padding_nodes), dim=1), bottom_tensors_padding_nodes),
+	# 		dim=0)
 
 	return ground_truth
 
@@ -136,6 +136,8 @@ def train(dataset):
 
 			ground_truth = ground_truth_list[index].to(device)
 			# print("groud",ground_truth)
+
+			pred = pred[:ground_truth.shape[0], :ground_truth.shape[1]]
 
 			loss = torch.norm(input=torch.sub(pred, ground_truth), p="fro")
 			# print("partial_loss",loss)
