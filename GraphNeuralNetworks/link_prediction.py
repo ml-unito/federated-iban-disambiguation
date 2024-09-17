@@ -2,7 +2,6 @@ import json
 import torch
 import pandas as pd
 from torch_geometric.data import Data, Batch
-from sentence_transformers import SentenceTransformer
 from sklearn.model_selection import train_test_split
 from os.path import exists
 from tqdm import tqdm
@@ -23,31 +22,45 @@ MAX_DIM_GRAPH = parameters["max_dim_graph"]
 
 def generate_ground_truth(dataset_group, node_mapping):
 	is_shared = dataset_group["IsShared"].tolist()[0]
-
 	num_valued_nodes = len(node_mapping.keys())
-	num_empty_nodes = MAX_DIM_GRAPH - num_valued_nodes
 
 	if not is_shared:
-		ground_truth = torch.ones(num_valued_nodes, num_valued_nodes) - torch.diag(torch.tensor([1] * num_valued_nodes))
+		ground_truth = torch.ones(num_valued_nodes, num_valued_nodes)
 	else:
 		ground_truth = torch.zeros(num_valued_nodes, num_valued_nodes)
 		for node1 in node_mapping.keys():
 			for node2 in node_mapping.keys():
-				if node1 != node2 and dataset_group.loc[node1]["Holder"] == dataset_group.loc[node2]["Holder"]:
+				if node1 == node2 or dataset_group.loc[node1]["Holder"] == dataset_group.loc[node2]["Holder"]:
 					ground_truth[node_mapping[node1], node_mapping[node2]] = 1
 
-	# Adding zeros for padding nodes
-	ground_truth = torch.cat((ground_truth, torch.zeros((num_valued_nodes, num_empty_nodes))), dim=1)
-	ground_truth = torch.cat((ground_truth, torch.zeros(num_empty_nodes, num_valued_nodes + num_empty_nodes)), dim=0)
+	# Adds values for padding nodes if needed
+	if num_valued_nodes < MAX_DIM_GRAPH:
+		num_empty_nodes = MAX_DIM_GRAPH - num_valued_nodes
+
+		top_right_tensors_padding_nodes = torch.zeros((num_valued_nodes, num_empty_nodes))
+		bottom_tensors_padding_nodes = torch.cat(
+			(torch.zeros(num_empty_nodes, num_valued_nodes), torch.ones(num_empty_nodes, num_empty_nodes)),
+			dim=1)
+
+		ground_truth = torch.cat(
+			(torch.cat((ground_truth, top_right_tensors_padding_nodes), dim=1), bottom_tensors_padding_nodes),
+			dim=0)
 
 	return ground_truth
 
 
 def generate_edges(node_mapping):
-	"""It generates the edges between all possible pairs of nodes."""
+	"""It generates the edges between all possible pairs of entries and between
+	all possible pairs of padding nodes."""
 
-	edges = [[couple[0], couple[1]] for couple in list(combinations(list(node_mapping.values()), 2))]
-	edge_index = torch.tensor(edges, dtype=torch.long)
+	index_nodes = list(node_mapping.values())
+	edges = [[couple[0], couple[1]] for couple in list(combinations(index_nodes, 2))]
+
+	index_padding_nodes = list(range(len(node_mapping.values()), MAX_DIM_GRAPH))
+	edges_padding_nodes = [[couple[0], couple[1]] for couple in list(combinations(index_padding_nodes, 2))]
+
+	complete_edges = edges + edges_padding_nodes
+	edge_index = torch.tensor(complete_edges, dtype=torch.long)
 
 	return edge_index
 
@@ -64,9 +77,6 @@ def generate_nodes(dataset, field):
 	if x.shape[0] < MAX_DIM_GRAPH:
 		null_nodes = torch.zeros(size=((MAX_DIM_GRAPH - x.shape[0]), x.shape[1]))
 		x = torch.cat((x, null_nodes), dim=0)
-	elif x.shape[0] > MAX_DIM_GRAPH:
-		print("The number of nodes (" + str(x.shape[0]) + ") is greater than the limit (" + str(MAX_DIM_GRAPH) + ").")
-		# raise Exception()
 
 	return x, mapping
 
@@ -74,12 +84,12 @@ def generate_nodes(dataset, field):
 def create_graphs(dataset):
 	data_list = []
 	correct_edges = []
-	n = 0
+
 	for iban, group in tqdm(dataset.groupby(["AccountNumber"]), desc="Creating graph"):
-		n += 1
-		if n == 5:
-			break
-		# try:
+		if len(group) > MAX_DIM_GRAPH:
+			print("The number of nodes (" + str(len(group)) + ") is greater than the limit (" + str(MAX_DIM_GRAPH) + "). The entries number was reduced.")
+			group = group[:MAX_DIM_GRAPH]
+
 		node, node_mapping = generate_nodes(group, field="Name")
 		edge_index = generate_edges(node_mapping)
 
@@ -89,10 +99,6 @@ def create_graphs(dataset):
 
 		ground_truth = generate_ground_truth(group, node_mapping)
 		correct_edges.append(ground_truth)
-		# except:
-		# 	print("The number of nodes (" + str(len(group)) + ") is greater than the limit (" + str(MAX_DIM_GRAPH) + "). "
-		# 				"The transactions of iban " + str(iban) + " are not included into the graph.")
-		# 	continue
 
 	return data_list, correct_edges
 
@@ -102,6 +108,7 @@ def test(dataset):
 
 
 def train(dataset):
+	# torch.set_printoptions(profile="full", linewidth=300)
 	data_list, ground_truth_list = create_graphs(dataset)
 	# print("data_list", data_list)
 	# data_batch = Batch.from_data_list(data_list)
