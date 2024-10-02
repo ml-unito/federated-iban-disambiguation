@@ -20,6 +20,20 @@ TRAIN = parameters["train"]
 MAX_DIM_GRAPH = parameters["max_dim_graph"]
 
 
+def union_ground_truth(ground_truth_list):
+	complete_ground_truth = None
+	for index, ground_truth in enumerate(ground_truth_list):
+		if index == 0:
+			complete_ground_truth = ground_truth
+		else:
+			complete_ground_truth = torch.cat(
+				(torch.cat((complete_ground_truth, torch.zeros(MAX_DIM_GRAPH * index, MAX_DIM_GRAPH)), dim=1),
+				 torch.cat((torch.zeros(MAX_DIM_GRAPH, MAX_DIM_GRAPH * index), ground_truth), dim=1)),
+				dim=0)
+
+	return complete_ground_truth
+
+
 def generate_ground_truth(dataset_group, node_mapping):
 	is_shared = dataset_group["IsShared"].tolist()[0]
 	num_valued_nodes = len(node_mapping.keys())
@@ -34,17 +48,17 @@ def generate_ground_truth(dataset_group, node_mapping):
 					ground_truth[node_mapping[node1], node_mapping[node2]] = 1
 
 	# Adds values for padding nodes if needed
-	# if num_valued_nodes < MAX_DIM_GRAPH:
-	# 	num_empty_nodes = MAX_DIM_GRAPH - num_valued_nodes
-	#
-	# 	top_right_tensors_padding_nodes = torch.zeros((num_valued_nodes, num_empty_nodes))
-	# 	bottom_tensors_padding_nodes = torch.cat(
-	# 		(torch.zeros(num_empty_nodes, num_valued_nodes), torch.ones(num_empty_nodes, num_empty_nodes)),
-	# 		dim=1)
-	#
-	# 	ground_truth = torch.cat(
-	# 		(torch.cat((ground_truth, top_right_tensors_padding_nodes), dim=1), bottom_tensors_padding_nodes),
-	# 		dim=0)
+	if num_valued_nodes < MAX_DIM_GRAPH:
+		num_empty_nodes = MAX_DIM_GRAPH - num_valued_nodes
+
+		top_right_tensors_padding_nodes = torch.zeros((num_valued_nodes, num_empty_nodes))
+		bottom_tensors_padding_nodes = torch.cat(
+			(torch.zeros(num_empty_nodes, num_valued_nodes), torch.ones(num_empty_nodes, num_empty_nodes)),
+			dim=1)
+
+		ground_truth = torch.cat(
+			(torch.cat((ground_truth, top_right_tensors_padding_nodes), dim=1), bottom_tensors_padding_nodes),
+			dim=0)
 
 	return ground_truth
 
@@ -65,11 +79,11 @@ def generate_edges(node_mapping):
 	return edge_index
 
 
-def generate_nodes(dataset, field):
-	mapping = {index: i for i, index in enumerate(dataset.index.unique())}
+def generate_nodes(group, field):
+	mapping = {index: i for i, index in enumerate(group.index.unique())}
 
 	nodes_list = []
-	for elem in dataset[field]:
+	for elem in group[field]:
 		node_embedding = embeddings_generator.create_characterBERT_embeddings(elem)
 		nodes_list.append(node_embedding)
 	x = torch.cat(nodes_list, 0)
@@ -83,11 +97,11 @@ def generate_nodes(dataset, field):
 
 def create_graphs(dataset):
 	data_list = []
-	correct_edges = []
-
-	for iban, group in tqdm(dataset.groupby(["AccountNumber"]), desc="Creating graph"):
+	ground_truth_list = []
+	for iban, group in tqdm(dataset.groupby(["AccountNumber"], sort=False), desc="Creating graph"):
 		if len(group) > MAX_DIM_GRAPH:
-			print("The number of nodes (" + str(len(group)) + ") is greater than the limit (" + str(MAX_DIM_GRAPH) + "). The entries number was reduced.")
+			print("The number of nodes (" + str(len(group)) + ") is greater than the limit (" + str(
+				MAX_DIM_GRAPH) + "). The entries number was reduced.")
 			group = group[:MAX_DIM_GRAPH]
 
 		node, node_mapping = generate_nodes(group, field="Name")
@@ -98,9 +112,9 @@ def create_graphs(dataset):
 		data_list.append(data)
 
 		ground_truth = generate_ground_truth(group, node_mapping)
-		correct_edges.append(ground_truth)
+		ground_truth_list.append(ground_truth)
 
-	return data_list, correct_edges
+	return data_list, ground_truth_list
 
 
 def test(dataset):
@@ -108,53 +122,42 @@ def test(dataset):
 
 
 def train(dataset):
-	# torch.set_printoptions(profile="full", linewidth=300)
-	data_list, ground_truth_list = create_graphs(dataset)
-	# print("data_list", data_list)
-	# data_batch = Batch.from_data_list(data_list)
-	# print("Batch (", str(data_batch.num_graphs) + ")", data_batch)
-
+	# f = open("log.txt", "w")
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-	# print(f"Device: '{device}'")
+	print(f"Device: '{device}'")
+	torch.set_printoptions(profile="full", linewidth=1000)
+	data_list, ground_truth_list = create_graphs(dataset)
+
+	data_batch = Batch.from_data_list(data_list).to(device)
+	ground_truth = union_ground_truth(ground_truth_list).to(device)
 
 	node_features_dim = data_list[0].num_node_features
-	model = GNN(input_dim=node_features_dim)
-	# model = GNN2(input_dim=node_features_dim, hidden_dim=256)
-	model = model.to(device)
+	model = GNN(input_dim=node_features_dim).to(device)
 
-	optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-
-	for epoch in tqdm(range(1, 2), desc="Training"):
+	optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
+	for epoch in tqdm(range(1, 5), desc="Training"):
 		optimizer.zero_grad()
-		partial_loss = 0
-		partial_accuracy = 0
+		pred = model.forward(data_batch.to(device))
+		# print("pred\n", pred)
+		# f.write("PRED\n")
+		# f.write(str(pred))
 
-		for index, data in enumerate(data_list):
-			# print(data)
-			pred = model.forward(data.to(device))
-			# print("pred",pred)
+		ground_truth = ground_truth.to(device)
+		# print("ground_truth\n", ground_truth.shape, ground_truth)
+		# f.write("GROUND TRUTH\n")
+		# f.write(str(ground_truth))
 
-			ground_truth = ground_truth_list[index].to(device)
-			# print("groud",ground_truth)
-
-			pred = pred[:ground_truth.shape[0], :ground_truth.shape[1]]
-
-			loss = torch.norm(input=torch.sub(pred, ground_truth), p="fro")
-			# print("partial_loss",loss)
-
-			partial_loss = torch.add(partial_loss, loss)
-
-			result = torch.eq(pred.round(), ground_truth)
-			partial_accuracy = torch.add(partial_accuracy, (torch.sum(result) / pred.numel()))
-
-		total_loss = torch.div(partial_loss, len(data_list))
-		total_loss.backward(retain_graph=True)
+		loss = torch.norm(input=torch.sub(pred, ground_truth), p="fro")
+		loss.backward(retain_graph=True)
 		optimizer.step()
 
-		accuracy = torch.div(partial_accuracy, len(data_list))
+		accuracy = (torch.sum(torch.eq(pred, ground_truth)) / pred.numel())
+
 		print("\n====== epoch " + str(epoch) + " ======")
-		print("loss:", total_loss.item())
+		print("loss:", loss.item())
 		print("accuracy:", accuracy.item())
+
+	# f.close()
 
 
 def split_dataset():
