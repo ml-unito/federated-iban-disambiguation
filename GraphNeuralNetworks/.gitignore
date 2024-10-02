@@ -1,4 +1,6 @@
 __pycache__/
 .idea/
 *.csv
+*.png
+*.txt
 embedding_generator/character_bert_model/pretrained-models/general_character_bert/*.bin

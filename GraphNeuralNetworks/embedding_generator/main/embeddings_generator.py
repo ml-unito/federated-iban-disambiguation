@@ -18,12 +18,33 @@ def create_model():
 
 # Load Custom model
 download_fine_tuned_model()
-indexer = CharacterIndexer()
+model_device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 characterBERTmodel = create_model()
+characterBERTmodel = characterBERTmodel.to(model_device)
+indexer = CharacterIndexer()
 
 
-def create_characterBERT_embeddings(string):
+
+
+def create_characterBERT_embeddings(padded_tensor):
     """ create embeddings using the characterBERT fine-Tuned model """
     
-    input_tensors = indexer.as_padded_tensor([string])
-    return characterBERTmodel(input_tensors)
+    embeddings = characterBERTmodel(padded_tensor)
+    return embeddings.to(model_device)
+
+
+
+def create_characterBERT_padded_tensors(words):
+    """ create embeddings using the characterBERT fine-Tuned model """
+    
+    padded_tensor = indexer.as_padded_tensor(words)
+    return padded_tensor.to(model_device)
+
+
+
+def create_characterBERT_embeddings_old_version(string):
+    """ create embeddings using the characterBERT fine-Tuned model """
+    
+    embeddings = characterBERTmodel(indexer.as_padded_tensor([string]))
+    torch.cuda.empty_cache() # free up memory
+    return embeddings

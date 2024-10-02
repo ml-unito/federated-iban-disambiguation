@@ -1,0 +1,381 @@
+import json
+import torch
+import pandas as pd
+from tqdm import tqdm
+from os.path import exists
+from itertools import combinations
+from gnn_model import GNN, GNN2, GNN3
+from torch_geometric.data import Data, Batch
+from sklearn.model_selection import train_test_split
+import embedding_generator.main.embeddings_generator as embeddings_generator
+#from torch.utils.data import DataLoader
+
+
+
+# Load parameters
+with open('./config/parameters.json', "r") as data_file: parameters = json.load(data_file)
+DATASET_PATH = parameters["dataset_path"]
+NODE_PLACEHOLDER = parameters["node_placheholder"]
+TRAIN_SIZE = parameters["train_size"]
+TRAIN_PATH = DATASET_PATH.replace(".csv", "_train.csv")
+TEST_PATH = DATASET_PATH.replace(".csv", "_test.csv")
+TRAIN = parameters["train"]
+MAX_DIM_GRAPH = parameters["max_dim_graph"]
+NUM_EPOCHS = parameters["num_epochs"]
+FORCE_DATASET_SPLIT = parameters["force_dataset_split"]
+MAX_NUM_NODES = parameters["max_num_nodes"]			   # Max number of nodes in a BATCH_SIZE	
+
+# Load GPU
+model_device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
+
+
+
+def generate_ground_truth(dataset_group, node_mapping):
+	""" Generate the ground truth tensor for each node (dataset_group) """
+
+	is_shared = dataset_group["IsShared"].tolist()[0]
+	num_valued_nodes = len(node_mapping.keys())
+
+	if not is_shared:
+		ground_truth = torch.ones(num_valued_nodes, num_valued_nodes)
+	else:
+		ground_truth = torch.zeros(num_valued_nodes, num_valued_nodes)
+		for node1 in node_mapping.keys():
+			for node2 in node_mapping.keys():
+				if node1 == node2 or dataset_group.loc[node1]["Holder"] == dataset_group.loc[node2]["Holder"]:
+					ground_truth[node_mapping[node1], node_mapping[node2]] = 1
+
+	# Adds values for padding nodes if needed
+	if num_valued_nodes < MAX_DIM_GRAPH:
+		num_empty_nodes = MAX_DIM_GRAPH - num_valued_nodes
+
+		top_right_tensors_padding_nodes = torch.zeros((num_valued_nodes, num_empty_nodes))
+		bottom_tensors_padding_nodes = torch.cat(
+			(torch.zeros(num_empty_nodes, num_valued_nodes), torch.ones(num_empty_nodes, num_empty_nodes)),
+			dim=1)
+
+		ground_truth = torch.cat(
+			(torch.cat((ground_truth, top_right_tensors_padding_nodes), dim=1), bottom_tensors_padding_nodes),
+			dim=0)
+
+	return ground_truth
+
+
+
+
+def generate_edges(node_mapping):
+	"""It generates the edges between all possible pairs of entries and between
+	all possible pairs of padding nodes."""
+
+	index_nodes = list(node_mapping.values())
+	edges = [[couple[0], couple[1]] for couple in list(combinations(index_nodes, 2))]
+
+	index_padding_nodes = list(range(len(node_mapping.values()), MAX_DIM_GRAPH))
+	edges_padding_nodes = [[couple[0], couple[1]] for couple in list(combinations(index_padding_nodes, 2))]
+	complete_edges = edges + edges_padding_nodes
+	edge_index = torch.tensor(complete_edges, dtype=torch.long)
+
+	return edge_index
+
+
+
+
+def generate_nodes(group, field):
+	""" Generate the nodes for each subgraph. the infos stored in every nodes 
+are the padded tensors (to be passed to the encoding layer or the BERT) of the field.
+ 		- group: dataset group
+ 		- field: field to be processed (eg. Name)"""
+
+	# Create mapping for nodes in DATA object
+	mapping = {index: i for i, index in enumerate(group.index.unique())}
+	shape = 0
+
+	# Generate the padded tensors for each name in the group
+	# Add the placeholder for the padding nodes
+	words = group[field].tolist()
+	shape = len(words)
+	if len(words) < MAX_DIM_GRAPH:
+		words += [NODE_PLACEHOLDER for _ in range(MAX_DIM_GRAPH - len(words))]
+	
+	x = embeddings_generator.create_characterBERT_padded_tensors(words)
+	# # Generate the padded tensors for each name in the group
+	# for elem in group[field]:
+	# 	node_embedding = embeddings_generator.create_characterBERT_padded_tensor(elem)
+	# 	nodes_list.append(node_embedding)
+	
+	# # Concatenate the tensors	
+	# x = torch.cat(nodes_list, 0)
+	# x = x.to(model_device)
+
+	# Check if there are more nodes than the limit
+	# Assign zeors to the extra nodes
+	# if x.shape[0] < MAX_DIM_GRAPH:
+	# 	null_nodes = torch.zeros(size=((MAX_DIM_GRAPH - x.shape[0]), x.shape[1]))
+	# 	null_nodes = null_nodes.to(device)
+	# 	x = torch.cat((x, null_nodes), dim=0)
+
+	return x, mapping, shape
+
+
+
+
+def create_graphs(train_set):
+	""" create the graphs from the dataset """
+
+	data_list = []
+	correct_edges = []
+	node_shapes = []
+
+	for _, group in tqdm(train_set.groupby(["AccountNumber"]), desc="Creating graph"):
+		if len(group) > MAX_DIM_GRAPH:
+			print("The number of nodes (" + str(len(group)) + ") is greater than the limit (" + str(MAX_DIM_GRAPH) + "). The entries number was reduced.")
+			group = group[:MAX_DIM_GRAPH]
+
+		# Generate nodes, edges and ground truth
+		# Each node is stored in a Data object. 
+		# The Data oject are stored in a list
+		node, node_mapping, shapes = generate_nodes(group, field="Name")
+		node_shapes.append(shapes)
+		edge_index = generate_edges(node_mapping)
+		data = Data(x=node, edge_index=edge_index.t().contiguous())
+		data.validate(raise_on_error=True)
+		data_list.append(data)
+		ground_truth = generate_ground_truth(group, node_mapping)
+		correct_edges.append(ground_truth)
+
+	return data_list, correct_edges, node_shapes
+
+
+
+
+def init_weights(m):
+    """ Initialize the weights of the model """
+    if isinstance(m, torch.nn.Linear):
+        torch.nn.init.xavier_uniform_(m.weight)
+        m.bias.data.fill_(0.01)
+
+
+
+def train(train_set):
+	""" """
+    
+	# torch.set_printoptions(profile="full", linewidth=300)
+	# model = GNN2(input_dim=768, hidden_dim=256)
+	# Memory usage
+	# print("Used memory:", torch.cuda.memory_allocated() / (1024 * 1024), "MB")
+	# print("Total memory:", torch.cuda.get_device_properties(0).total_memory / (1024 * 1024), "MB")
+	# Batch size
+	#data_loader = DataLoader(data_list, batch_size=min_num_graph, collate_fn=lambda x: x)
+ 
+
+
+	# Load data
+	data_list, ground_truth_list, node_shapes = create_graphs(train_set)
+	min_num_nodes = 0
+	batch_size = 0
+	for i, data in enumerate(data_list):
+		if min_num_nodes + data.x.shape[0] <= MAX_NUM_NODES:
+			min_num_nodes += data.x.shape[0]
+			batch_size += 1
+	
+	# Load model
+	model = GNN3(input_dim=768)
+	model = model.to(model_device)
+	model.train()
+ 
+	# Init weights
+	model.apply(init_weights)
+	optimizer = torch.optim.AdamW(model.parameters(), lr=0.04, weight_decay=0.01)
+	scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=NUM_EPOCHS)
+	criterion = torch.nn.BCELoss()
+	#criterion = torch.nn.MSELoss()
+	#criterion = torch.nn.BCEWithLogitsLoss()
+	
+	# print some infos
+	print()
+	print("Minimum batch size: " + str(batch_size))
+	print("Total number of graphs: " + str(len(data_list)))
+	print("Total number of nodes: " + str(data_list[0].x.shape[0] * len(data_list)))
+
+
+	# Training Loop
+	for epoch in range(NUM_EPOCHS):			# For each epoch
+		
+		# run a training step
+		print("\n====== init epoch " + str(epoch + 1) + " ======")
+		total_accuracy, total_loss = training_step(model, optimizer, criterion, scheduler, data_list,ground_truth_list, node_shapes, batch_size)
+
+		# print total accuracy and total loss
+		total_accuracy = total_accuracy / len(data_list)
+		total_loss = total_loss / len(data_list)
+		print("Total loss:", total_loss)
+		print("Total accuracy:", total_accuracy)
+		print()
+
+  
+		# Free the cache after each epoch
+		torch.cuda.empty_cache()
+	
+
+
+
+
+
+def training_step(model, optimizer, criterion, scheduler, data_list,ground_truth_list, node_shapes, batch_size):
+	""" """
+
+	total_loss = 0
+	total_accuracy = 0
+
+	for i in tqdm(range(0, len(data_list), batch_size), desc="Batch"):					# For each batch
+			
+		# reset the gradient
+		optimizer.zero_grad(set_to_none=True)
+		singular_loss = 0
+		singular_accuracy = 0
+		
+		# get the batch	
+		#print("Batch " + str(i) + "/" + str(len(data_list)))
+		batch = data_list[i:i+batch_size]
+		shapes = node_shapes[i:i+batch_size]
+		ground_truth_batch = ground_truth_list[i:i+batch_size] 
+		
+		for index, data in enumerate(batch):						# For each graph
+
+			# generate the BERT embeddings
+			old_data = data.x.clone()
+			data.x = data.x.to(model_device)
+			data.x = embeddings_generator.create_characterBERT_embeddings(data.x)
+
+			# Pad the nodes to the maximum dimension
+			if shapes[index] < MAX_DIM_GRAPH:
+				null_nodes = torch.zeros(size=((MAX_DIM_GRAPH - shapes[index]), data.x.shape[1]))
+				null_nodes = null_nodes.to(model_device)
+				data.x = torch.cat((data.x[:shapes[index]], null_nodes), dim=0)
+   
+
+			# Forward pass
+			data.to(model_device)
+			pred = model.forward(data)
+			ground_truth = ground_truth_batch[index].to(model_device)
+
+			# retrieve the prediction for only the existent nodes in the ground truth
+			# pred = pred[:ground_truth.shape[0], :ground_truth.shape[1]]
+
+	
+			# Apply binary cross-entropy loss
+			#loss = torch.norm(input=torch.sub(pred, ground_truth), p="fro")
+			loss = criterion(pred, ground_truth)
+			singular_loss = torch.add(singular_loss, loss)
+
+			# Compute accuracy
+			# THRESHOLD = 0.05
+			# result = torch.where(torch.round(pred) < THRESHOLD, torch.zeros_like(pred), torch.ones_like(pred))
+			# result = torch.eq(result, ground_truth)
+			result = torch.eq(torch.round(pred), ground_truth)
+			singular_accuracy = torch.add(singular_accuracy, (torch.sum(result) / pred.numel()))
+   
+			if index == len(batch) - 1:
+				print("PREDICTION")
+				print(pred)
+				print("GROUND TRUTH")
+				print(ground_truth)
+			# 	print("DECISION")
+			# 	print(torch.round(pred))
+			# 	print()
+			# 	print("ACCURACY: ", singular_accuracy)
+			# 	print("LOSS: ", singular_loss)
+			# 	print("------------------")
+			# 	print("\n")
+			
+   
+   			# Free the cache
+			data.x = data.x.cpu()
+			data.x = old_data
+			pred = pred.cpu()
+			ground_truth = ground_truth.cpu()
+			del pred, ground_truth, result, loss
+				
+		
+		batch_loss = torch.div(singular_loss, len(batch))
+		total_loss += batch_loss.item()
+		total_accuracy += singular_accuracy.item()
+		#print(total_accuracy, total_loss)
+	
+		
+  		# Backward pass
+		torch.nn.utils.clip_grad_norm_(model.parameters(), 1)  # Gradient clipping
+		batch_loss.backward(retain_graph=True)
+		optimizer.step()
+		scheduler.step()
+		
+
+	return total_accuracy, total_loss
+
+
+
+
+def test(dataset):
+	pass
+
+
+
+
+def split_dataset():
+	""" Split the dataset into train and test datasets """
+
+	train_datasets_exists = exists(TRAIN_PATH)
+	test_datasets_exists = exists(TEST_PATH)	
+
+	if FORCE_DATASET_SPLIT:
+		train_datasets_exists = False
+		test_datasets_exists = False
+	
+ 
+	if train_datasets_exists and test_datasets_exists:
+		print("Dataset already splitted!\nLoading training and testing dataset...")
+		train_df = pd.read_csv(TRAIN_PATH)
+		test_df = pd.read_csv(TEST_PATH)
+	else:
+		print("Dataset not found!\nCreate train and test...")
+		
+		# Splitting in training and testing set mantaining the same proportion 
+		# of the original IsShared column in the splitted dataset 
+		dataset = pd.read_csv(DATASET_PATH)
+		iban_list = dataset.AccountNumber.unique()
+		isShared = dataset.groupby('AccountNumber')['IsShared'].first().loc[iban_list].values
+
+		train_iban_list, test_iban_list = train_test_split(iban_list, train_size=TRAIN_SIZE, stratify=isShared)
+		train_df = dataset.loc[dataset.AccountNumber.isin(train_iban_list)]
+		test_df = dataset.loc[dataset.AccountNumber.isin(test_iban_list)]
+
+		train_df.to_csv(TRAIN_PATH)
+		test_df.to_csv(TEST_PATH)
+
+	return train_df, test_df
+
+
+
+
+
+
+def main():
+	""" Main function: 
+ 		- Split the dataset into train and test datasets
+ 		- Train the model
+ 		- Test the model
+	"""
+	
+	train_df, test_df = split_dataset()
+	print("Datasets loaded!\n")
+ 
+	if TRAIN:train(train_df)
+	else:test(test_df)
+
+
+
+
+if __name__ == "__main__":
+	main()

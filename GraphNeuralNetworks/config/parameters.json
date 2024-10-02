@@ -1,8 +1,11 @@
 {
-  "dataset_path": "./dataset/dataset_10-07-2024_16-10-45.csv",
+  "dataset_path": "./dataset/dataset_1000_max20T.csv",
+  "node_placheholder"  : "VOID",
   "train_size": 0.8,
-  "train_path": "./dataset/train_dataset.csv",
-  "test_path": "./dataset/test_dataset.csv",
-  "train": 1,
-  "max_dim_graph": 200
+  "valid_size": 0.5,
+  "force_dataset_split": 1,
+  "only_train": 1,
+  "max_dim_graph": 20,
+  "num_epochs": 10,
+  "max_num_nodes": 512
 }
