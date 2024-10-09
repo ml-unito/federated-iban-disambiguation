@@ -423,7 +423,7 @@ def save_used_parameters(dataset_file_name):
 
   json_object = json.dumps(param, indent=2)
 
-  with open(dataset_file_name[:-4]+".json", "w") as outfile:
+  with open(dataset_file_name[:-4] + "__parameters" + ".json", "w") as outfile:
     outfile.write(json_object)
 
 
