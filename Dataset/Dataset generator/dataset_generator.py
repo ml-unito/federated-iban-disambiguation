@@ -409,12 +409,33 @@ def print_dataset(dataset, maxLine = 20):
   print("\n\n")
 
 
+def save_used_parameters(dataset_file_name):
+  param = {
+    "dataset_file_name": dataset_file_name,
+    "num_iban": NUM_IBAN,
+    "min_range_entry": MIN_RANGE_ENTRY,
+    "max_range_entry": MAX_RANGE_ENTRY,
+    "min_range_holders": MIN_RANGE_HOLDERS,
+    "max_range_holders": MAX_RANGE_HOLDERS,
+    "prob_shared_account": PROB_SHARED_ACCOUNT,
+    "prob_address": PROB_ADDRESS,
+  }
+
+  json_object = json.dumps(param, indent=2)
+
+  with open(dataset_file_name[:-4]+".json", "w") as outfile:
+    outfile.write(json_object)
+
+
 def main():
   empty_dataset = create_dataset()
   faker_objects = create_faker_objects()
+
   dataset = data_generator(empty_dataset, faker_objects)
+
   path = get_dataset_filePath()
   save_dataset(dataset, path)
+  save_used_parameters(path)
 
   if len(sys.argv) > 1 and sys.argv[1] == "show":
     print_dataset(dataset)
@@ -427,4 +448,4 @@ if __name__ == "__main__":
   print("Main...")
   main()
   print("Done...")
-  print("Dataset saved in /output foldes.")
+  print("Dataset and parameters used are saved in /output folders.")
