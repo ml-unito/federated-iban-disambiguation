@@ -2,13 +2,14 @@ import json
 import torch
 import pandas as pd
 from tqdm import tqdm
+from gnn_model import GNN3
 from os.path import exists
 from datetime import datetime
 import matplotlib.pyplot as plt
 from itertools import combinations
 from saveOutput import SaveOutput
-from gnn_model import GNN3
 from torch_geometric.data import Data
+from torchmetrics import Precision, Recall, F1Score
 from sklearn.model_selection import train_test_split
 import embedding_generator.main.embeddings_generator as embeddings_generator
 torch.set_printoptions(precision=4, threshold=2000, edgeitems=3, linewidth=200, profile='full')
@@ -24,57 +25,78 @@ VALID_SIZE = parameters["valid_size"]					# Percentage of the test set for valid
 TRAIN_PATH = DATASET_PATH.replace(".csv", "_train.csv")
 VALID_PATH = DATASET_PATH.replace(".csv", "_valid.csv")
 TEST_PATH = DATASET_PATH.replace(".csv", "_test.csv")
+DATASET_NAME = DATASET_PATH.split("/")[-1].replace(".csv", "")
+MODEL_PATH = "./saved_model/" + "model_" + DATASET_NAME + ".pt"
+LOAD_MODEL_PATH = parameters["load_model_path"]
+SAVE_MODEL = parameters["save_model"]
 TRAIN = parameters["only_train"]
 MAX_DIM_GRAPH = parameters["max_dim_graph"]
 NUM_EPOCHS = parameters["num_epochs"]
 FORCE_DATASET_SPLIT = parameters["force_dataset_split"]
 MAX_NUM_NODES = parameters["max_num_nodes"]			   # Max number of nodes in a BATCH_SIZE	
 
-
 # Load GPU
 model_device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # define a log file
 DATE_NAME = str(datetime.now()).split(".")[0].replace(" ", "_") 
-LOG_NAME = "Train_log_" + DATE_NAME + ".txt"
-PLOT_NAME = "Train_plot_" + DATE_NAME + ".png"
-PLOT_VALID_NAME = "Valid_plot_" + DATE_NAME + ".png"
-
-saveToFile = SaveOutput('./log/', LOG_NAME, debug=False)
-
+LOG_NAME = "Train_log_" + DATASET_NAME + DATE_NAME + ".txt"
+PLOT_NAME = "Train_plot_" + DATASET_NAME + DATE_NAME + ".png"
+PLOT_VALID_NAME = "Valid_plot_" + DATASET_NAME + DATE_NAME + ".png"
+DEBUG = False
 
 
 
+def plot_train_metrics(train_loss, train_accuracy, val_loss, val_accuracy, val_precision, val_recall, val_f1, figsize=(15, 10), saveName=None):
+	""" plot train and validation metrics """
 
+	epochs = range(1, len(train_loss) + 1)
+	plt.figure(figsize=figsize)
 
-def plot_metrics(train_loss, train_accuracy, label_loss, label_accuracy, figsize=(10, 5), saveName=None):
-    """ plot train metrics """
+	# Plot train loss
+	plt.subplot(2, 2, 1)
+	plt.plot(epochs, train_loss, 'b', label="Train loss")
+	plt.title("Train Loss")
+	plt.xlabel('Epochs')
+	plt.ylabel('Loss')
+	plt.xticks(epochs)
+	plt.legend()
 
-    epochs = range(1, len(train_loss) + 1)
-    plt.figure(figsize=figsize)
+	# Plot validation loss
+	plt.subplot(2, 2, 2)
+	plt.plot(epochs, val_loss, 'r', label='Validation loss')
+	plt.title("Validation Loss")
+	plt.xlabel('Epochs')
+	plt.ylabel('Loss')
+	plt.xticks(epochs)
+	plt.legend()
 
-    # Plot losses
-    plt.subplot(1, 2, 1)
-    plt.plot(epochs, train_loss, 'b', label=label_loss)
-    plt.title(label_loss)
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.xticks(epochs)
-    plt.legend()
+	# Plot accuracy
+	plt.subplot(2, 2, 3)
+	plt.plot(epochs, train_accuracy, 'g', label="Train accuracy")
+	plt.plot(epochs, val_accuracy, 'y', label='Validation accuracy')
+	plt.title("Accuracy")
+	plt.xlabel('Epochs')
+	plt.ylabel('Accuracy')
+	plt.xticks(epochs)
+	plt.legend()
 
-    # Plot accuracy
-    plt.subplot(1, 2, 2)
-    plt.plot(epochs, train_accuracy, 'g', label=label_accuracy)
-    plt.title(label_accuracy)
-    plt.xlabel('Epochs')
-    plt.ylabel('Metrics')
-    plt.xticks(epochs)
-    plt.legend()
+	# Plot precision, recall, and f1 score
+	plt.subplot(2, 2, 4)
+	plt.plot(epochs, val_precision, 'b', label="Precision")
+	plt.plot(epochs, val_recall, 'g', label="Recall")
+	plt.plot(epochs, val_f1, 'r', label="F1 Score")
+	plt.title('Validation Metrics')
+	plt.xlabel('Epochs')
+	plt.ylabel('Metrics')
+	plt.xticks(epochs)
+	plt.legend()
 
-    plt.tight_layout(w_pad=4)
-    if saveName: plt.savefig(saveName)
-    else: plt.savefig("./plot/" + PLOT_NAME)
-    plt.show()
+	plt.tight_layout(w_pad=4)
+	if saveName: plt.savefig(saveName)
+	else: plt.savefig("./train_plot/" + PLOT_NAME)
+	print("Plot saved")
+	plt.show()
 
 
 
@@ -162,7 +184,7 @@ def create_graphs(train_set):
  
 	for _, group in tqdm(train_set.groupby(["AccountNumber"], sort=False), desc="Creating graph"):
 		if len(group) > MAX_DIM_GRAPH:
-			saveToFile("The number of nodes (" + str(len(group)) + ") is greater than the limit (" + str(MAX_DIM_GRAPH) + "). The entries number was reduced.")
+			print("The number of nodes (" + str(len(group)) + ") is greater than the limit (" + str(MAX_DIM_GRAPH) + "). The entries number was reduced.")
 			group = group[:MAX_DIM_GRAPH]
 
 
@@ -183,12 +205,16 @@ def create_graphs(train_set):
 
 
 
+
 def init_weights(m):
     """ Initialize the weights of the model """
     if isinstance(m, torch.nn.Linear):
         torch.nn.init.xavier_uniform_(m.weight)
         m.bias.data.fill_(0.01)
         print("WEIGHT INITIALIZED")
+
+
+
 
 
 
@@ -212,12 +238,13 @@ def train(train_set, valid_set):
 	model = model.to(model_device)
  
 	# Init weights
-	model.apply(init_weights)
+	#model.apply(init_weights)
 	optimizer = torch.optim.AdamW(model.parameters(), lr=0.041, weight_decay=0.01)
 	scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=NUM_EPOCHS)
 	criterion = torch.nn.BCELoss()
 	
 	# print some infos
+	saveToFile = SaveOutput('./log/', LOG_NAME, debug=DEBUG)
 	saveToFile("")
 	saveToFile("Optimizer: " + str(optimizer))
 	saveToFile("Scheduler: " + str(scheduler))
@@ -225,11 +252,18 @@ def train(train_set, valid_set):
 	saveToFile("Minimum batch size: " + str(batch_size))
 	saveToFile("Total number of graphs: " + str(len(data_list)))
 	saveToFile("Total number of nodes: " + str(data_list[0].x.shape[0] * len(data_list)))
+	saveToFile("", printAll=False)
+	saveToFile("Training Set size: " + str(len(data_list)))
+	saveToFile("Validation Set size: " + str(len(data_list_valid)))
+	
 
 	total_train_loss = []
 	total_valid_loss = []
 	total_train_accuracy = []
 	total_valid_accuracy = []
+	total_precision = []
+	total_recall = []
+	total_f1 = []
 
 
 	# Training Loop
@@ -238,18 +272,26 @@ def train(train_set, valid_set):
 		# run a training step
 		saveToFile("\n====== init epoch " + str(epoch + 1) + " ======")
 		train_accuracy, train_loss = training_step(model, optimizer, criterion, scheduler, data_list,ground_truth_list, node_shapes, mapping_list, batch_size)
-		valid_accuracy, valid_loss = validation_step(model, optimizer, criterion, scheduler, data_list_valid, ground_truth_list_valid, node_shapes_valid, mapping_list_valid, batch_size)
+		valid_accuracy, valid_loss, precision, recall, f1 = validation_step(model, optimizer, criterion, scheduler, data_list_valid, ground_truth_list_valid, node_shapes_valid, mapping_list_valid, batch_size)
 		
   		# print total accuracy and total loss
 		train_accuracy = train_accuracy / len(data_list)
 		valid_accuracy = valid_accuracy / len(data_list_valid)
 		train_loss = train_loss / len(data_list)
 		valid_loss = valid_loss / len(data_list_valid)
+		total_precision.append(precision)
+		total_recall.append(recall)
+		total_f1.append(f1)
   
-		saveToFile("Total Train loss: " + str(train_loss))
-		saveToFile("Total Train accuracy: " + str(train_accuracy))
-		saveToFile("Total Valid loss: " + str(valid_loss))
-		saveToFile("Total Valid accuracy: " + str(valid_accuracy))
+		saveToFile("Training performance:")
+		saveToFile("Loss: " + str(train_loss))
+		saveToFile("Accuracy: " + str(train_accuracy))
+		saveToFile("\nValidation performance:")
+		saveToFile("Loss: " + str(valid_loss))
+		saveToFile("Accuracy: " + str(valid_accuracy))
+		saveToFile("Precision: " + str(precision))
+		saveToFile("Recall: " + str(recall))
+		saveToFile("F1: " + str(f1))
 		saveToFile("")
 		
 		# Save the loss and accuracy for each epoch	
@@ -261,8 +303,10 @@ def train(train_set, valid_set):
 		# Free the cache after each epoch
 		torch.cuda.empty_cache()
 
-	plot_metrics(total_train_loss, total_train_accuracy, label_loss="Train Loss", label_accuracy="Train Accuracy")
-	plot_metrics(total_valid_loss, total_valid_accuracy, label_loss="Valid Loss", label_accuracy="Valid Accuracy", saveName="./plot/" + PLOT_VALID_NAME)
+	# plot the train and validation metrics
+	plot_train_metrics(total_train_loss, total_train_accuracy, total_valid_loss, total_valid_accuracy, total_precision, total_recall, total_f1, saveName="./train_plot/" + PLOT_NAME)
+	return model
+
 
 
 
@@ -274,6 +318,7 @@ def training_step(model, optimizer, criterion, scheduler, data_list,ground_truth
 	model.train()
 	total_loss = 0
 	total_accuracy = 0
+	saveToFile = SaveOutput('./log/', LOG_NAME, debug=DEBUG)
 
 	for i in tqdm(range(0, len(data_list), batch_size), desc="Batch"):					# For each batch
 			
@@ -294,7 +339,7 @@ def training_step(model, optimizer, criterion, scheduler, data_list,ground_truth
 			# generate the BERT embeddings
 			old_data = data.x.clone()
 			data.x = data.x.to(model_device)
-			data.x = embeddings_generator.create_characterBERT_embeddings(data.x)
+			data.x = embeddings_generator.create_characterBERT_embeddings(data.x[:shapes[index]])
 
 			# Pad the nodes to the maximum dimension with zeros
 			if shapes[index] < MAX_DIM_GRAPH:
@@ -317,8 +362,8 @@ def training_step(model, optimizer, criterion, scheduler, data_list,ground_truth
 			singular_accuracy = torch.add(singular_accuracy, (torch.sum(result) / pred.numel()))
 		
    
-			if i >= len(data_list) - len(batch):
-				saveToFile("DECISION FOR THE LAST BATCH -----------------------------------", printAll=False)
+			if i >= len(data_list) - len(batch) and index == len(batch) - 1:
+				saveToFile("DECISION FOR THE LAST GRAPH IN THE BATCH IN THE TRAINING STEP -----------------------------------", printAll=False)
 				saveToFile("GRAPH: " + str(index), printAll=False)
 				saveToFile("MAPPING_LIST: " + str(mapping_list_batch[index]), printAll=False)
 				saveToFile("", printAll=False)
@@ -355,90 +400,208 @@ def training_step(model, optimizer, criterion, scheduler, data_list,ground_truth
 
 
 
+def validation_step(model, optimizer, criterion, scheduler, data_list, ground_truth_list, node_shapes, mapping_list, batch_size):
+    """ Run a validation step for each epoch """
 
-def validation_step(model, optimizer, criterion, scheduler, data_list,ground_truth_list, node_shapes, mapping_list, batch_size):
-	""" Run a validation step for each epoch """
+    saveToFile = SaveOutput('./log/', LOG_NAME, debug=DEBUG)
+    model.eval()
+    total_loss = 0
+    total_accuracy = 0
+    precision = Precision(task='binary').to(model_device)
+    recall = Recall(task='binary').to(model_device)
+    f1 = F1Score(task='binary').to(model_device)
+    
+    for i in tqdm(range(0, len(data_list), batch_size), desc="Batch"):  # For each batch
 
-	model.eval()
-	total_loss = 0
-	total_accuracy = 0
+        # reset the gradient for each batch
+        singular_loss = 0
+        singular_accuracy = 0
+        batch_pred = []
+        batch_ground_truth = []
 
-	for i in tqdm(range(0, len(data_list), batch_size), desc="Batch"):					# For each batch
-			
-		# reset the gradient for each batch
-		singular_loss = 0
-		singular_accuracy = 0
-		
-		# get the batch	
-		batch = data_list[i:i+batch_size]
-		shapes = node_shapes[i:i+batch_size]
-		ground_truth_batch = ground_truth_list[i:i+batch_size]
-		mapping_list_batch = mapping_list[i:i+batch_size]
-		
-		
-		for index, data in enumerate(batch):						# For each graph
+        # get the batch
+        batch = data_list[i:i+batch_size]
+        shapes = node_shapes[i:i+batch_size]
+        ground_truth_batch = ground_truth_list[i:i+batch_size]
+        mapping_list_batch = mapping_list[i:i+batch_size]
 
-			# generate the BERT embeddings
-			old_data = data.x.clone()
-			data.x = data.x.to(model_device)
-			data.x = embeddings_generator.create_characterBERT_embeddings(data.x)
+        for index, data in enumerate(batch):  # For each graph
 
-			# Pad the nodes to the maximum dimension with zeros
-			if shapes[index] < MAX_DIM_GRAPH:
-				null_nodes = torch.zeros(size=((MAX_DIM_GRAPH - shapes[index]), data.x.shape[1]))
-				null_nodes = null_nodes.to(model_device)
-				data.x = torch.cat((data.x[:shapes[index]], null_nodes), dim=0)
-   
+            # generate the BERT embeddings
 
-			# Forward pass
-			data.to(model_device)
-			pred = model.forward(data)
-			ground_truth = ground_truth_batch[index].to(model_device)
+            old_data = data.x.clone()
+            data.x = data.x.to(model_device)
+            data.x = embeddings_generator.create_characterBERT_embeddings(data.x[:shapes[index]])
 
-			# Apply binary cross-entropy loss
-			loss = criterion(pred, ground_truth)
-			singular_loss = torch.add(singular_loss, loss)
+            # Pad the nodes to the maximum dimension with zeros
+            if shapes[index] < MAX_DIM_GRAPH:
+                null_nodes = torch.zeros(size=((MAX_DIM_GRAPH - shapes[index]), data.x.shape[1]))
+                null_nodes = null_nodes.to(model_device)
+                data.x = torch.cat((data.x[:shapes[index]], null_nodes), dim=0)
 
-			# Compute accuracy
-			result = torch.eq(torch.round(pred), ground_truth)
-			singular_accuracy = torch.add(singular_accuracy, (torch.sum(result) / pred.numel()))
-		
-   
-			# if i >= len(data_list) - len(batch):
-			# 	saveToFile("DECISION FOR THE LAST BATCH -----------------------------------", printAll=False)
-			# 	saveToFile("GRAPH: " + str(index), printAll=False)
-			# 	saveToFile("MAPPING_LIST: " + str(mapping_list_batch[index]), printAll=False)
-			# 	saveToFile("", printAll=False)
-			# 	saveToFile("PREDICTION:", printAll=False)
-			# 	saveToFile(pred, printAll=False)
-			# 	saveToFile("\nDECISION:", printAll=False)
-			# 	saveToFile(torch.round(pred), printAll=False)
-			# 	saveToFile("\nGROUND TRUTH:", printAll=False)
-			# 	saveToFile(ground_truth, printAll=False)
-			# 	saveToFile("------------------------------------------------------------------------", printAll=False)
-			# 	saveToFile("\n", printAll=False)
-			
-   
-   			# Free the cache
-			data.x = data.x.cpu()
-			data.x = old_data
-			pred = pred.cpu()
-			ground_truth = ground_truth.cpu()
-			del pred, ground_truth, result, loss
-				
-		
-		batch_loss = torch.div(singular_loss, len(batch))
-		total_loss += batch_loss.item()
-		total_accuracy += singular_accuracy.item()
-			
-	return total_accuracy, total_loss
+            # Forward pass
+            data.to(model_device)
+            pred = model.forward(data)
+            ground_truth = ground_truth_batch[index].to(model_device)
+
+            # Apply binary cross-entropy loss
+            loss = criterion(pred, ground_truth)
+            singular_loss = torch.add(singular_loss, loss)
+
+            # Compute accuracy
+            result = torch.eq(torch.round(pred), ground_truth)
+            singular_accuracy = torch.add(singular_accuracy, (torch.sum(result) / pred.numel()))
+            batch_pred.append(torch.round(pred))
+            batch_ground_truth.append(ground_truth)
+
+            if i >= len(data_list) - len(batch) and index == len(batch) - 1:
+                saveToFile("DECISION FOR THE LAST GRAPH IN THE BATCH IN THE VALIDATION STEP -----------------------------------", printAll=False)
+                saveToFile("GRAPH: " + str(index), printAll=False)
+                saveToFile("MAPPING_LIST: " + str(mapping_list_batch[index]), printAll=False)
+                saveToFile("", printAll=False)
+                saveToFile("PREDICTION:", printAll=False)
+                saveToFile(pred, printAll=False)
+                saveToFile("\nDECISION:", printAll=False)
+                saveToFile(torch.round(pred), printAll=False)
+                saveToFile("\nGROUND TRUTH:", printAll=False)
+                saveToFile(ground_truth, printAll=False)
+                saveToFile("------------------------------------------------------------------------", printAll=False)
+                saveToFile("\n", printAll=False)
+
+            # Free the cache
+            data.x = data.x.cpu()
+            data.x = old_data
+            pred = pred.cpu()
+            ground_truth = ground_truth.cpu()
+            del pred, ground_truth, result, loss
+
+        batch_loss = torch.div(singular_loss, len(batch))
+        total_loss += batch_loss.item()
+        total_accuracy += singular_accuracy.item()
+
+        # Compute precision, recall, and f1 for the batch
+        batch_pred = torch.cat(batch_pred)
+        batch_ground_truth = torch.cat(batch_ground_truth)
+        precision.update(batch_pred, batch_ground_truth)
+        recall.update(batch_pred, batch_ground_truth)
+        f1.update(batch_pred, batch_ground_truth)
+
+    # Compute precision, recall, and f1 for the entire validation set
+    precision_result = precision.compute()
+    recall_result = recall.compute()
+    f1_result = f1.compute()
+
+    return total_accuracy, total_loss, precision_result.item(), recall_result.item(), f1_result.item()
 
 
 
 
 def test(test_set):
 	""" Test the model """
-	pass
+	
+	saveToFile = SaveOutput('./test_log/', LOG_NAME, debug=DEBUG)
+	data_list, ground_truth_list, node_shapes, mapping_list = create_graphs(test_set)
+	min_num_nodes = 0
+	batch_size = 0
+	for i, data in enumerate(data_list):
+		if min_num_nodes + data.x.shape[0] <= MAX_NUM_NODES:
+			min_num_nodes += data.x.shape[0]
+			batch_size += 1
+	
+	# Load model
+	model = GNN3(input_dim=768)
+	if(LOAD_MODEL_PATH != ""):model.load(LOAD_MODEL_PATH)
+	model = model.to(model_device)
+	model.eval()
+
+
+	total_accuracy = 0
+	precision = Precision(task='binary').to(model_device)
+	recall = Recall(task='binary').to(model_device)
+	f1 = F1Score(task='binary').to(model_device)
+
+	for i in tqdm(range(0, len(data_list), batch_size), desc="Batch"):  # For each batch
+
+		singular_accuracy = 0
+		batch_pred = []
+		batch_ground_truth = []
+
+		# get the batch
+		batch = data_list[i:i+batch_size]
+		shapes = node_shapes[i:i+batch_size]
+		ground_truth_batch = ground_truth_list[i:i+batch_size]
+		mapping_list_batch = mapping_list[i:i+batch_size]
+
+
+		for index, data in enumerate(batch):  # For each graph
+			# generate the BERT embeddings
+			old_data = data.x.clone()
+			data.x = data.x.to(model_device)
+			data.x = embeddings_generator.create_characterBERT_embeddings(data.x[:shapes[index]])
+
+			# Pad the nodes to the maximum dimension with zeros
+			if shapes[index] < MAX_DIM_GRAPH:
+				null_nodes = torch.zeros(size=((MAX_DIM_GRAPH - shapes[index]), data.x.shape[1]))
+				null_nodes = null_nodes.to(model_device)
+				data.x = torch.cat((data.x[:shapes[index]], null_nodes), dim=0)
+
+			# Forward pass
+			data.to(model_device)
+			pred = model.forward(data)
+			ground_truth = ground_truth_batch[index].to(model_device)
+
+			# Compute accuracy
+			result = torch.eq(torch.round(pred), ground_truth)
+			singular_accuracy = torch.add(singular_accuracy, (torch.sum(result) / pred.numel()))
+			batch_pred.append(torch.round(pred))
+			batch_ground_truth.append(ground_truth)
+
+			if i >= len(data_list) - len(batch) and index == len(batch) - 1:
+				saveToFile("DECISION FOR THE LAST GRAPH IN THE BATCH IN THE VALIDATION STEP -----------------------------------", printAll=False)
+				saveToFile("GRAPH: " + str(index), printAll=False)
+				saveToFile("MAPPING_LIST: " + str(mapping_list_batch[index]), printAll=False)
+				saveToFile("", printAll=False)
+				saveToFile("PREDICTION:", printAll=False)
+				saveToFile(pred, printAll=False)
+				saveToFile("\nDECISION:", printAll=False)
+				saveToFile(torch.round(pred), printAll=False)
+				saveToFile("\nGROUND TRUTH:", printAll=False)
+				saveToFile(ground_truth, printAll=False)
+				saveToFile("------------------------------------------------------------------------", printAll=False)
+				saveToFile("\n", printAll=False)
+
+			# Free the cache
+			data.x = data.x.cpu()
+			data.x = old_data
+			pred = pred.cpu()
+			ground_truth = ground_truth.cpu()
+			del pred, ground_truth, result, loss
+
+
+		# Compute precision, recall, and f1 for the batch
+		total_accuracy += singular_accuracy.item()
+		batch_pred = torch.cat(batch_pred)
+		batch_ground_truth = torch.cat(batch_ground_truth)
+		precision.update(batch_pred, batch_ground_truth)
+		recall.update(batch_pred, batch_ground_truth)
+		f1.update(batch_pred, batch_ground_truth)
+
+
+	# Compute precision, recall, and f1 for the entire validation set
+	total_accuracy /= len(data_list)
+	precision_result = precision.compute().item()
+	recall_result = recall.compute().item()
+	f1_result = f1.compute().item()
+ 
+
+	saveToFile("Testing performance:")
+	saveToFile("Accuracy: " + str(total_accuracy))
+	saveToFile("Precision: " + str(precision_result))
+	saveToFile("Recall: " + str(recall_result))
+	saveToFile("F1: " + str(f1_result))
+	saveToFile("")
+
+
 
 
 
@@ -447,6 +610,7 @@ def test(test_set):
 def split_dataset():
 	""" Split the dataset into train and test datasets """
 
+	saveToFile = SaveOutput('./log/', LOG_NAME, debug=DEBUG)
 	train_datasets_exists = exists(TRAIN_PATH)
 	valid_datasets_exists = exists(VALID_PATH)
 	test_datasets_exists = exists(TEST_PATH)	
@@ -481,7 +645,6 @@ def split_dataset():
 		valid_df = test_df.loc[test_df.AccountNumber.isin(valid_iban_list)]
 		test_df = test_df.loc[test_df.AccountNumber.isin(test_iban_list)]
 
-
 		train_df.to_csv(TRAIN_PATH)
 		test_df.to_csv(TEST_PATH)
 		valid_df.to_csv(VALID_PATH)
@@ -490,13 +653,7 @@ def split_dataset():
 	return dataset, train_df, test_df, valid_df
 
 
-
-def check_dataset(dataset, train_df, test_df, valid_df):
-	""" Check if the dataset is correctly splitted """
-
-	if train_df.shape[0] + test_df.shape[0] + valid_df.shape[0] != dataset.shape[0]:saveToFile("Dataset not correctly splitted!")
-	else: saveToFile("Dataset correctly splitted!")
-
+	
 def main():
 	""" Main function: 
  		- Split the dataset into train and test datasets
@@ -504,11 +661,15 @@ def main():
  		- Test the model
 	"""
 	
+	saveToFile = SaveOutput('./log/', LOG_NAME, debug=DEBUG)
 	dataset, train_df, test_df, valid_df = split_dataset()
-	check_dataset(dataset, train_df, test_df, valid_df)
+	if train_df.shape[0] + test_df.shape[0] + valid_df.shape[0] != dataset.shape[0]:saveToFile("Dataset not correctly splitted!")
+	else: saveToFile("Dataset correctly splitted!")
 	saveToFile("Datasets loaded!\n") 
 	
-	if TRAIN:train(train_df, valid_df)
+	if TRAIN:
+		model = train(train_df, valid_df)
+		if (SAVE_MODEL): model.save(MODEL_PATH)
 	else:test(test_df)
 
 

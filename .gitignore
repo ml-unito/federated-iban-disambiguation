@@ -1,2 +1,6 @@
 *.bin
+*.pt
+*.csv
+*.txt
 ./UnitoBertNer/character_bert_model/pretrained-models/general_character_bert/*.bin
+

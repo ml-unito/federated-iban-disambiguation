@@ -1,11 +1,13 @@
 {
-  "dataset_path": "./dataset/dataset_1000_max20T.csv",
+  "dataset_path": "./dataset/dataset_10000_max20T.csv",
+  "load_model_path": "./saved_model/model.pt",
   "node_placheholder"  : "VOID",
   "train_size": 0.8,
   "valid_size": 0.5,
   "force_dataset_split": 1,
   "only_train": 1,
-  "max_dim_graph": 20,
+  "save_model":1,
+  "max_dim_graph": 100,
   "num_epochs": 10,
-  "max_num_nodes": 512
+  "max_num_nodes": 600
 }

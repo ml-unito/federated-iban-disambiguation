@@ -42,9 +42,8 @@ def create_characterBERT_padded_tensors(words):
 
 
 
-def create_characterBERT_embeddings_old_version(string):
+def create_characterBERT_embeddings_old(words):
     """ create embeddings using the characterBERT fine-Tuned model """
     
-    embeddings = characterBERTmodel(indexer.as_padded_tensor([string]))
-    torch.cuda.empty_cache() # free up memory
-    return embeddings
+    embeddings = characterBERTmodel(indexer.as_padded_tensor(words).to(model_device))
+    return embeddings.to(model_device)

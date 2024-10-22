@@ -50,11 +50,11 @@ class GNN2(torch.nn.Module):
 
 		return pred
 
-
 class GNN3(torch.nn.Module):
     def __init__(self, input_dim):
         super().__init__()
         self.gatconv1 = GATConv(in_channels=input_dim, out_channels=256)
+        self.gatconv2 = GATConv(in_channels=256, out_channels=128)
 
     def forward(self, graph):
         x = graph.x
@@ -64,11 +64,22 @@ class GNN3(torch.nn.Module):
         x = F.leaky_relu(x, negative_slope=0.02)
         x = F.dropout(x, p=0.8, training=self.training)
 
+        x = self.gatconv2(x, edge_index)
+        x = F.leaky_relu(x, negative_slope=0.02)
+        x = F.dropout(x, p=0.8, training=self.training)
+
         x = x / torch.norm(x)
         xT = x.t()
         pred = x @ xT
         
         return torch.sigmoid(pred)
+
+    def save(self, path):
+        torch.save(self.state_dict(), path)
+
+    def load(self, path):
+        self.load_state_dict(torch.load(path))
+
 
 
 
