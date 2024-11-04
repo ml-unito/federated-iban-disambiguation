@@ -14,13 +14,13 @@ class GNN(torch.nn.Module):
 
 		x = self.gatconv1(x, edge_index)
 		x = F.leaky_relu(x, negative_slope=0.02)
-		x = F.dropout(x, p=0.6, training=self.training)
+		x = F.dropout(x, p=0.2, training=self.training)
 
 		x = x / torch.norm(x)
 		xT = x.t()
 		pred = x @ xT
 
-		return pred
+		return torch.sigmoid(pred)
 
 
 class GNN2(torch.nn.Module):

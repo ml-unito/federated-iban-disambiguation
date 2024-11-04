@@ -1,8 +1,13 @@
 {
-  "dataset_path": "./dataset/dataset_10-07-2024_16-10-45.csv",
+  "dataset_directory": "./dataset/",
+  "dataset_name": "dataset_22-10-2024_10-06-34.csv",
   "train_size": 0.8,
-  "train_path": "./dataset/train_dataset.csv",
-  "test_path": "./dataset/test_dataset.csv",
-  "train": 1,
-  "max_dim_graph": 200
+  "validation_size": 0.5,
+  "train_path": "./dataset/train_dataset_22-10-2024_10-06-34.csv",
+  "test_path": "./dataset/test_dataset_22-10-2024_10-06-34.csv",
+  "validation_path": "./dataset/validation_dataset_22-10-2024_10-06-34.csv",
+  "train": 0,
+  "max_dim_graph": 100,
+  "num_epoch": 50,
+  "learning_rate": 0.001
 }
