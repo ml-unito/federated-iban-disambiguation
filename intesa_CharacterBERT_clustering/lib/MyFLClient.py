@@ -4,7 +4,7 @@ from fluke.client import Client
 import pandas as pd
 from itertools import combinations
 from lib.datasetManipulation import *
-from CharacterBERT_clustering.lib.CharacterBertForClassificationOptimized import *
+from lib.CharacterBertForClassificationOptimized import *
 from fluke.utils.log import Log
 
 class MyFLClient(Client):
