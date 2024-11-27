@@ -1,12 +1,12 @@
 import os
 import sys
-sys.path.insert(0, os.path.abspath('./character_bert_model'))
+# sys.path.insert(0, os.path.abspath('./character_bert_model'))
 from tqdm import tqdm
 import torch
 import numpy as np
 import torch.nn as nn
-from utils.character_cnn import CharacterIndexer
-from modeling.character_bert import CharacterBertModel
+from character_bert_model.utils.character_cnn import CharacterIndexer
+from character_bert_model.modeling.character_bert import CharacterBertModel
 from sklearn.metrics import accuracy_score, recall_score, precision_score,f1_score
 indexer = CharacterIndexer()
 
