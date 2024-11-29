@@ -67,7 +67,7 @@ eval:
 # Logger configuration
 logger:
     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
-    name: Log
+    lname: Log
     # `wandb` parameters. Leave empty if `name` is `Log`
     params: null
 # FL protocol configuration

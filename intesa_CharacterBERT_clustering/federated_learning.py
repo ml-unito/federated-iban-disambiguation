@@ -3,8 +3,9 @@ import torch
 import pandas as pd
 import json
 import yaml
+import time
 from fluke import DDict
-from fluke.utils.log import Log
+import fluke.utils.log as log
 from fluke import GlobalSettings
 from fluke.data import DataSplitter
 from fluke.algorithms.fedavg import FedAVG
@@ -135,10 +136,22 @@ def main():
                     data_splitter=DataSplitter(dataset=datasets, **config_exp["data"]),
                     hyper_params=DDict(**config_alg["hyperparameters"]) )
 
-  logger = Log()
+  logger = log.get_logger(**config_exp["logger"])
   algorithm.set_callbacks(logger)
-  algorithm.run(n_rounds=config_exp["protocol"]["n_rounds"], eligible_perc=config_exp["protocol"]["eligible_perc"])
 
+  start_time = time.time()
+  algorithm.run(n_rounds=config_exp["protocol"]["n_rounds"], eligible_perc=config_exp["protocol"]["eligible_perc"])
+  end_time = time.time()
+
+  # Adds information into log
+  general_info_log = {}
+  for i, df_client in enumerate(datasets.clients_tr, start=1):
+    general_info_log["Couples number in Client" + str(i) + " dataset"] = df_client.size
+  general_info_log["Couples number in Server dataset"] = datasets.server_data.size
+  general_info_log["Execution time (sec)"] = round(end_time - start_time, 5)
+  logger.pretty_log(data=general_info_log, title="General information")
+  
+  # Save log in json file
   logger.save("./out/log_fl_" + str(datetime.now().strftime("%d-%m-%Y_%H-%M-%S")) + ".json")
   
 
