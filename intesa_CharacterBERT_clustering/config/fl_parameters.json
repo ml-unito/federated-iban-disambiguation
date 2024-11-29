@@ -1,0 +1,12 @@
+{
+  "config": {
+    "alg_path": "./config/alg.yaml",
+    "exp_path": "./config/exp.yaml"
+  },
+  
+  "dataset_path": "./dataset/dataset_27-11-2024_12-00-28.csv",
+
+  "couple_dataset_path": "./dataset/dataset_27-11-2024_12-00-28__couple.csv",
+
+  "device": "cuda"
+}

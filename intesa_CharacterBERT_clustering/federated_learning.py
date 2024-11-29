@@ -1,6 +1,7 @@
 
 import torch
 import pandas as pd
+import json
 from fluke import DDict
 from fluke.utils.log import Log
 from fluke import GlobalSettings
@@ -17,10 +18,18 @@ download_pre_trained_model()
 from lib.CharacterBertForClassification import *
 
 
+with open('./config/fl_parameters.json', "r") as data_file:
+	fl_parameters = json.load(data_file)
+
 
 # DATASET_PATH = "./test_federated_learning_dataset.csv"
 # DATASET_PATH = "./dataset_prova.csv"
-DATASET_PATH = "./Dataset_federated_learning/dataset_1k.csv"
+# DATASET_PATH = "./Dataset_federated_learning/dataset_1k.csv"
+DATASET_PATH = fl_parameters["dataset_path"]
+COUPLE_DATASET_PATH = fl_parameters["couple_dataset_path"]
+EXP_PATH = fl_parameters["config"]["exp_path"]
+ALG_PATH = fl_parameters["config"]["alg_path"]
+DEVICE = "cuda" if fl_parameters["device"] == "cuda" and torch.cuda.is_available() else 'cpu'
 
 
 def MyDataset(X, y) -> DataContainer:
@@ -90,7 +99,7 @@ def main():
 
   hyperparams = DDict(client=client_hp,
                       server=DDict(weighted=True),
-                      model=CharacterBertForClassification())   # we use our network :)
+                      model=CharacterBertForClassification()) 
 
   
   algorithm = MyFLClustering(n_clients=10,
