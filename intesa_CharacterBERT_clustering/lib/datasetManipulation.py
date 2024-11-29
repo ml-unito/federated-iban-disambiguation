@@ -76,7 +76,7 @@ def create_pairs(dataset):
 
 def prepocess_dataset(dataset):
     """ Simple remove the unused columns and remove all the duplicates """
-    preprocessDataset = dataset.drop("Address", axis=1)
+    preprocessDataset = dataset.drop("Address", axis=1, errors='ignore')
     return preprocessDataset.drop_duplicates()
 
 
