@@ -2,6 +2,7 @@
 import torch
 import pandas as pd
 import json
+import yaml
 from fluke import DDict
 from fluke.utils.log import Log
 from fluke import GlobalSettings
@@ -30,12 +31,12 @@ DATASET_PATH = fl_parameters["dataset_path"]
 COUPLE_DATASET_PATH = fl_parameters["couple_dataset_path"]
 EXP_PATH = fl_parameters["config"]["exp_path"]
 ALG_PATH = fl_parameters["config"]["alg_path"]
-DEVICE = "cuda" if fl_parameters["device"] == "cuda" and torch.cuda.is_available() else 'cpu'
+DEVICE = fl_parameters["device"]
 NUM_CLIENT = 4
 
 
 
-def extract_x_and_y(dataset: pd.DataFrame):
+def extract_x_and_y(dataset: pd.DataFrame) -> list:
   tokenized_texts = tokenize_dataset(dataset)
   x, y = lookup_table(tokenized_texts, dataset)
   y = y.unsqueeze(1)
@@ -76,7 +77,8 @@ def MyDataset(X, y) -> DataContainer:
                         num_classes=2)
 
 
-def load_dataset():
+
+def load_dataset() -> pd.DataFrame:
   dataset = pd.read_csv(DATASET_PATH)
   return dataset
 
@@ -100,10 +102,21 @@ def lookup_table(tokenized_texts, dataframe):
   return input_tensors, labels
 
 
+def load_parameters() -> list:
+  config_file_exp = open(EXP_PATH)
+  config_exp = yaml.safe_load(config_file_exp)
+
+  config_file_alg = open(ALG_PATH)
+  config_alg = yaml.safe_load(config_file_alg)
+
+  return config_exp, config_alg
+
 
 def main():
+  config_exp, config_alg = load_parameters()
+
   settings = GlobalSettings()
-  settings.set_seed(42)         # we set a seed for reproducibility
+  settings.set_seed(config_exp["exp"]["seed"])
   settings.set_device(DEVICE) 
   
   # Load datasets
@@ -116,42 +129,15 @@ def main():
 
   datasets = create_dummy_data_container()
 
-  # we set the evaluator to be used by both the server and the clients
   settings.set_evaluator(ClassificationEval(eval_every=1, n_classes=datasets.num_classes))
-  splitter = DataSplitter(dataset=datasets, distribution="iid")
-  
-  
-  client_hp = DDict(
-      batch_size=512,
-      local_epochs=5,
-      loss="BCELoss",
-      optimizer=DDict(
-        name="AdamW",
-        lr=0.0001,
-        weight_decay=0.001),
-      scheduler=DDict(
-        name= "StepLR",
-        gamma= 0.995,
-        step_size= 10),
-        testset_path="./Dataset_federated_learning/test_sets"
-  )
 
-  hyperparams = DDict(client=client_hp,
-                      server=DDict(weighted=True),
-                      model=CharacterBertForClassification()) 
-
-  
-  # algorithm = MyFLClustering(n_clients=4,
-  #                   data_splitter=splitter,
-  #                   hyper_params=hyperparams)
-
-  algorithm = FedAVG(n_clients=NUM_CLIENT,
-                    data_splitter=splitter,
-                    hyper_params=hyperparams)
+  algorithm = FedAVG(n_clients=config_exp["protocol"]["n_clients"],
+                    data_splitter=DataSplitter(dataset=datasets, **config_exp["data"]),
+                    hyper_params=DDict(**config_alg["hyperparameters"]) )
 
   logger = Log()
   algorithm.set_callbacks(logger)
-  algorithm.run(n_rounds=3, eligible_perc=1)
+  algorithm.run(n_rounds=config_exp["protocol"]["n_rounds"], eligible_perc=config_exp["protocol"]["eligible_perc"])
 
   logger.save("./out/log_fl_" + str(datetime.now().strftime("%d-%m-%Y_%H-%M-%S")) + ".json")
   
