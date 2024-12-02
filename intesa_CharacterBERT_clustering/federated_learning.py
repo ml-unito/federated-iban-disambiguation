@@ -47,9 +47,9 @@ def extract_x_and_y(dataset: pd.DataFrame) -> list:
   return x, y
 
 
-def create_dummy_data_container() -> DummyDataContainer:
+def create_dummy_data_container(num_clients: int) -> DummyDataContainer:
   # Loads client datasetS and server dataset
-  df_clients = [pd.read_csv(DIR_DATASET_PATH + "client" + str(i) + "_train_couple.csv") for i in range(1, NUM_CLIENT+1)]
+  df_clients = [pd.read_csv(DIR_DATASET_PATH + "client" + str(i) + "_train_couple.csv") for i in range(1, num_clients+1)]
   df_server = pd.read_csv(DIR_DATASET_PATH + "server_test_couple.csv")
 
   # Creates FastDataLoader for each client data
@@ -63,7 +63,7 @@ def create_dummy_data_container() -> DummyDataContainer:
   x, y = extract_x_and_y(df_server)
   fdl_server = FastDataLoader(x, y, num_labels=2, batch_size=512)
 
-  return DummyDataContainer(clients_tr=fdl_clients, clients_te=[None]*NUM_CLIENT, 
+  return DummyDataContainer(clients_tr=fdl_clients, clients_te=[None]*num_clients, 
                             server_data=fdl_server, 
                             num_classes=2)
 
@@ -129,7 +129,7 @@ def main():
   # labels = labels.float()
   # dataset = MyDataset(input_tensors, labels)
 
-  datasets = create_dummy_data_container()
+  datasets = create_dummy_data_container(num_clients=config_exp["protocol"]["n_clients"])
 
   settings.set_evaluator(ClassificationEval(eval_every=1, n_classes=datasets.num_classes))
 
