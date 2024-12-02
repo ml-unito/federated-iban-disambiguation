@@ -32,8 +32,9 @@ DATASET_PATH = fl_parameters["dataset_path"]
 COUPLE_DATASET_PATH = fl_parameters["couple_dataset_path"]
 EXP_PATH = fl_parameters["config"]["exp_path"]
 ALG_PATH = fl_parameters["config"]["alg_path"]
-DEVICE = fl_parameters["device"]
 NUM_CLIENT = 4
+SAVE_MODELS = fl_parameters["save_models"]
+PATH_SAVE_MODELS = fl_parameters["path_save_models"]
 
 
 
@@ -118,7 +119,7 @@ def main():
 
   settings = GlobalSettings()
   settings.set_seed(config_exp["exp"]["seed"])
-  settings.set_device(DEVICE) 
+  settings.set_device(config_exp["exp"]["device"]) 
   
   # Load datasets
   # dataset = load_dataset()
@@ -143,6 +144,10 @@ def main():
   algorithm.run(n_rounds=config_exp["protocol"]["n_rounds"], eligible_perc=config_exp["protocol"]["eligible_perc"])
   end_time = time.time()
 
+  if SAVE_MODELS:
+    algorithm.save("./out/federated_learning_models/")
+    print("Clients model and server model are saved in" + "./out/federated_learning_models/"+ " directory.")
+
   # Adds information into log
   general_info_log = {}
   for i, df_client in enumerate(datasets.clients_tr, start=1):
@@ -152,7 +157,7 @@ def main():
   logger.pretty_log(data=general_info_log, title="General information")
   
   # Save log in json file
-  logger.save("./out/log_fl_" + str(datetime.now().strftime("%d-%m-%Y_%H-%M-%S")) + ".json")
+  logger.save("./out/federated_learning_logs/log_fl_" + str(datetime.now().strftime("%d-%m-%Y_%H-%M-%S")) + ".json")
   
 
 

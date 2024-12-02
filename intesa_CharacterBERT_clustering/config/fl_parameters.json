@@ -8,5 +8,6 @@
   "dataset_path": "./dataset/dataset_27-11-2024_12-00-28.csv",
   "couple_dataset_path": "./dataset/dataset_27-11-2024_12-00-28__couple.csv",
 
-  "device": "cuda"
+  "save_models": true,
+  "path_save_models": "./out/federated_learning_models/"
 }
