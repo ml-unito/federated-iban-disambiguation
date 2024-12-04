@@ -32,7 +32,6 @@ DATASET_PATH = fl_parameters["dataset_path"]
 COUPLE_DATASET_PATH = fl_parameters["couple_dataset_path"]
 EXP_PATH = fl_parameters["config"]["exp_path"]
 ALG_PATH = fl_parameters["config"]["alg_path"]
-NUM_CLIENT = 4
 SAVE_MODELS = fl_parameters["save_models"]
 PATH_SAVE_MODELS = fl_parameters["path_save_models"]
 
@@ -146,7 +145,7 @@ def main():
 
   if SAVE_MODELS:
     algorithm.save("./out/federated_learning_models/")
-    print("Clients model and server model are saved in" + "./out/federated_learning_models/"+ " directory.")
+    print("\nClients model and server model are saved in \"" + "./out/federated_learning_models\""+ " directory.\n")
 
   # Adds information into log
   general_info_log = {}
