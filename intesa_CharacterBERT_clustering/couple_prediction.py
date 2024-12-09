@@ -12,7 +12,6 @@ from lib.download import download_pre_trained_model
 download_pre_trained_model()
 from lib.CharacterBertForClassificationOptimized import *
 
-
 # Load Custom model
 model = CharacterBertForClassification()
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -148,7 +147,7 @@ def main():
     saveToFile("")
     
     dataframe.to_csv(dataset_preprocessed_path, index=False)
-    X = tokenize_dataset(dataframe).tolist()
+    X = tokenize_dataset(dataframe, tokenizer).tolist()
     y = dataframe['label'].tolist()
     saveToFile("\n- Preview of the dataset after the tokenization step:")
     for i in range(5):saveToFile(str(X[i]))

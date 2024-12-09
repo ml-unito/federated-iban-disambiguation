@@ -56,16 +56,31 @@ def create_pairs(dataset):
     labels = []
     grouped = dataset.groupby('AccountNumber')
     
-    for _, group in grouped:
-        names = group['Name'].tolist()
-        holders = group['Holder'].tolist()
-        if(len(names)) == 1:
-            pairs.append(" @ ".join([names[0], names[0]]))
-            labels.append(0)
-        else:
-            for (name1, holder1), (name2, holder2) in combinations(zip(names, holders), 2):
-                pairs.append(" @ ".join([name1, name2]))
-                labels.append(0 if holder1 == holder2 else 1)
+    if "cluster" in dataset.columns:
+        dataset.fillna(0, inplace=True)
+        
+        for _, group in grouped:
+            names = group['Name'].tolist()
+            clusters = group['cluster'].tolist()
+            if(len(names)) == 1:
+                pairs.append(" @ ".join([names[0], names[0]]))
+                labels.append(0)
+            else:
+                for (name1, cluster1), (name2, cluster2) in combinations(zip(names, clusters), 2):
+                    pairs.append(" @ ".join([name1, name2]))
+                    labels.append(0 if cluster1 == cluster2 else 1)
+            
+    else:
+        for _, group in grouped:
+            names = group['Name'].tolist()
+            holders = group['Holder'].tolist()
+            if(len(names)) == 1:
+                pairs.append(" @ ".join([names[0], names[0]]))
+                labels.append(0)
+            else:
+                for (name1, holder1), (name2, holder2) in combinations(zip(names, holders), 2):
+                    pairs.append(" @ ".join([name1, name2]))
+                    labels.append(0 if holder1 == holder2 else 1)
     
     
     df = pd.DataFrame()
@@ -76,14 +91,24 @@ def create_pairs(dataset):
 
 def prepocess_dataset(dataset):
     """ Simple remove the unused columns and remove all the duplicates """
-    preprocessDataset = dataset.drop("Address", axis=1, errors='ignore')
-    return preprocessDataset.drop_duplicates()
+    
+    if "Address" in dataset.columns:
+        preprocessDataset = dataset.drop("Address", axis=1)
+        return preprocessDataset.drop_duplicates()
+    return dataset.drop_duplicates()
 
 
 
-def tokenize_dataset(dataframe):
+def tokenize_dataset(dataframe, tokenizer):
     """ 
         Tokenize the dataset for the encoding layer of the CharacterBERT model.
         The tokenization is done with the symbol '@' to separate the names.
     """
-    return dataframe['text'].apply(lambda x: ['[CLS]', *[y.strip() for y in x.split("@")], '[SEP]'])
+    # return dataframe['text'].apply(lambda x: ['[CLS]', *[y.strip() for y in x.split("@")], '[SEP]'])
+    if not tokenizer:
+        return dataframe['text'].apply(lambda x: ['[CLS]'] + [y.strip() for y in x.split("@")[0].split()] + ['[SEP]'] + [y.strip() for y in x.split("@")[1].split()] + ['[SEP]'])
+    else:
+        return dataframe['text'].apply(lambda x: ['[CLS]'] + tokenizer.tokenize(' '.join([x.split("@")[0]])) + ['[SEP]'] + tokenizer.tokenize(' '.join([x.split("@")[1]])) + ['[SEP]'])
+        
+
+

@@ -1,15 +1,17 @@
 import os
 import sys
-# sys.path.insert(0, os.path.abspath('./character_bert_model'))
+sys.path.insert(0, os.path.abspath('./character_bert_model'))
 from tqdm import tqdm
 import torch
 import numpy as np
 import torch.nn as nn
-from character_bert_model.utils.character_cnn import CharacterIndexer
-from character_bert_model.modeling.character_bert import CharacterBertModel
+from utils.character_cnn import CharacterIndexer
+from modeling.character_bert import CharacterBertModel
 from sklearn.metrics import accuracy_score, recall_score, precision_score,f1_score
-indexer = CharacterIndexer()
+from transformers import BertTokenizer
 
+indexer = CharacterIndexer()
+tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
 
 def lookup_table(tokenized_texts, dataframe):
@@ -146,7 +148,7 @@ class EarlyStopping:
   def __init__(self, patience=5, delta=0.001):
       self.patience = patience
       self.delta = delta
-      self.best_metric = np.Inf
+      self.best_metric = np.inf
       self.counter = 0
       self.early_stop = False
 

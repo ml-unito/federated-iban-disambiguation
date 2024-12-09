@@ -141,7 +141,7 @@ def main():
     
     
     # tokenize pairs
-    X = tokenize_dataset(dataframe).tolist()
+    X = tokenize_dataset(dataframe, tokenizer).tolist()
     y = dataframe['label'].tolist()
     dataframe = dataframe.drop('text', axis=1)
     saveToFile("\nTokenized text:")
