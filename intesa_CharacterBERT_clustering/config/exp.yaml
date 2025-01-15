@@ -59,7 +59,7 @@ eval:
     # Whether to evaluate the client model before the client local training starts
     pre_fit: false
     # Whether to evaluate the client model after the client local training
-    post_fit: false
+    post_fit: true
     # Whether to evaluate the global model on the server-side test set
     server: true
     # Whether to evaluate the client local models on the server-side test set
@@ -77,4 +77,4 @@ protocol:
     # Total number of clients partcipating in the federation
     n_clients: 4
     # Total number of rounds
-    n_rounds: 3
+    n_rounds: 4

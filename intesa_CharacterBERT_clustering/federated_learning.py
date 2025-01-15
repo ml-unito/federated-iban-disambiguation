@@ -9,7 +9,6 @@ import fluke.utils.log as log
 from fluke import GlobalSettings
 from fluke.data import DataSplitter
 from fluke.algorithms.fedavg import FedAVG
-from lib.MyFLClustering import MyFLClustering
 from fluke.data.datasets import DataContainer, DummyDataContainer, FastDataLoader
 from fluke.evaluation import ClassificationEval
 from lib.download import download_pre_trained_model
@@ -46,7 +45,7 @@ def extract_x_and_y(dataset: pd.DataFrame) -> list:
   return x, y
 
 
-def create_dummy_data_container(num_clients: int) -> DummyDataContainer:
+def create_dummy_data_container(num_clients: int, client_test=False) -> DummyDataContainer:
   # Loads client datasetS and server dataset
   df_clients = [pd.read_csv(DIR_DATASET_PATH + "client" + str(i) + "_train_couple.csv") for i in range(1, num_clients+1)]
   df_server = pd.read_csv(DIR_DATASET_PATH + "server_test_couple.csv")
@@ -62,7 +61,8 @@ def create_dummy_data_container(num_clients: int) -> DummyDataContainer:
   x, y = extract_x_and_y(df_server)
   fdl_server = FastDataLoader(x, y, num_labels=2, batch_size=512)
 
-  return DummyDataContainer(clients_tr=fdl_clients, clients_te=[None]*num_clients, 
+  return DummyDataContainer(clients_tr=fdl_clients, 
+                            clients_te= [fdl_server]*num_clients if client_test else [None]*num_clients, 
                             server_data=fdl_server, 
                             num_classes=2)
 
@@ -128,9 +128,11 @@ def main():
   # labels = labels.float()
   # dataset = MyDataset(input_tensors, labels)
 
-  datasets = create_dummy_data_container(num_clients=config_exp["protocol"]["n_clients"])
+  datasets = create_dummy_data_container(num_clients=config_exp["protocol"]["n_clients"], client_test=True)
 
   settings.set_evaluator(ClassificationEval(eval_every=1, n_classes=datasets.num_classes))
+
+  settings.set_eval_cfg(config_exp["eval"])
 
   algorithm = FedAVG(n_clients=config_exp["protocol"]["n_clients"],
                     data_splitter=DataSplitter(dataset=datasets, **config_exp["data"]),
