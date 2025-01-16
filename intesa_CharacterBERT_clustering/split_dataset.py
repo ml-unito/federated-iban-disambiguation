@@ -71,7 +71,9 @@ def generate_datasets():
       print(f"\nclient1:\tlen {len(df_client1)}\t prob shared {round(df_client1.groupby('IsShared').size()[1] * 100 / len(df_client1), 2)}")
       print(f"client2:\tlen {len(df_client2)}\t prob shared {round(df_client2.groupby('IsShared').size()[1] * 100 / len(df_client2),2)}")
       print(f"client3:\tlen {len(df_client3)}\t\t prob shared {round(df_client3.groupby('IsShared').size()[1] * 100 / len(df_client3), 2)}")
-      print(f"client4:\tlen {len(df_client4)}\t\t prob shared {round(df_client4.groupby('IsShared').size()[1] * 100 / len(df_client4), 2)}\n")
+      print(f"client4:\tlen {len(df_client4)}\t\t prob shared {round(df_client4.groupby('IsShared').size()[1] * 100 / len(df_client4), 2)}")
+      print(f"server:\tlen {len(df_server)}\t\t\t prob shared {round(df_server.groupby('IsShared').size()[1] * 100 / len(df_server), 2)}")
+      print(f"clustering:\tlen {len(df_server)}\t\t prob shared {round(df_server.groupby('IsShared').size()[1] * 100 / len(df_server), 2)}\n")
       
       # Save all dataset generated
       if SAVE_DATASETS:
@@ -115,7 +117,7 @@ def main(action: str):
 
 if __name__ == "__main__":
   if len(sys.argv) >= 1:
-    action = sys.argv
+    action = sys.argv[1]
     main(action)
   else:
     print("error parameters")
