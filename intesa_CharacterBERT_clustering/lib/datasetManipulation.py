@@ -3,7 +3,6 @@ from itertools import combinations
 
 
 
-
 def load_dataset(path):
     """ Load the dataset """
     
@@ -18,9 +17,6 @@ def save_dataset(dataset, path, mode="w", index=False, header=True):
     
     if ".csv" in path: dataset.to_csv(path, mode=mode, index=index, header=header)
     else: dataset.to_excel(path)
-
-
-
 
 
 def balance_dataset(dataset_train, label):
@@ -44,7 +40,6 @@ def balance_dataset(dataset_train, label):
 
     # Shuffle dataset
     return balancedDataset.sample(frac=1, random_state=42).reset_index(drop=True)
-
 
 
 def create_pairs(dataset):
@@ -98,7 +93,6 @@ def prepocess_dataset(dataset):
     return dataset.drop_duplicates()
 
 
-
 def tokenize_dataset(dataframe, tokenizer):
     """ 
         Tokenize the dataset for the encoding layer of the CharacterBERT model.
@@ -124,4 +118,3 @@ def tokenize_dataset_pair(dataframe, tokenizer):
                 (['[CLS]'] + tokenizer.tokenize(' '.join([x.split("@")[0]])) + ['[SEP]'],
                 ['[CLS]'] + tokenizer.tokenize(' '.join([x.split("@")[1]])) + ['[SEP]'])
             )
-

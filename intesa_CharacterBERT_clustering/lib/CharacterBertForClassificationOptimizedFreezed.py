@@ -1,11 +1,8 @@
 from tqdm import tqdm
 import torch
-import numpy as np
 import torch.nn as nn
 from character_bert_model.utils.character_cnn import CharacterIndexer
 from character_bert_model.modeling.character_bert import CharacterBertModel
-from sklearn.metrics import accuracy_score, recall_score, precision_score,f1_score
-from transformers import BertTokenizer
 from lib.trainingUtilities import compute_metrics
 
 indexer = CharacterIndexer()

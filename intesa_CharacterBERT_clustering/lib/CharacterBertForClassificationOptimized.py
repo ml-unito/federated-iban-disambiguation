@@ -1,14 +1,13 @@
 from tqdm import tqdm
 import torch
-import numpy as np
 import torch.nn as nn
 from character_bert_model.utils.character_cnn import CharacterIndexer
 from character_bert_model.modeling.character_bert import CharacterBertModel
 from lib.trainingUtilities import compute_metrics
-from transformers import BertTokenizer
 
 indexer = CharacterIndexer()
 # tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
+
 
 
 def lookup_table(tokenized_texts, dataframe):
