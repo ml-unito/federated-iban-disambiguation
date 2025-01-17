@@ -1,17 +1,14 @@
-import os
-import sys
-# sys.path.insert(0, os.path.abspath('./character_bert_model'))
 from tqdm import tqdm
 import torch
 import numpy as np
 import torch.nn as nn
 from character_bert_model.utils.character_cnn import CharacterIndexer
 from character_bert_model.modeling.character_bert import CharacterBertModel
-from sklearn.metrics import accuracy_score, recall_score, precision_score,f1_score
+from lib.trainingUtilities import compute_metrics
 from transformers import BertTokenizer
 
 indexer = CharacterIndexer()
-tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
+# tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
 
 def lookup_table(tokenized_texts, dataframe):
@@ -20,7 +17,6 @@ def lookup_table(tokenized_texts, dataframe):
     input_tensors = indexer.as_padded_tensor(tokenized_texts)     # Create input tensor
     labels = torch.tensor(dataframe['label'].values)  
     return input_tensors, labels
-
 
 
 class CharacterBertForClassification(nn.Module):
@@ -42,18 +38,6 @@ class CharacterBertForClassification(nn.Module):
         return x
 
 
-
-
-def compute_metrics(predictions, labels):
-    """ """
-    accuracy = accuracy_score(y_true=labels, y_pred=predictions)
-    recall = recall_score(y_true=labels, y_pred=predictions)
-    precision = precision_score(y_true=labels, y_pred=predictions)
-    f1 = f1_score(y_true=labels, y_pred=predictions)
-    return {"accuracy": round(accuracy,3), "precision": round(precision,3), "recall": round(recall,3), "f1": round(f1,3)}
-
-
-
 def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
     """ Train the model """
     
@@ -67,7 +51,7 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
     for i in tqdm(range(0, len(X_train), batch_size), desc="Training"):
         batch_X = X_train[i:i+batch_size]
         batch_y = y_train[i:i+batch_size]
-        
+
         # Convert batch to tensors  
         input_ids = indexer.as_padded_tensor(batch_X)
         labels = torch.tensor(batch_y)
@@ -95,7 +79,6 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
     loss = total_loss / (len(X_train) // batch_size)
     metrics = compute_metrics(predictions, total_labels)
     return loss, metrics['accuracy']
-
 
 
 def test(model, X_test, y_test, batch_size, criterion):
@@ -137,60 +120,3 @@ def test(model, X_test, y_test, batch_size, criterion):
     loss = total_loss / (len(X_test) // batch_size)
     metrics = compute_metrics(predictions, total_labels)
     return loss, metrics, predictions, total_labels
-
-
-
-
-class EarlyStopping:
-  """ Implement a simple early stopping criterion """
-  
-
-  def __init__(self, patience=5, delta=0.001):
-      self.patience = patience
-      self.delta = delta
-      self.best_metric = np.inf
-      self.counter = 0
-      self.early_stop = False
-
-  def __call__(self, current_metric):
-      if current_metric < self.best_metric - self.delta:
-          self.best_metric = current_metric
-          self.counter = 0
-      else:
-          self.counter += 1
-
-      if self.counter >= self.patience:
-          self.early_stop = True
-
-      return self.early_stop
-
-
-  def reset(self):
-      self.counter = 0
-      self.best_metric = np.Inf
-      self.early_stop = False
-
-
-
-
-
-class SaveBestModel():
-  """ Save best model """
-
-
-  def __init__(self, savePath, delta):
-
-    self.delta = delta
-    self.savePath = savePath
-
-
-  def __call__(self, model, epoch, train_loss, valid_loss):
-
-    if (valid_loss < (train_loss + self.delta)):
-      torch.save(model.state_dict(), self.savePath)
-      print("Best model found, saved on:", self.savePath)
-      print("Best epoch: ", epoch)
-
-    elif (epoch == 1):
-      torch.save(model.state_dict(), self.savePath)
-      print("Model epoch1 saved on:", self.savePath)

@@ -1,19 +1,23 @@
 import os
 import json
 import time
+import torch
+import sys
 from lib.plot import *
 from lib.saveOutput import *
 from collections import Counter
 from lib.datasetManipulation import *
+from transformers import BertTokenizer
 from sklearn.model_selection import train_test_split
 from transformers import AdamW, get_linear_schedule_with_warmup
 from lib.download import download_pre_trained_model
+from lib.trainingUtilities import EarlyStopping, SaveBestModel
 
 download_pre_trained_model()
 
-from lib.CharacterBertForClassificationOptimized import *
-# from lib.CharacterBertForClassificationOptimizedFreezed import *
-# from lib.CharacterBertForClassificationOptimizedFreezedSeparated import *
+import lib.CharacterBertForClassificationOptimized as characterbert
+import lib.CharacterBertForClassificationOptimizedFreezed as characterberfreezed
+import lib.CharacterBertForClassificationOptimizedFreezedSeparated as characterberfreezedsep
 
 
 DEBUG = False
@@ -40,7 +44,7 @@ learning_rate = parameters['learning_rate']
 
 
 
-def test_model(model, X_test, y_test, criterion):
+def test_model(model, X_test, y_test, criterion, test):
     writeLog("\nTesting on Test Set\n")
     
     _, metrics, predictions, total_labels = test(model, X_test, y_test, batch_size, criterion)
@@ -51,7 +55,7 @@ def test_model(model, X_test, y_test, criterion):
     return metrics
 
 
-def train_model(model, optimizer, scheduler, criterion, X_train, y_train, X_val, y_val):
+def train_model(model, optimizer, scheduler, criterion, X_train, y_train, X_val, y_val, train, test):
     training_loss = []
     training_accuracy = []
     validation_loss = []
@@ -103,7 +107,7 @@ def train_model(model, optimizer, scheduler, criterion, X_train, y_train, X_val,
     return training_loss, validation_loss, validation_accuracy, validation_f1
 
 
-def create_couple_dataframe(dataset_path, balance):
+def create_couple_dataframe(dataset_path: str, balance: bool) -> pd.DataFrame:
     # -------------------------------------------------------
     # Load the dataset and print the preview on the log file
     # -------------------------------------------------------
@@ -186,17 +190,14 @@ def loads_dataset(dataset_path: str):
     if not os.path.exists(dataset_directory_path):os.makedirs(dataset_directory_path)
     
     dataset = load_dataset(dataset_path)
+    
     writeLog("\nDataset path: " + dataset_path)
     writeLog("Dataset Preview\n" + str(writeLog(dataset.head(5).to_markdown())))
 
     return dataset, dataset_preprocessed_path
 
 
-def load_model():
-    model = CharacterBertForClassification()
-    # model = CharacterBertForClassificationOptimizedFreezed()
-    # model = CharacterBertForClassificationOptimizedFreezedSeparated()
-    
+def couple_prediction(model, tokenizer, dataset_path: str, balance: bool, train, test):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model.to(device)
 
@@ -206,36 +207,16 @@ def load_model():
     writeLog(str(model))
     writeLog("\n")
 
-    return model
-
-
-def main(dataset_path: str, balance):
-    """ Main function 
-    - Read dataset
-    - Prepocess dataset
-    - Tokenize dataset
-    - Train model
-    - Save model
-    
-    The dataset is a .csv or .xlsx file. From an existing dataset the program 
-    generate another dataset with the couples Name1 - Name2 - Label. 
-    On this new dataset the model is trained to recognize the couples.
-    """ 
-
-    model = load_model()
-
     dataframe = create_couple_dataframe(dataset_path, balance)
-
-    if model. __class__. __name__ == "CharacterBertForClassificationOptimizedFreezedSepareted":
+    
+    if model. __class__. __name__ == "CharacterBertForClassificationOptimizedFreezedSeparated":
         X = tokenize_dataset_pair(dataframe, tokenizer).tolist()
     else:
         X = tokenize_dataset(dataframe, tokenizer).tolist()
     y = dataframe['label'].tolist()
+    del dataframe
 
     X_train, X_test, y_train, y_test, X_val, y_val = split_dataset(X, y)
-
-    # Free memory
-    del dataframe
 
     # -------------------------------------------------------
     # Train the model
@@ -244,15 +225,15 @@ def main(dataset_path: str, balance):
     # used parameters until: 5/11 ---> optimizer = AdamW(model.parameters(), lr=1e-6, weight_decay=0.0005)
     optimizer = AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=(len(X_train) // batch_size)*num_epochs)
-    criterion = nn.BCELoss()
+    criterion = torch.nn.BCELoss()
 
-    training_loss, validation_loss, validation_accuracy, validation_f1 = train_model(model, optimizer, scheduler, criterion, X_train, y_train, X_val, y_val)
+    training_loss, validation_loss, validation_accuracy, validation_f1 = train_model(model, optimizer, scheduler, criterion, X_train, y_train, X_val, y_val, train, test)
   
     # --------------------------------------
     # Evaluate on test set
     # --------------------------------------
 
-    metrics = test_model(model, X_test, y_test, criterion)
+    metrics = test_model(model, X_test, y_test, criterion, test)
     
     # -------------------------------------------------------
     # Plot the metrics
@@ -261,7 +242,24 @@ def main(dataset_path: str, balance):
     plot_metrics(training_loss, validation_loss, validation_accuracy, validation_f1, (9,4), saveName=PLOT_NAME)
     writeLog("\nYou can see the plot at the link: " + PLOT_NAME)
     writeLog("You can see the model .pt file at the link: " + BEST_MODEL_PATH)
-    
+
+
+def main(model_name: str, dataset_path: str, balance: bool):
+    character_bert_model = characterbert.CharacterBertForClassification()
+    character_bert_freezed_model = characterberfreezed.CharacterBertForClassificationOptimizedFreezed()
+    character_bert_freezed_sep_model = characterberfreezedsep.CharacterBertForClassificationOptimizedFreezedSeparated()
+
+    tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
+
+    if model_name == "character_bert_model":
+        couple_prediction(model=character_bert_model, tokenizer=tokenizer, dataset_path=dataset_path, balance=balance, 
+                          train=characterbert.train, test=characterbert.test)
+    elif model_name == "character_bert_freezed_model":
+        couple_prediction(model=character_bert_freezed_model, tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, 
+                          train=characterberfreezed.train, test=characterberfreezed.test)
+    elif model_name == "character_bert_freezed_sep_model":
+        couple_prediction(model=character_bert_freezed_sep_model, tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, 
+                          train=characterberfreezedsep.train, test=characterberfreezedsep.test)
     
 
 if __name__ == "__main__":
@@ -269,14 +267,16 @@ if __name__ == "__main__":
         print("\nType a dataset, first!")
         print("USAGE: python3 couple_prediction.py DATASET_PATH MODEL BALANCE")
         print("where, DATASET_PATH is a .csv or .xlsx file")
+        print("where, MODEL is the name of the model")
         print("where, BALANCE for balancing the dataset. Take one of ['unbalance' or 'balance'] default balance")
         exit()
 
     dataset_path = sys.argv[1]
+    model_name = sys.argv[2]
 
     balance = True
-    if len(sys.argv) == 3:
-        if(sys.argv[2] == "unbalance"):
+    if len(sys.argv) == 4:
+        if(sys.argv[3] == "unbalance"):
             balance = False
     
-    main(dataset_path=dataset_path, balance=balance)
+    main(model_name=model_name, dataset_path=dataset_path, balance=balance)
