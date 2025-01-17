@@ -1,6 +1,5 @@
 import os
 import sys
-# sys.path.insert(0, os.path.abspath('./character_bert_model'))
 from tqdm import tqdm
 import torch
 import numpy as np
@@ -14,6 +13,7 @@ indexer = CharacterIndexer()
 tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
 
+
 def lookup_table(tokenized_texts, dataframe):
     """ define the input tensors for the CharacterBert model """
     
@@ -22,26 +22,34 @@ def lookup_table(tokenized_texts, dataframe):
     return input_tensors, labels
 
 
-
-class CharacterBertForClassification(nn.Module):
+class CharacterBertForClassificationOptimizedFreezed(nn.Module):
     def __init__(self, num_labels=1):
         """ Add classification layer with a sigmoid activation function on the last level"""
-        super(CharacterBertForClassification, self).__init__()
+        super(CharacterBertForClassificationOptimizedFreezed, self).__init__()
         self.character_bert = CharacterBertModel.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
+        
+        # Freeze the CharacterBert model
+        self.character_bert.eval()
+        for param in self.character_bert.parameters():
+            param.requires_grad = False
+            
         self.dropout = nn.Dropout(0.2)
-        self.classifier = nn.Linear(768, num_labels)
+        self.hidden = nn.Linear(768, 100)
+        self.classifier = nn.Linear(100, num_labels)
         self.sigmoid = nn.Sigmoid()
+        self.relu = nn.ReLU()
 
 
     def forward(self, input_ids):
         """Forward pass"""
         outputs = self.character_bert(input_ids)[0]       # Use the last hidden states
         pooled_output = self.dropout(outputs[:, 0, :])    # Take the first token's embedding ([CLS])
-        logits = self.classifier(pooled_output)
+        
+        hidden_logits = self.relu(self.hidden(pooled_output))
+
+        logits = self.classifier(hidden_logits)
         x = self.sigmoid(logits)
         return x
-
-
 
 
 def compute_metrics(predictions, labels):
@@ -51,7 +59,6 @@ def compute_metrics(predictions, labels):
     precision = precision_score(y_true=labels, y_pred=predictions)
     f1 = f1_score(y_true=labels, y_pred=predictions)
     return {"accuracy": round(accuracy,3), "precision": round(precision,3), "recall": round(recall,3), "f1": round(f1,3)}
-
 
 
 def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
@@ -67,7 +74,8 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
     for i in tqdm(range(0, len(X_train), batch_size), desc="Training"):
         batch_X = X_train[i:i+batch_size]
         batch_y = y_train[i:i+batch_size]
-        
+
+
         # Convert batch to tensors  
         input_ids = indexer.as_padded_tensor(batch_X)
         labels = torch.tensor(batch_y)
@@ -95,7 +103,6 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
     loss = total_loss / (len(X_train) // batch_size)
     metrics = compute_metrics(predictions, total_labels)
     return loss, metrics['accuracy']
-
 
 
 def test(model, X_test, y_test, batch_size, criterion):
@@ -139,8 +146,6 @@ def test(model, X_test, y_test, batch_size, criterion):
     return loss, metrics, predictions, total_labels
 
 
-
-
 class EarlyStopping:
   """ Implement a simple early stopping criterion """
   
@@ -169,9 +174,6 @@ class EarlyStopping:
       self.counter = 0
       self.best_metric = np.Inf
       self.early_stop = False
-
-
-
 
 
 class SaveBestModel():

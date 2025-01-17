@@ -1,6 +1,5 @@
 import os
 import sys
-# sys.path.insert(0, os.path.abspath('./character_bert_model'))
 from tqdm import tqdm
 import torch
 import numpy as np
@@ -14,6 +13,7 @@ indexer = CharacterIndexer()
 tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
 
+
 def lookup_table(tokenized_texts, dataframe):
     """ define the input tensors for the CharacterBert model """
     
@@ -22,26 +22,39 @@ def lookup_table(tokenized_texts, dataframe):
     return input_tensors, labels
 
 
-
-class CharacterBertForClassification(nn.Module):
+class CharacterBertForClassificationOptimizedFreezedSeparated(nn.Module):
     def __init__(self, num_labels=1):
         """ Add classification layer with a sigmoid activation function on the last level"""
-        super(CharacterBertForClassification, self).__init__()
+        super(CharacterBertForClassificationOptimizedFreezedSeparated, self).__init__()
         self.character_bert = CharacterBertModel.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
+        
+        # Freeze the CharacterBert model
+        self.character_bert.eval()
+        for param in self.character_bert.parameters():
+            param.requires_grad = False
+            
         self.dropout = nn.Dropout(0.2)
-        self.classifier = nn.Linear(768, num_labels)
+        self.hidden = nn.Linear(1536, 200)
+        self.classifier = nn.Linear(200, num_labels)
         self.sigmoid = nn.Sigmoid()
+        self.relu = nn.ReLU()
 
 
-    def forward(self, input_ids):
+    def forward(self, input_ids_1, input_ids_2):
         """Forward pass"""
-        outputs = self.character_bert(input_ids)[0]       # Use the last hidden states
-        pooled_output = self.dropout(outputs[:, 0, :])    # Take the first token's embedding ([CLS])
-        logits = self.classifier(pooled_output)
+        outputs1 = self.character_bert(input_ids_1)[0]
+        print(outputs1[:10])
+        pooled_output1 = outputs1[:, 0, :]
+
+        outputs2 = self.character_bert(input_ids_2)[0]
+        pooled_output2 = outputs2[:, 0, :]
+        
+        concatenated_output = torch.cat((pooled_output1, pooled_output2), dim=1)
+        
+        hidden_logits = self.relu(self.hidden(concatenated_output))
+        logits = self.classifier(hidden_logits)
         x = self.sigmoid(logits)
         return x
-
-
 
 
 def compute_metrics(predictions, labels):
@@ -51,7 +64,6 @@ def compute_metrics(predictions, labels):
     precision = precision_score(y_true=labels, y_pred=predictions)
     f1 = f1_score(y_true=labels, y_pred=predictions)
     return {"accuracy": round(accuracy,3), "precision": round(precision,3), "recall": round(recall,3), "f1": round(f1,3)}
-
 
 
 def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
@@ -68,16 +80,21 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
         batch_X = X_train[i:i+batch_size]
         batch_y = y_train[i:i+batch_size]
         
+        batch_X_first_names, batch_X_second_names = zip(*batch_X)
+
         # Convert batch to tensors  
-        input_ids = indexer.as_padded_tensor(batch_X)
-        labels = torch.tensor(batch_y)
-         
-        input_ids = input_ids.to(device)
+        input_ids_1 = indexer.as_padded_tensor(batch_X_first_names)
+        input_ids_1 = input_ids_1.to(device)
+
+        input_ids_2 = indexer.as_padded_tensor(batch_X_second_names)
+        input_ids_2 = input_ids_2.to(device)
+
+        labels = torch.tensor(batch_y) 
         labels = labels.to(device)
         labels = labels.unsqueeze(1)
 
         optimizer.zero_grad()                               # Clear gradients
-        outputs = model(input_ids)                          # Forward pass
+        outputs = model(input_ids_1, input_ids_2)           # Forward pass
         loss = criterion(outputs, labels.float())           # Compute loss
         total_loss += loss.item()
         
@@ -97,7 +114,6 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
     return loss, metrics['accuracy']
 
 
-
 def test(model, X_test, y_test, batch_size, criterion):
     """ Evaluate the model """
     
@@ -112,16 +128,22 @@ def test(model, X_test, y_test, batch_size, criterion):
         # for i in range(0, len(X_test), batch_size):
             batch_X = X_test[i:i+batch_size]
             batch_y = y_test[i:i+batch_size]
+
+            batch_X_first_names, batch_X_second_names = zip(*batch_X)
             
             # Convert batch to tensors  
-            input_ids = indexer.as_padded_tensor(batch_X)
+            input_ids_1 = indexer.as_padded_tensor(batch_X_first_names)
+            input_ids_1 = input_ids_1.to(device)
+
+            input_ids_2 = indexer.as_padded_tensor(batch_X_second_names)
+            input_ids_2 = input_ids_2.to(device)
+
             labels = torch.tensor(batch_y)
-            input_ids = input_ids.to(device)
             labels = labels.to(device)
             labels = labels.unsqueeze(1)
 
             # Forward pass
-            outputs = model(input_ids)
+            outputs = model(input_ids_1, input_ids_2)
 
             # Compute loss
             loss = criterion(outputs, labels.float())
@@ -137,8 +159,6 @@ def test(model, X_test, y_test, batch_size, criterion):
     loss = total_loss / (len(X_test) // batch_size)
     metrics = compute_metrics(predictions, total_labels)
     return loss, metrics, predictions, total_labels
-
-
 
 
 class EarlyStopping:
@@ -169,9 +189,6 @@ class EarlyStopping:
       self.counter = 0
       self.best_metric = np.Inf
       self.early_stop = False
-
-
-
 
 
 class SaveBestModel():
