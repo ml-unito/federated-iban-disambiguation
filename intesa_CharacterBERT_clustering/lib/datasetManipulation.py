@@ -111,4 +111,17 @@ def tokenize_dataset(dataframe, tokenizer):
         return dataframe['text'].apply(lambda x: ['[CLS]'] + tokenizer.tokenize(' '.join([x.split("@")[0]])) + ['[SEP]'] + tokenizer.tokenize(' '.join([x.split("@")[1]])) + ['[SEP]'])
         
 
+def tokenize_dataset_pair(dataframe, tokenizer):
+    if not tokenizer:
+        return dataframe['text'].apply(
+            lambda x: 
+                (['[CLS]'] + [y.strip() for y in x.split("@")[0].split()] + ['[SEP]'],
+                ['[CLS]'] + [y.strip() for y in x.split("@")[1].split()] + ['[SEP]'])
+            )
+    else:
+        return dataframe['text'].apply(
+            lambda x: 
+                (['[CLS]'] + tokenizer.tokenize(' '.join([x.split("@")[0]])) + ['[SEP]'],
+                ['[CLS]'] + tokenizer.tokenize(' '.join([x.split("@")[1]])) + ['[SEP]'])
+            )
 
