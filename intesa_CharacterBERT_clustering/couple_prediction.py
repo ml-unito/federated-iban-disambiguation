@@ -28,23 +28,11 @@ BEST_MODEL_PATH = './out/couple_prediction/output_model/model_weight_' + DATE_NA
 
 
 # New log File
-writeLog = SaveOutput('./out/couple_prediction/log/', LOG_NAME, printAll=False, debug=DEBUG)
-with open('./config/parameters.json', "r") as data_file:
-    parameters = json.load(data_file)
-
-
-# Retrieve parameters
-train_proportion = parameters['train_proportion']
-val_proportion = parameters['val_proportion']
-test_proportion = parameters['test_proportion']
-batch_size = parameters['batch_size']
-num_epochs = parameters['num_epochs']
-weight_decay = parameters['weight_decay']
-learning_rate = parameters['learning_rate']
+writeLog = SaveOutput('./out/couple_prediction/log/', LOG_NAME, printAll=True, debug=DEBUG)
 
 
 
-def test_model(model, X_test, y_test, criterion, test):
+def test_model(model, X_test, y_test, criterion, batch_size: int, test):
     writeLog("\nTesting on Test Set\n")
     
     _, metrics, predictions, total_labels = test(model, X_test, y_test, batch_size, criterion)
@@ -55,7 +43,7 @@ def test_model(model, X_test, y_test, criterion, test):
     return metrics
 
 
-def train_model(model, optimizer, scheduler, criterion, X_train, y_train, X_val, y_val, train, test):
+def train_model(model, optimizer, scheduler, criterion, num_epochs: int, batch_size: int, X_train, y_train, X_val, y_val, train, test):
     training_loss = []
     training_accuracy = []
     validation_loss = []
@@ -159,7 +147,7 @@ def create_couple_dataframe(dataset_path: str, balance: bool) -> pd.DataFrame:
     return dataframe
     
 
-def split_dataset(X, y):
+def split_dataset(X, y, train_proportion):
     writeLog("\n- Preview of the dataset after the tokenization step:")
     for i in range(5):writeLog(str(X[i]))
     writeLog("")
@@ -197,7 +185,7 @@ def loads_dataset(dataset_path: str):
     return dataset, dataset_preprocessed_path
 
 
-def couple_prediction(model, tokenizer, dataset_path: str, balance: bool, train, test):
+def couple_prediction(model, tokenizer, dataset_path: str, balance: bool, parameters: dict, train, test):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model.to(device)
 
@@ -216,24 +204,24 @@ def couple_prediction(model, tokenizer, dataset_path: str, balance: bool, train,
     y = dataframe['label'].tolist()
     del dataframe
 
-    X_train, X_test, y_train, y_test, X_val, y_val = split_dataset(X, y)
+    X_train, X_test, y_train, y_test, X_val, y_val = split_dataset(X, y, parameters["train_proportion"])
 
     # -------------------------------------------------------
     # Train the model
     # -------------------------------------------------------
     
     # used parameters until: 5/11 ---> optimizer = AdamW(model.parameters(), lr=1e-6, weight_decay=0.0005)
-    optimizer = AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
-    scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=(len(X_train) // batch_size)*num_epochs)
+    optimizer = AdamW(model.parameters(), lr=parameters["learning_rate"], weight_decay=parameters['weight_decay'])
+    scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=(len(X_train) // parameters['batch_size'])*parameters['num_epochs'])
     criterion = torch.nn.BCELoss()
 
-    training_loss, validation_loss, validation_accuracy, validation_f1 = train_model(model, optimizer, scheduler, criterion, X_train, y_train, X_val, y_val, train, test)
+    training_loss, validation_loss, validation_accuracy, validation_f1 = train_model(model, optimizer, scheduler, criterion, parameters['num_epochs'], parameters['batch_size'], X_train, y_train, X_val, y_val, train, test)
   
     # --------------------------------------
     # Evaluate on test set
     # --------------------------------------
 
-    metrics = test_model(model, X_test, y_test, criterion, test)
+    metrics = test_model(model, X_test, y_test, criterion, parameters['batch_size'], test)
     
     # -------------------------------------------------------
     # Plot the metrics
@@ -244,28 +232,34 @@ def couple_prediction(model, tokenizer, dataset_path: str, balance: bool, train,
     writeLog("You can see the model .pt file at the link: " + BEST_MODEL_PATH)
 
 
-def main(model_name: str, dataset_path: str, balance: bool):
+def main(model_name: str, dataset_path: str, config_path: str, balance: bool):
+    # Loads parameters
+    config_file = open(config_path)
+    parameters = json.load(config_file)
+
+    # Loads models
     character_bert_model = characterbert.CharacterBertForClassification()
     character_bert_freezed_model = characterberfreezed.CharacterBertForClassificationOptimizedFreezed()
     character_bert_freezed_sep_model = characterberfreezedsep.CharacterBertForClassificationOptimizedFreezedSeparated()
 
+    # Loads tokenizer
     tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
     if model_name == "character_bert_model":
-        couple_prediction(model=character_bert_model, tokenizer=tokenizer, dataset_path=dataset_path, balance=balance, 
+        couple_prediction(model=character_bert_model, tokenizer=tokenizer, dataset_path=dataset_path, balance=balance, parameters=parameters,
                           train=characterbert.train, test=characterbert.test)
     elif model_name == "character_bert_freezed_model":
-        couple_prediction(model=character_bert_freezed_model, tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, 
+        couple_prediction(model=character_bert_freezed_model, tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, parameters=parameters,
                           train=characterberfreezed.train, test=characterberfreezed.test)
     elif model_name == "character_bert_freezed_sep_model":
-        couple_prediction(model=character_bert_freezed_sep_model, tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, 
+        couple_prediction(model=character_bert_freezed_sep_model, tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, parameters=parameters,
                           train=characterberfreezedsep.train, test=characterberfreezedsep.test)
     
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 4:
         print("\nType a dataset, first!")
-        print("USAGE: python3 couple_prediction.py DATASET_PATH MODEL BALANCE")
+        print("USAGE: python3 couple_prediction.py DATASET_PATH MODEL CONFIG_PATH BALANCE")
         print("where, DATASET_PATH is a .csv or .xlsx file")
         print("where, MODEL is the name of the model")
         print("where, BALANCE for balancing the dataset. Take one of ['unbalance' or 'balance'] default balance")
@@ -273,10 +267,11 @@ if __name__ == "__main__":
 
     dataset_path = sys.argv[1]
     model_name = sys.argv[2]
+    config_path = sys.argv[3]
 
     balance = True
-    if len(sys.argv) == 4:
-        if(sys.argv[3] == "unbalance"):
+    if len(sys.argv) == 5:
+        if(sys.argv[4] == "unbalance"):
             balance = False
     
-    main(model_name=model_name, dataset_path=dataset_path, balance=balance)
+    main(model_name=model_name, dataset_path=dataset_path, config_path=config_path, balance=balance)
