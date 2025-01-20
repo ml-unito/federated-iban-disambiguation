@@ -9,7 +9,7 @@ from collections import Counter
 from lib.datasetManipulation import *
 from transformers import BertTokenizer
 from sklearn.model_selection import train_test_split
-from transformers import AdamW, get_linear_schedule_with_warmup
+from transformers import get_linear_schedule_with_warmup
 from lib.download import download_pre_trained_model
 from lib.trainingUtilities import EarlyStopping, SaveBestModel
 
@@ -28,7 +28,7 @@ BEST_MODEL_PATH = './out/couple_prediction/output_model/model_weight_' + DATE_NA
 
 
 # New log File
-writeLog = SaveOutput('./out/couple_prediction/log/', LOG_NAME, printAll=True, debug=DEBUG)
+writeLog = SaveOutput('./out/couple_prediction/log/', LOG_NAME, printAll=False, debug=DEBUG)
 
 
 
@@ -211,7 +211,7 @@ def couple_prediction(model, tokenizer, dataset_path: str, balance: bool, parame
     # -------------------------------------------------------
     
     # used parameters until: 5/11 ---> optimizer = AdamW(model.parameters(), lr=1e-6, weight_decay=0.0005)
-    optimizer = AdamW(model.parameters(), lr=parameters["learning_rate"], weight_decay=parameters['weight_decay'])
+    optimizer = torch.optim.AdamW(model.parameters(), lr=parameters["learning_rate"], weight_decay=parameters['weight_decay'])
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=(len(X_train) // parameters['batch_size'])*parameters['num_epochs'])
     criterion = torch.nn.BCELoss()
 
