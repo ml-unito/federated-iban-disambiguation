@@ -5,9 +5,7 @@
   },
 
   "dir_dataset_path": "./dataset/",
-  "dataset_path": "./dataset/dataset_27-11-2024_12-00-28.csv",
-  "couple_dataset_path": "./dataset/dataset_27-11-2024_12-00-28__couple.csv",
 
-  "save_models": true,
+  "save_models": false,
   "path_save_models": "./out/federated_learning_models/"
 }
