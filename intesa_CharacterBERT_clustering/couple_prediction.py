@@ -238,7 +238,7 @@ def main(model_name: str, dataset_path: str, config_path: str, balance: bool):
     parameters = json.load(config_file)
 
     # Loads models
-    character_bert_model = characterbert.CharacterBertForClassification()
+    character_bert_model = characterbert.CharacterBertForClassificationOptimized()
     character_bert_freezed_model = characterberfreezed.CharacterBertForClassificationOptimizedFreezed()
     character_bert_freezed_sep_model = characterberfreezedsep.CharacterBertForClassificationOptimizedFreezedSeparated()
 

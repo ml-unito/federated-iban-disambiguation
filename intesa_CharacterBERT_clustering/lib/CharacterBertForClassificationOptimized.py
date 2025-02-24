@@ -18,10 +18,10 @@ def lookup_table(tokenized_texts, dataframe):
     return input_tensors, labels
 
 
-class CharacterBertForClassification(nn.Module):
+class CharacterBertForClassificationOptimized(nn.Module):
     def __init__(self, num_labels=1):
         """ Add classification layer with a sigmoid activation function on the last level"""
-        super(CharacterBertForClassification, self).__init__()
+        super(CharacterBertForClassificationOptimized, self).__init__()
         self.character_bert = CharacterBertModel.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
         self.dropout = nn.Dropout(0.2)
         self.classifier = nn.Linear(768, num_labels)
