@@ -45,6 +45,10 @@ class CharacterBertForClassificationOptimizedFreezed(nn.Module):
 
         logits = self.classifier(hidden_logits)
         x = self.sigmoid(logits)
+
+        if not self.training:
+            x = x.round()
+        
         return x
 
 

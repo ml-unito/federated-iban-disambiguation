@@ -34,6 +34,8 @@ class CharacterBertForClassificationOptimized(nn.Module):
         pooled_output = self.dropout(outputs[:, 0, :])    # Take the first token's embedding ([CLS])
         logits = self.classifier(pooled_output)
         x = self.sigmoid(logits)
+        if not self.training:
+            x = x.round()
         return x
 
 
