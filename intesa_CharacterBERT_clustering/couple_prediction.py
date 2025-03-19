@@ -13,7 +13,7 @@ from transformers import get_linear_schedule_with_warmup
 from lib.download import download_pre_trained_model
 from lib.trainingUtilities import EarlyStopping, SaveBestModel
 
-download_pre_trained_model()
+#download_pre_trained_model()
 
 import lib.CharacterBertForClassificationOptimized as characterbert
 import lib.CharacterBertForClassificationOptimizedFreezed as characterberfreezed
@@ -38,7 +38,7 @@ def test_model(model, X_test, y_test, criterion, batch_size: int, test):
     _, metrics, predictions, total_labels = test(model, X_test, y_test, batch_size, criterion)
     
     for el in metrics: writeLog("- " + el +  ":" + str(metrics[el]))
-    if not DEBUG: plot_confusion_matrix(total_labels, predictions, ['Same name (0)', 'Different name(1)'], (7,4), saveName=PLOT_NAME) 
+    # if not DEBUG: plot_confusion_matrix(total_labels, predictions, ['Same name (0)', 'Different name(1)'], (7,4), saveName=PLOT_NAME) 
 
     return metrics
 
@@ -63,24 +63,24 @@ def train_model(model, optimizer, scheduler, criterion, num_epochs: int, batch_s
         # --------------------------------------
         
         writeLog("\n\n------ Epoch: " + str(epoch + 1) + "/" + str(num_epochs) + " ------\n")
-        loss_t, accuracy_t = train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler)
+        loss_t, metrics_t = train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler)
         training_loss.append(loss_t)
-        training_accuracy.append(accuracy_t)
+        training_accuracy.append(metrics_t["accuracy"])
 
         # --------------------------------------
         # Evaluate on validation set
         # --------------------------------------
         
-        loss_v, metrics, _, _ = test(model, X_val, y_val, batch_size, criterion)
+        loss_v, metrics_v, _, _ = test(model, X_val, y_val, batch_size, criterion)
         validation_loss.append(loss_v)
-        validation_accuracy.append(metrics["accuracy"])
-        validation_f1.append(metrics['f1'])
+        validation_accuracy.append(metrics_v["accuracy"])
+        validation_f1.append(metrics_v['f1'])
         saveCriteria(model, (epoch + 1), loss_t, loss_v)
         
         writeLog(f'- Training set loss: {loss_t}')
-        writeLog(f'- Training set accuracy: {accuracy_t} \n')
+        writeLog(f'- Training set accuracy: {metrics_t["accuracy"]} \n')
         writeLog(f'- Validation set loss: {loss_v}')
-        for el in metrics: writeLog("- " + el +  ":" + str(metrics[el]))
+        for el in metrics_v: writeLog("- " + el +  ":" + str(metrics_v[el]))
         writeLog(" ")
         
         
@@ -103,7 +103,7 @@ def create_couple_dataframe(dataset_path: str, balance: bool) -> pd.DataFrame:
     dataset, dataset_preprocessed_path = loads_dataset(dataset_path)
 
     # -------------------------------------------------------
-    # Preprocessing dataset. The preprocessing remove the "address" column
+    # Preprocessing dataset.
     # Eventually - ballancing the dataset on the IsShared column
     # -------------------------------------------------------
     
@@ -174,7 +174,7 @@ def loads_dataset(dataset_path: str):
     
     datasetName = os.path.basename(dataset_path).split(".")[0]
     dataset_directory_path = "./dataset/Train/" + datasetName
-    dataset_preprocessed_path = dataset_directory_path + "/" + datasetName + "_dataset.csv"
+    dataset_preprocessed_path = dataset_directory_path + "/" + datasetName + "_couple.csv"
     if not os.path.exists(dataset_directory_path):os.makedirs(dataset_directory_path)
     
     dataset = load_dataset(dataset_path)
@@ -210,10 +210,9 @@ def couple_prediction(model, tokenizer, dataset_path: str, balance: bool, parame
     # Train the model
     # -------------------------------------------------------
     
-    # used parameters until: 5/11 ---> optimizer = AdamW(model.parameters(), lr=1e-6, weight_decay=0.0005)
     optimizer = torch.optim.AdamW(model.parameters(), lr=parameters["learning_rate"], weight_decay=parameters['weight_decay'])
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=(len(X_train) // parameters['batch_size'])*parameters['num_epochs'])
-    criterion = torch.nn.BCELoss()
+    criterion = torch.nn.CrossEntropyLoss()
 
     training_loss, validation_loss, validation_accuracy, validation_f1 = train_model(model, optimizer, scheduler, criterion, parameters['num_epochs'], parameters['batch_size'], X_train, y_train, X_val, y_val, train, test)
   
@@ -237,21 +236,19 @@ def main(model_name: str, dataset_path: str, config_path: str, balance: bool):
     config_file = open(config_path)
     parameters = json.load(config_file)
 
-    # Loads models
-    character_bert_model = characterbert.CharacterBertForClassificationOptimized()
-    character_bert_freezed_model = characterberfreezed.CharacterBertForClassificationOptimizedFreezed()
-    character_bert_freezed_sep_model = characterberfreezedsep.CharacterBertForClassificationOptimizedFreezedSeparated()
-
     # Loads tokenizer
     tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
     if model_name == "character_bert_model":
+        character_bert_model = characterbert.CharacterBertForClassificationOptimized()
         couple_prediction(model=character_bert_model, tokenizer=tokenizer, dataset_path=dataset_path, balance=balance, parameters=parameters,
                           train=characterbert.train, test=characterbert.test)
     elif model_name == "character_bert_freezed_model":
+        character_bert_freezed_model = characterberfreezed.CharacterBertForClassificationOptimizedFreezed()
         couple_prediction(model=character_bert_freezed_model, tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, parameters=parameters,
                           train=characterberfreezed.train, test=characterberfreezed.test)
     elif model_name == "character_bert_freezed_sep_model":
+        character_bert_freezed_sep_model = characterberfreezedsep.CharacterBertForClassificationOptimizedFreezedSeparated()
         couple_prediction(model=character_bert_freezed_sep_model, tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, parameters=parameters,
                           train=characterberfreezedsep.train, test=characterberfreezedsep.test)
     

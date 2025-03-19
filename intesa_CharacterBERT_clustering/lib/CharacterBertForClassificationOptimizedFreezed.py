@@ -1,9 +1,11 @@
 from tqdm import tqdm
 import torch
+import numpy as np
 import torch.nn as nn
 from character_bert_model.utils.character_cnn import CharacterIndexer
 from character_bert_model.modeling.character_bert import CharacterBertModel
 from lib.trainingUtilities import compute_metrics
+from torchmetrics import Accuracy, F1Score, Precision, Recall
 
 indexer = CharacterIndexer()
 # tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
@@ -19,8 +21,7 @@ def lookup_table(tokenized_texts, dataframe):
 
 
 class CharacterBertForClassificationOptimizedFreezed(nn.Module):
-    def __init__(self, num_labels=1):
-        """ Add classification layer with a sigmoid activation function on the last level"""
+    def __init__(self, num_labels=2):
         super(CharacterBertForClassificationOptimizedFreezed, self).__init__()
         self.character_bert = CharacterBertModel.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
         
@@ -44,10 +45,8 @@ class CharacterBertForClassificationOptimizedFreezed(nn.Module):
         hidden_logits = self.relu(self.hidden(pooled_output))
 
         logits = self.classifier(hidden_logits)
+        
         x = self.sigmoid(logits)
-
-        if not self.training:
-            x = x.round()
         
         return x
 
@@ -57,14 +56,18 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model.train()
     total_loss = 0
-    predictions = []
-    total_labels = []
+    # predictions = []
+    # total_labels = []
+    accs, precs, recs, f1s = [], [], [], []
 
-
+    accuracy = Accuracy(task="multiclass", num_classes=2, top_k=1, average="micro")
+    precision = Precision(task="multiclass", num_classes=2, top_k=1, average="micro")
+    recall = Recall(task="multiclass", num_classes=2, top_k=1, average="micro")
+    f1 = F1Score(task="multiclass", num_classes=2, top_k=1, average="micro")
+   
     for i in tqdm(range(0, len(X_train), batch_size), desc="Training"):
         batch_X = X_train[i:i+batch_size]
         batch_y = y_train[i:i+batch_size]
-
 
         # Convert batch to tensors  
         input_ids = indexer.as_padded_tensor(batch_X)
@@ -72,27 +75,47 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
          
         input_ids = input_ids.to(device)
         labels = labels.to(device)
-        labels = labels.unsqueeze(1)
-
+        
         optimizer.zero_grad()                               # Clear gradients
         outputs = model(input_ids)                          # Forward pass
-        loss = criterion(outputs, labels.float())           # Compute loss
+        loss = criterion(outputs, labels)           # Compute loss
         total_loss += loss.item()
         
+        accuracy.update(outputs.cpu(), labels.cpu())
+        precision.update(outputs.cpu(), labels.cpu())
+        recall.update(outputs.cpu(), labels.cpu())
+        f1.update(outputs.cpu(), labels.cpu())
+
+        accs.append(accuracy.compute().item())
+        precs.append(precision.compute().item())
+        recs.append(recall.compute().item())
+        f1s.append(f1.compute().item())
         # get eval metrics
-        elem_list = outputs.round().tolist()
-        predictions += [int(el[0]) for el in elem_list]
-        elem_list = labels.tolist()
-        total_labels += [el[0] for el in elem_list]
+        # elem_list = outputs.tolist()
+        # print(elem_list)
+        # predictions += [int(el[0]) for el in elem_list]
+        # predictions += outputs
+        # print("pred",predictions)
+        # elem_list = labels.tolist()
+        # total_labels += [el for el in elem_list]
+        # total_labels += labels
 
         # Backpropagation
         loss.backward()
         optimizer.step()
 
-    scheduler.step()                                        # Step the scheduler after every epoch
-    loss = total_loss / (len(X_train) // batch_size)
-    metrics = compute_metrics(predictions, total_labels)
-    return loss, metrics['accuracy']
+    scheduler.step()
+    
+    num_batch = (len(X_train) // batch_size) if (len(X_train) // batch_size) != 0 else 1
+    loss = total_loss / num_batch
+
+    acc_value = np.round(sum(accs) / len(accs), 5).item()
+    prec_value = np.round(sum(precs) / len(precs), 5).item()
+    rec_value =  np.round(sum(recs) / len(recs), 5).item()
+    f1_value = np.round(sum(f1s) / len(f1s), 5).item()
+    metrics = {"accuracy":acc_value, "precision":prec_value, "recall":rec_value, "f1":f1_value}
+
+    return loss, metrics
 
 
 def test(model, X_test, y_test, batch_size, criterion):
@@ -103,9 +126,14 @@ def test(model, X_test, y_test, batch_size, criterion):
     predictions = []
     total_labels = []
 
+    accs, precs, recs, f1s = [], [], [], []
+    accuracy = Accuracy(task="multiclass", num_classes=2, top_k=1, average="micro")
+    precision = Precision(task="multiclass", num_classes=2, top_k=1, average="micro")
+    recall = Recall(task="multiclass", num_classes=2, top_k=1, average="micro")
+    f1 = F1Score(task="multiclass", num_classes=2, top_k=1, average="micro")
+
     with torch.no_grad():
         for i in tqdm(range(0, len(X_test), batch_size), desc="Testing"):
-        # for i in range(0, len(X_test), batch_size):
             batch_X = X_test[i:i+batch_size]
             batch_y = y_test[i:i+batch_size]
             
@@ -114,22 +142,38 @@ def test(model, X_test, y_test, batch_size, criterion):
             labels = torch.tensor(batch_y)
             input_ids = input_ids.to(device)
             labels = labels.to(device)
-            labels = labels.unsqueeze(1)
+            # labels = labels.unsqueeze(1)
 
             # Forward pass
             outputs = model(input_ids)
 
             # Compute loss
-            loss = criterion(outputs, labels.float())
+            loss = criterion(outputs, labels)
             total_loss += loss.item()
 
-            # get eval metrics
-            elem_list = outputs.round().tolist()
-            predictions += [int(el[0]) for el in elem_list]
-            elem_list = labels.tolist()
-            total_labels += [el[0] for el in elem_list]
-            
+            # Metrics
+            accuracy.update(outputs.cpu(), labels.cpu())
+            precision.update(outputs.cpu(), labels.cpu())
+            recall.update(outputs.cpu(), labels.cpu())
+            f1.update(outputs.cpu(), labels.cpu())
 
-    loss = total_loss / (len(X_test) // batch_size)
-    metrics = compute_metrics(predictions, total_labels)
+            accs.append(accuracy.compute().item())
+            precs.append(precision.compute().item())
+            recs.append(recall.compute().item())
+            f1s.append(f1.compute().item())
+
+            # elem_list = outputs.tolist()
+            predictions += outputs.cpu() #[int(el[0]) for el in elem_list]
+            # elem_list = labels.tolist()
+            total_labels += labels.cpu() #[el for el in elem_list]
+
+    num_batch = (len(X_test) // batch_size) if (len(X_test) // batch_size) != 0 else 1
+    loss = total_loss / num_batch
+
+    acc_value = np.round(sum(accs) / len(accs), 5).item()
+    prec_value = np.round(sum(precs) / len(precs), 5).item()
+    rec_value =  np.round(sum(recs) / len(recs), 5).item()
+    f1_value = np.round(sum(f1s) / len(f1s), 5).item()
+    metrics = {"accuracy":acc_value, "precision":prec_value, "recall":rec_value, "f1":f1_value}
+
     return loss, metrics, predictions, total_labels
