@@ -20,43 +20,51 @@ def lookup_table(tokenized_texts, dataframe):
     return input_tensors, labels
 
 
-class CharacterBertForClassificationOptimized(nn.Module):
+class CBertClassifFrz(nn.Module):
     def __init__(self, num_labels=2):
-        """ Add classification layer with a sigmoid activation function on the last level"""
-        super(CharacterBertForClassificationOptimized, self).__init__()
+        super(CBertClassifFrz, self).__init__()
         self.character_bert = CharacterBertModel.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
+        
+        # Freeze the CharacterBert model
+        self.character_bert.eval()
+        for param in self.character_bert.parameters():
+            param.requires_grad = False
+            
         self.dropout = nn.Dropout(0.2)
-        self.classifier = nn.Linear(768, num_labels)
+        self.hidden = nn.Linear(768, 100)
+        self.classifier = nn.Linear(100, num_labels)
         self.sigmoid = nn.Sigmoid()
+        self.relu = nn.ReLU()
 
 
     def forward(self, input_ids):
         """Forward pass"""
         outputs = self.character_bert(input_ids)[0]       # Use the last hidden states
         pooled_output = self.dropout(outputs[:, 0, :])    # Take the first token's embedding ([CLS])
-        logits = self.classifier(pooled_output)
+        
+        hidden_logits = self.relu(self.hidden(pooled_output))
+
+        logits = self.classifier(hidden_logits)
+        
         x = self.sigmoid(logits)
-        # if not self.training:
-        #     x = x.round()
+        
         return x
 
 
 def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
     """ Train the model """
-    
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model.train()
     total_loss = 0
-    predictions = []
-    total_labels = []
-
+    # predictions = []
+    # total_labels = []
     accs, precs, recs, f1s = [], [], [], []
 
     accuracy = Accuracy(task="multiclass", num_classes=2, top_k=1, average="micro")
     precision = Precision(task="multiclass", num_classes=2, top_k=1, average="micro")
     recall = Recall(task="multiclass", num_classes=2, top_k=1, average="micro")
     f1 = F1Score(task="multiclass", num_classes=2, top_k=1, average="micro")
-
+   
     for i in tqdm(range(0, len(X_train), batch_size), desc="Training"):
         batch_X = X_train[i:i+batch_size]
         batch_y = y_train[i:i+batch_size]
@@ -67,14 +75,12 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
          
         input_ids = input_ids.to(device)
         labels = labels.to(device)
-        # labels = labels.unsqueeze(1)
-
-        optimizer.zero_grad()                               
-        outputs = model(input_ids)
-        loss = criterion(outputs, labels)
+        
+        optimizer.zero_grad()                               # Clear gradients
+        outputs = model(input_ids)                          # Forward pass
+        loss = criterion(outputs, labels)           # Compute loss
         total_loss += loss.item()
         
-        # Metrics
         accuracy.update(outputs.cpu(), labels.cpu())
         precision.update(outputs.cpu(), labels.cpu())
         recall.update(outputs.cpu(), labels.cpu())
@@ -84,16 +90,25 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
         precs.append(precision.compute().item())
         recs.append(recall.compute().item())
         f1s.append(f1.compute().item())
+        # get eval metrics
+        # elem_list = outputs.tolist()
+        # print(elem_list)
+        # predictions += [int(el[0]) for el in elem_list]
+        # predictions += outputs
+        # print("pred",predictions)
+        # elem_list = labels.tolist()
+        # total_labels += [el for el in elem_list]
+        # total_labels += labels
 
         # Backpropagation
         loss.backward()
         optimizer.step()
 
-    scheduler.step()                                        # Step the scheduler after every epoch
+    scheduler.step()
     
     num_batch = (len(X_train) // batch_size) if (len(X_train) // batch_size) != 0 else 1
     loss = total_loss / num_batch
-    
+
     acc_value = np.round(sum(accs) / len(accs), 5).item()
     prec_value = np.round(sum(precs) / len(precs), 5).item()
     rec_value =  np.round(sum(recs) / len(recs), 5).item()
@@ -105,7 +120,6 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
 
 def test(model, X_test, y_test, batch_size, criterion):
     """ Evaluate the model """
-    
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model.eval()
     total_loss = 0
@@ -128,7 +142,8 @@ def test(model, X_test, y_test, batch_size, criterion):
             labels = torch.tensor(batch_y)
             input_ids = input_ids.to(device)
             labels = labels.to(device)
-            
+            # labels = labels.unsqueeze(1)
+
             # Forward pass
             outputs = model(input_ids)
 
@@ -147,10 +162,11 @@ def test(model, X_test, y_test, batch_size, criterion):
             recs.append(recall.compute().item())
             f1s.append(f1.compute().item())
 
-            predictions += outputs.cpu() 
-            total_labels += labels.cpu()
+            # elem_list = outputs.tolist()
+            predictions += outputs.cpu() #[int(el[0]) for el in elem_list]
+            # elem_list = labels.tolist()
+            total_labels += labels.cpu() #[el for el in elem_list]
 
-            
     num_batch = (len(X_test) // batch_size) if (len(X_test) // batch_size) != 0 else 1
     loss = total_loss / num_batch
 

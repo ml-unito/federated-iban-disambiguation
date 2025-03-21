@@ -17,9 +17,9 @@ from datetime import datetime
 from transformers import BertTokenizer
 
 # download_pre_trained_model()
-# from lib.CharacterBertForClassificationOptimized import *
-from lib.CharacterBertForClassificationOptimizedFreezed import *
-# from lib.CharacterBertForClassificationOptimizedFreezedSeparated import *
+# from lib.CBertClassif import *
+from lib.CBertClassifFrz import *
+# from lib.CBertClassifFrzSep import *
 from lib.datasetManipulation import *
 
 

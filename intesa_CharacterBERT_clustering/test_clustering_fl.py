@@ -6,8 +6,8 @@ import networkx as nx
 from datetime import datetime
 from itertools import combinations
 from lib.datasetManipulation import *
-from lib.CharacterBertForClassification import CharacterBertForClassification
-from lib.CharacterBertForClassificationOptimized import *
+from lib.CBertClassif import CBertClassif
+from lib.CBertClassif import *
 from fluke.utils.log import Log
 
 
@@ -47,7 +47,6 @@ def create_pairs_for_clustering(dataset: pd.DataFrame) -> pd.DataFrame:
         else:
             for (name1, holder1), (name2, holder2) in combinations(zip(names, holders), 2):
                 if(isinstance(name1, float) or isinstance(name2, float)):
-                    print("BOOOO FLOAT")
                     print(iban)
                     print(name1, name2)
                 pairs.append(" @ ".join([name1, name2]))
@@ -69,7 +68,7 @@ def create_pairs_for_clustering(dataset: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def clustering(model: CharacterBertForClassification) -> dict:
+def clustering(model) -> dict:
 	# load dataset
 	dataset = pd.read_csv(PATH_TEST_DATASET)
 	dataset = prepocess_dataset(dataset)
@@ -129,7 +128,6 @@ def clustering(model: CharacterBertForClassification) -> dict:
 					if predicted[i] == 0: G.add_edge(names1[i], names2[i])
 
 			if len(predicted) != len(names1):
-					print("CHEEEEEEEEEEEEEEEEEEEEEEECK !!!!!!!!!!!!!!")
 					print(iban +  " " + str(len(predicted)) + " " + str(len(names1)) + " " + str(len(names2)))
 
 
@@ -230,8 +228,8 @@ def clustering(model: CharacterBertForClassification) -> dict:
 	return performance
 
 
-def load_model_with_weigths(path_weigths_model: str) -> CharacterBertForClassification:
-	model = CharacterBertForClassification().to(DEVICE)
+def load_model_with_weigths(path_weigths_model: str) -> CBertClassif:
+	model = CBertClassif().to(DEVICE)
 	model.load_state_dict(torch.load(path_weigths_model, weights_only=False)["model"])
 	model.eval()
 

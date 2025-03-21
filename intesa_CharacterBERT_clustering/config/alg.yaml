@@ -34,5 +34,5 @@ hyperparameters:
     # The model (neural network) to federate.
     # This can be the name of a neural network included in `fluke.nets` or
     # the fully qualified name of an user defined class
-    # model: lib.CharacterBertForClassificationOptimized.CharacterBertForClassificationOptimized
-    model: lib.CharacterBertForClassificationOptimizedFreezed.CharacterBertForClassificationOptimizedFreezed
+    # model: lib.CBertClassif.CBertClassif
+    model: lib.CBertClassifFrz.CBertClassifFrz

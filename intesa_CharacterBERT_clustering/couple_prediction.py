@@ -15,9 +15,9 @@ from lib.trainingUtilities import EarlyStopping, SaveBestModel
 
 #download_pre_trained_model()
 
-import lib.CharacterBertForClassificationOptimized as characterbert
-import lib.CharacterBertForClassificationOptimizedFreezed as characterberfreezed
-import lib.CharacterBertForClassificationOptimizedFreezedSeparated as characterberfreezedsep
+import lib.CBertClassif as characterbert
+import lib.CBertClassifFrz as characterberfreezed
+import lib.CBertClassifFrzSep as characterberfreezedsep
 
 
 DEBUG = False
@@ -197,7 +197,7 @@ def couple_prediction(model, tokenizer, dataset_path: str, balance: bool, parame
 
     dataframe = create_couple_dataframe(dataset_path, balance)
     
-    if model. __class__. __name__ == "CharacterBertForClassificationOptimizedFreezedSeparated":
+    if model. __class__. __name__ == "CBertClassifFrzSep":
         X = tokenize_dataset_pair(dataframe, tokenizer).tolist()
     else:
         X = tokenize_dataset(dataframe, tokenizer).tolist()
@@ -240,15 +240,15 @@ def main(model_name: str, dataset_path: str, config_path: str, balance: bool):
     tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
     if model_name == "character_bert_model":
-        character_bert_model = characterbert.CharacterBertForClassificationOptimized()
+        character_bert_model = characterbert.CBertClassif()
         couple_prediction(model=character_bert_model, tokenizer=tokenizer, dataset_path=dataset_path, balance=balance, parameters=parameters,
                           train=characterbert.train, test=characterbert.test)
     elif model_name == "character_bert_freezed_model":
-        character_bert_freezed_model = characterberfreezed.CharacterBertForClassificationOptimizedFreezed()
+        character_bert_freezed_model = characterberfreezed.CBertClassifFrz()
         couple_prediction(model=character_bert_freezed_model, tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, parameters=parameters,
                           train=characterberfreezed.train, test=characterberfreezed.test)
     elif model_name == "character_bert_freezed_sep_model":
-        character_bert_freezed_sep_model = characterberfreezedsep.CharacterBertForClassificationOptimizedFreezedSeparated()
+        character_bert_freezed_sep_model = characterberfreezedsep.CBertClassifFrzSep()
         couple_prediction(model=character_bert_freezed_sep_model, tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, parameters=parameters,
                           train=characterberfreezedsep.train, test=characterberfreezedsep.test)
     

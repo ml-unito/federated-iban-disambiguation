@@ -9,13 +9,13 @@ from lib.datasetManipulation import *
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import train_test_split
 from lib.download import download_pre_trained_model
-from transformers import AdamW, get_linear_schedule_with_warmup
+from transformers import AdamW, get_linear_schedule_with_warmup, BertTokenizer
 
 download_pre_trained_model()
-from lib.CharacterBertForClassificationOptimized import *
+from lib.CBertClassif import *
 
 # Load Custom model
-model = CharacterBertForClassification()
+model = CBertClassif()
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 model.to(device)
 
@@ -143,7 +143,7 @@ def fine_tuning(dataset, balance=False, num_epochs=5, train_proportion=0.9, test
     # -------------------------------------------------------
     # Splitting dataset
     # -------------------------------------------------------
-    
+    tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
     X = tokenize_dataset(dataframe, tokenizer).tolist()
     y = dataframe['label'].tolist()
     # print("\n- Preview of the dataset after the tokenization step:")

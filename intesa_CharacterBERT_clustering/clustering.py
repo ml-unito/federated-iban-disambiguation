@@ -1,18 +1,21 @@
 import json
+import torch
+import sys
 import pandas as pd
 from lib.plot import *
 from lib.saveOutput import *
 from collections import Counter
 from itertools import combinations
 from lib.datasetManipulation import *
+from transformers import BertTokenizer
 from lib.download import download_pre_trained_model
 
 download_pre_trained_model()
-from lib.CharacterBertForClassificationOptimized import *
+from lib.CBertClassif import *
 
 
 # Load Custom model
-model = CharacterBertForClassification()
+model = CBertClassif()
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 model.to(device)
 
@@ -141,6 +144,7 @@ def main():
     
     
     # tokenize pairs
+    tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
     X = tokenize_dataset(dataframe, tokenizer).tolist()
     y = dataframe['label'].tolist()
     dataframe = dataframe.drop('text', axis=1)
@@ -203,7 +207,6 @@ def main():
             if predicted[i] == 0: G.add_edge(names1[i], names2[i])
 
         if len(predicted) != len(names1):
-            saveToFile("CHEEEEEEEEEEEEEEEEEEEEEEECK !!!!!!!!!!!!!!")
             saveToFile(iban +  " " + str(len(predicted)) + " " + str(len(names1)) + " " + str(len(names2)))
 
 
