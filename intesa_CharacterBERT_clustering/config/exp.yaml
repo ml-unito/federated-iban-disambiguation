@@ -59,22 +59,27 @@ eval:
     # Whether to evaluate the client model before the client local training starts
     pre_fit: false
     # Whether to evaluate the client model after the client local training
-    post_fit: true
+    post_fit: false
     # Whether to evaluate the global model on the server-side test set
     server: true
     # Whether to evaluate the client local models on the server-side test set
     locals: false
 # Logger configuration
 logger:
-    # `Log` is the standard output, `WandBLog` logs everything on weights and bias
-    lname: Log
-    # `wandb` parameters. Leave empty if `name` is `Log`
-    params: null
+    name: WandBLog
+    project: fl-ner
+    entity: mlgroup
+    tags: ["flner", "test"]
+# logger:
+#     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
+#     lname: Log
+#     # `wandb` parameters. Leave empty if `name` is `Log`
+#     params: null
 # FL protocol configuration
 protocol:
     # % of eligible clients, i.e., participants, in each round
     eligible_perc: 1
     # Total number of clients partcipating in the federation
-    n_clients: 4
+    n_clients: 1
     # Total number of rounds
-    n_rounds: 4
+    n_rounds: 1

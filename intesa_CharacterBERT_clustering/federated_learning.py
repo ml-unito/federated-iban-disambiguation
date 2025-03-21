@@ -1,5 +1,5 @@
-
-import torch
+import copy
+import sys
 import pandas as pd
 import json
 import yaml
@@ -11,14 +11,15 @@ from fluke.data import DataSplitter
 from fluke.algorithms.fedavg import FedAVG
 from fluke.data.datasets import DataContainer, DummyDataContainer, FastDataLoader
 from fluke.evaluation import ClassificationEval
-from lib.download import download_pre_trained_model
-from sklearn.model_selection import train_test_split
+# from lib.download import download_pre_trained_model
+# from sklearn.model_selection import train_test_split
 from datetime import datetime
 from transformers import BertTokenizer
 
-download_pre_trained_model()
+# download_pre_trained_model()
 # from lib.CharacterBertForClassificationOptimized import *
 from lib.CharacterBertForClassificationOptimizedFreezed import *
+# from lib.CharacterBertForClassificationOptimizedFreezedSeparated import *
 from lib.datasetManipulation import *
 
 
@@ -37,8 +38,6 @@ PATH_SAVE_MODELS = fl_parameters["path_save_models"]
 def extract_x_and_y(dataset: pd.DataFrame, tokenizer) -> list:
   tokenized_texts = tokenize_dataset(dataset, tokenizer)
   x, y = lookup_table(tokenized_texts, dataset)
-  y = y.unsqueeze(1)
-  y = y.float()
   return x, y
 
 
@@ -74,10 +73,10 @@ def load_parameters() -> list:
   config_file_alg = open(ALG_PATH)
   config_alg = yaml.safe_load(config_file_alg)
 
-  return config_exp, config_alg
+  return DDict(config_exp), DDict(config_alg)
 
 
-def main():
+def main(log_name: str):
   config_exp, config_alg = load_parameters()
 
   settings = GlobalSettings()
@@ -87,14 +86,17 @@ def main():
   datasets = create_dummy_data_container(num_clients=config_exp["protocol"]["n_clients"], client_test=True)
 
   settings.set_evaluator(ClassificationEval(eval_every=1, n_classes=datasets.num_classes))
-
   settings.set_eval_cfg(config_exp["eval"])
 
   algorithm = FedAVG(n_clients=config_exp["protocol"]["n_clients"],
                     data_splitter=DataSplitter(dataset=datasets, **config_exp["data"]),
                     hyper_params=DDict(**config_alg["hyperparameters"]) )
 
-  logger = log.get_logger(**config_exp["logger"])
+  logger = log.get_logger(config_exp["logger"]["name"], name=log_name, **config_exp["logger"].exclude("name"))
+  cfg = copy.copy(config_exp)
+  cfg.update(config_alg)
+  logger.init(**cfg)
+  
   algorithm.set_callbacks(logger)
   
   start_time = time.time()
@@ -118,4 +120,9 @@ def main():
   
 
 if __name__ == "__main__":
-  main()
+  if len(sys.argv) < 4:
+    print("USAGE: python3 federated_learning.py LOG_NAME")
+    exit()
+
+  log_name = sys.argv[1]
+  main(log_name)
