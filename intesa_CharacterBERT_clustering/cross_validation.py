@@ -1,15 +1,14 @@
 import pandas as pd
-import os
 import json
 import time
 from lib.plot import *
 from lib.saveOutput import *
-from collections import Counter
 from lib.datasetManipulation import *
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import train_test_split
 from lib.download import download_pre_trained_model
 from transformers import AdamW, get_linear_schedule_with_warmup, BertTokenizer
+from lib.trainingUtilities import EarlyStopping
 
 download_pre_trained_model()
 from lib.CBertClassif import *
@@ -25,7 +24,6 @@ with open('./config/parameters.json', "r") as data_file:
     parameters = json.load(data_file)
 
 
-
 # Retrieve parameters
 # train_proportion = parameters['train_proportion']
 # val_proportion = parameters['val_proportion']
@@ -34,8 +32,6 @@ with open('./config/parameters.json', "r") as data_file:
 batch_size = parameters['batch_size']
 weight_decay = parameters['weight_decay']
 learning_rate = parameters['learning_rate']
-
-
 
 
 
@@ -86,8 +82,6 @@ def create_pairs_for_clustering(dataset):
     df['IsShared'] = isShared
     
     return df
-
-
 
 
 def fine_tuning(dataset, balance=False, num_epochs=5, train_proportion=0.9, test_proportion=0.1):
@@ -261,11 +255,6 @@ def fine_tuning(dataset, balance=False, num_epochs=5, train_proportion=0.9, test
     return metrics, model
     
 
-
-
-
-
-
 def clustering(model, dataset):
     """ """
     
@@ -282,6 +271,7 @@ def clustering(model, dataset):
     dataframe = create_pairs_for_clustering(dataset)
     
     # tokenize pairs
+    tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
     X = tokenize_dataset(dataframe, tokenizer).tolist()
     y = dataframe['label'].tolist()
     dataframe = dataframe.drop('text', axis=1)
@@ -421,12 +411,6 @@ def clustering(model, dataset):
     return final_metrics
 
 
-
-
-
-
-
-
 def cross_validation(dataset, num_epochs=5, folds_number=5, train_proportion=1.0, test_proportion=0.0):
     """ """
     
@@ -493,7 +477,6 @@ def cross_validation(dataset, num_epochs=5, folds_number=5, train_proportion=1.0
         total_clustering_metrics.append(clustering_metrics)
     
     return total_finetuning_metrics, total_clustering_metrics, folds
-
 
 
 def export_results(total_finetuning_metrics, total_clustering_metrics, folds):
