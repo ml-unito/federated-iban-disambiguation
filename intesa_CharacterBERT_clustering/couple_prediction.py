@@ -3,6 +3,7 @@ import json
 import time
 import torch
 import sys
+import wandb
 from lib.plot import *
 from lib.saveOutput import *
 from collections import Counter
@@ -15,9 +16,9 @@ from lib.trainingUtilities import EarlyStopping, SaveBestModel
 
 #download_pre_trained_model()
 
-import lib.CBertClassif as characterbert
-import lib.CBertClassifFrz as characterberfreezed
-import lib.CBertClassifFrzSep as characterberfreezedsep
+import lib.CBertClassif as cbert
+import lib.CBertClassifFrz as cbertfr
+import lib.CBertClassifFrzSep as cbertfrsp
 
 
 DEBUG = False
@@ -25,6 +26,7 @@ DATE_NAME = str(datetime.now()).split(".")[0].replace(" ", "_")
 LOG_NAME = "train_log_" + DATE_NAME + ".txt"
 PLOT_NAME = "./out/couple_prediction/plot/plot_train/plot_" + DATE_NAME + ".png"
 BEST_MODEL_PATH = './out/couple_prediction/output_model/model_weight_' + DATE_NAME + '.pt'
+LOG_WANDB = True
 
 
 # New log File
@@ -67,6 +69,16 @@ def train_model(model, optimizer, scheduler, criterion, num_epochs: int, batch_s
         training_loss.append(loss_t)
         training_accuracy.append(metrics_t["accuracy"])
 
+        if LOG_WANDB:
+            wandb.log({
+                "train_loss": loss_t,
+                "train_accuracy": metrics_t["accuracy"],
+                "train_precision": metrics_t["precision"],
+                "train_recall": metrics_t["recall"],
+                "train_f1": metrics_t["f1"],
+                "train_epoch": epoch
+            })
+
         # --------------------------------------
         # Evaluate on validation set
         # --------------------------------------
@@ -83,6 +95,15 @@ def train_model(model, optimizer, scheduler, criterion, num_epochs: int, batch_s
         for el in metrics_v: writeLog("- " + el +  ":" + str(metrics_v[el]))
         writeLog(" ")
         
+        if LOG_WANDB:
+            wandb.log({
+                "val_loss": loss_v,
+                "val_accuracy": metrics_v["accuracy"],
+                "val_precision": metrics_v["precision"],
+                "val_recall": metrics_v["recall"],
+                "val_f1": metrics_v["f1"],
+                "val_epoch": epoch
+            })
         
         # Evaluate The early stopping
         if early_stopping_train(loss_t) or early_stopping_val(loss_v):
@@ -185,7 +206,7 @@ def loads_dataset(dataset_path: str):
     return dataset, dataset_preprocessed_path
 
 
-def couple_prediction(model, tokenizer, dataset_path: str, balance: bool, parameters: dict, train, test):
+def couple_prediction(model, tokenizer, dataset_path: str, balance: bool, parameters: dict, train, test, name_wandb: str):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model.to(device)
 
@@ -214,13 +235,40 @@ def couple_prediction(model, tokenizer, dataset_path: str, balance: bool, parame
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=(len(X_train) // parameters['batch_size'])*parameters['num_epochs'])
     criterion = torch.nn.CrossEntropyLoss()
 
+    if LOG_WANDB:
+        wandb.init(
+            project="fl-ner",
+            entity="mlgroup",
+            tags=["flner", "test"],
+            name=name_wandb,
+            config={
+                "batch_size": parameters["batch_size"],
+                "epochs": parameters["num_epochs"],
+                "weight_decay": parameters["weight_decay"],
+                "learning_rate": parameters["learning_rate"],
+                "model": str(model),
+                "loss": str(criterion),
+                "optimizer": str(optimizer),
+                "tokenizer": str(tokenizer.name_or_path),
+                "train_proportion": parameters["train_proportion"],
+                "dataset": dataset_path
+            }
+        )
+
     training_loss, validation_loss, validation_accuracy, validation_f1 = train_model(model, optimizer, scheduler, criterion, parameters['num_epochs'], parameters['batch_size'], X_train, y_train, X_val, y_val, train, test)
-  
+
     # --------------------------------------
     # Evaluate on test set
     # --------------------------------------
 
     metrics = test_model(model, X_test, y_test, criterion, parameters['batch_size'], test)
+
+    if LOG_WANDB:
+        wandb.summary["test_accuracy"] = metrics["accuracy"]
+        wandb.summary["test_precision"] = metrics["precision"]
+        wandb.summary["test_recall"] = metrics["recall"]
+        wandb.summary["test_f1"] = metrics["f1"]
+        wandb.finish()
     
     # -------------------------------------------------------
     # Plot the metrics
@@ -231,7 +279,7 @@ def couple_prediction(model, tokenizer, dataset_path: str, balance: bool, parame
     writeLog("You can see the model .pt file at the link: " + BEST_MODEL_PATH)
 
 
-def main(model_name: str, dataset_path: str, config_path: str, balance: bool):
+def main(model_name: str, dataset_path: str, config_path: str, balance: bool, name_wandb: str):
     # Loads parameters
     config_file = open(config_path)
     parameters = json.load(config_file)
@@ -239,18 +287,17 @@ def main(model_name: str, dataset_path: str, config_path: str, balance: bool):
     # Loads tokenizer
     tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
-    if model_name == "character_bert_model":
-        character_bert_model = characterbert.CBertClassif()
-        couple_prediction(model=character_bert_model, tokenizer=tokenizer, dataset_path=dataset_path, balance=balance, parameters=parameters,
-                          train=characterbert.train, test=characterbert.test)
-    elif model_name == "character_bert_freezed_model":
-        character_bert_freezed_model = characterberfreezed.CBertClassifFrz()
-        couple_prediction(model=character_bert_freezed_model, tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, parameters=parameters,
-                          train=characterberfreezed.train, test=characterberfreezed.test)
-    elif model_name == "character_bert_freezed_sep_model":
-        character_bert_freezed_sep_model = characterberfreezedsep.CBertClassifFrzSep()
-        couple_prediction(model=character_bert_freezed_sep_model, tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, parameters=parameters,
-                          train=characterberfreezedsep.train, test=characterberfreezedsep.test)
+    if model_name == "CBertClassif":
+        couple_prediction(model=cbert.CBertClassif(), tokenizer=tokenizer, dataset_path=dataset_path, balance=balance, parameters=parameters,
+                          train=cbert.train, test=cbert.test, name_wandb=name_wandb)
+    elif model_name == "CBertClassifFrz":
+        couple_prediction(model=cbertfr.CBertClassifFrz(), tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, parameters=parameters,
+                          train=cbertfr.train, test=cbertfr.test, name_wandb=name_wandb)
+    elif model_name == "CBertClassifFrzSep":
+        couple_prediction(model=cbertfrsp.CBertClassifFrzSep(), tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, parameters=parameters,
+                          train=cbertfrsp.train, test=cbertfrsp.test, name_wandb=name_wandb)
+    else:
+        print("Unknown model")
     
 
 if __name__ == "__main__":
@@ -259,16 +306,18 @@ if __name__ == "__main__":
         print("USAGE: python3 couple_prediction.py DATASET_PATH MODEL CONFIG_PATH BALANCE")
         print("where, DATASET_PATH is a .csv or .xlsx file")
         print("where, MODEL is the name of the model")
+        print("where, NAME_LOG is the name of the wandb log")
         print("where, BALANCE for balancing the dataset. Take one of ['unbalance' or 'balance'] default balance")
         exit()
 
     dataset_path = sys.argv[1]
     model_name = sys.argv[2]
     config_path = sys.argv[3]
+    name_wandb = sys.argv[4]
 
     balance = True
-    if len(sys.argv) == 5:
-        if(sys.argv[4] == "unbalance"):
+    if len(sys.argv) == 6:
+        if(sys.argv[5] == "unbalance"):
             balance = False
     
-    main(model_name=model_name, dataset_path=dataset_path, config_path=config_path, balance=balance)
+    main(model_name=model_name, dataset_path=dataset_path, config_path=config_path, balance=balance, name_wandb=name_wandb)
