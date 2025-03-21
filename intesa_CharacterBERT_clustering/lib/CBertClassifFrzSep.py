@@ -87,14 +87,17 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
 
         labels = torch.tensor(batch_y) 
         labels = labels.to(device)
-        labels = labels.unsqueeze(1)
 
-        optimizer.zero_grad()                               # Clear gradients
-        outputs = model(input_ids_1, input_ids_2)           # Forward pass
-        loss = criterion(outputs, labels.float())           # Compute loss
+        optimizer.zero_grad()
+
+        # Forward pass
+        outputs = model(input_ids_1, input_ids_2)           
+        
+        # Compute loss
+        loss = criterion(outputs, labels)           
         total_loss += loss.item()
         
-        # get eval metrics
+        # Metrics
         accuracy.update(outputs.cpu(), labels.cpu())
         precision.update(outputs.cpu(), labels.cpu())
         recall.update(outputs.cpu(), labels.cpu())
@@ -155,13 +158,12 @@ def test(model, X_test, y_test, batch_size, criterion):
 
             labels = torch.tensor(batch_y)
             labels = labels.to(device)
-            labels = labels.unsqueeze(1)
 
             # Forward pass
             outputs = model(input_ids_1, input_ids_2)
 
             # Compute loss
-            loss = criterion(outputs, labels.float())
+            loss = criterion(outputs, labels)
             total_loss += loss.item()
 
             # Metrics
