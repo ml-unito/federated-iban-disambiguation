@@ -14,7 +14,7 @@ from transformers import get_linear_schedule_with_warmup
 from lib.download import download_pre_trained_model
 from lib.trainingUtilities import EarlyStopping, SaveBestModel
 
-#download_pre_trained_model()
+download_pre_trained_model()
 
 import lib.CBertClassif as cbert
 import lib.CBertClassifFrz as cbertfr
@@ -239,7 +239,7 @@ def couple_prediction(model, tokenizer, dataset_path: str, balance: bool, parame
         wandb.init(
             project="fl-ner",
             entity="mlgroup",
-            tags=["flner", "test"],
+            tags=["flner", "test", "centralize"],
             name=name_wandb,
             config={
                 "batch_size": parameters["batch_size"],
@@ -264,6 +264,12 @@ def couple_prediction(model, tokenizer, dataset_path: str, balance: bool, parame
     metrics = test_model(model, X_test, y_test, criterion, parameters['batch_size'], test)
 
     if LOG_WANDB:
+        wandb.log({
+            "test_accuracy": metrics["accuracy"],
+            "test_precision": metrics["precision"],
+            "test_recall": metrics["recall"],
+            "test_f1": metrics["f1"]
+        })
         wandb.summary["test_accuracy"] = metrics["accuracy"]
         wandb.summary["test_precision"] = metrics["precision"]
         wandb.summary["test_recall"] = metrics["recall"]
@@ -297,7 +303,7 @@ def main(model_name: str, dataset_path: str, config_path: str, balance: bool, na
         couple_prediction(model=cbertfrsp.CBertClassifFrzSep(), tokenizer=tokenizer,dataset_path=dataset_path, balance=balance, parameters=parameters,
                           train=cbertfrsp.train, test=cbertfrsp.test, name_wandb=name_wandb)
     else:
-        print("Unknown model")
+        print("Error: unknown model.")
     
 
 if __name__ == "__main__":
