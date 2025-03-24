@@ -69,7 +69,7 @@ logger:
     name: WandBLog
     project: fl-ner
     entity: mlgroup
-    tags: ["flner", "test"]
+    tags: ["flner", "test", "fluke"]
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log
@@ -82,4 +82,4 @@ protocol:
     # Total number of clients partcipating in the federation
     n_clients: 1
     # Total number of rounds
-    n_rounds: 1
+    n_rounds: 20

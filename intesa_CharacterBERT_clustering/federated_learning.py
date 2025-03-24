@@ -12,7 +12,7 @@ from fluke.algorithms.fedavg import FedAVG
 from fluke.data.datasets import DataContainer, DummyDataContainer, FastDataLoader
 from fluke.evaluation import ClassificationEval
 # from lib.download import download_pre_trained_model
-# from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split
 from datetime import datetime
 from transformers import BertTokenizer
 
@@ -27,7 +27,8 @@ with open('./config/fl_parameters.json', "r") as data_file:
 	fl_parameters = json.load(data_file)
 
 
-DIR_DATASET_PATH = fl_parameters["dir_dataset_path"]
+# DIR_DATASET_PATH = "./dataset/4Clients/"  #fl_parameters["dir_dataset_path"]
+DIR_DATASET_PATH = "./dataset/Train/benchmark_intesa_preprocessed/"  
 EXP_PATH = fl_parameters["config"]["exp_path"]
 ALG_PATH = fl_parameters["config"]["alg_path"]
 SAVE_MODELS = fl_parameters["save_models"]
@@ -42,28 +43,45 @@ def extract_x_and_y(dataset: pd.DataFrame, tokenizer) -> list:
 
 
 def create_dummy_data_container(num_clients: int, client_test=False) -> DummyDataContainer:
-  # Loads client datasetS and server dataset
-  df_clients = [pd.read_csv(DIR_DATASET_PATH + "client" + str(i) + "_train_couple.csv") for i in range(1, num_clients+1)]
-  df_server = pd.read_csv(DIR_DATASET_PATH + "server_test_couple.csv")
-
   # Loads tokenizer
   tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
-  # Creates FastDataLoader for each client data
-  fdl_clients = []
-  for df_client in df_clients:
-    x, y = extract_x_and_y(df_client, tokenizer)
-    fdl = FastDataLoader(x, y, num_labels=2, batch_size=512)
-    fdl_clients.append(fdl)
-  
-  # Creates FastDataLoader for server data
-  x, y = extract_x_and_y(df_server, tokenizer)
-  fdl_server = FastDataLoader(x, y, num_labels=2, batch_size=512)
+  if num_clients == 1:
+    # Loads datasets
+    df = pd.read_csv(DIR_DATASET_PATH + "benchmark_intesa_preprocessed_couple.csv")
+    x, y = extract_x_and_y(df, tokenizer)
 
-  return DummyDataContainer(clients_tr=fdl_clients, 
-                            clients_te= [fdl_server]*num_clients if client_test else [None]*num_clients, 
-                            server_data=fdl_server, 
-                            num_classes=2)
+    X_train, X_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=42, stratify=y)
+    X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, train_size=0.5, random_state=42, stratify=y_test)
+
+    # Creates FastDataLoader for client data and server data
+    fdl_clt = FastDataLoader(X_train, y_train, num_labels=2, batch_size=512)
+    fdl_srv = FastDataLoader(X_test, y_test, num_labels=2, batch_size=512)
+
+    return DummyDataContainer(clients_tr=[fdl_clt], 
+                              clients_te=[fdl_srv] if client_test else [None], 
+                              server_data=fdl_srv, 
+                              num_classes=2)
+  else:
+    # Loads client datasets and server dataset
+    df_clients = [pd.read_csv(DIR_DATASET_PATH + "client" + str(i) + "_train_couple.csv") for i in range(1, num_clients+1)]
+    df_server = pd.read_csv(DIR_DATASET_PATH + "server_test_couple.csv")
+
+    # Creates FastDataLoader for each client data
+    fdl_clts = []
+    for df_client in df_clients:
+      x, y = extract_x_and_y(df_client, tokenizer)
+      fdl = FastDataLoader(x, y, num_labels=2, batch_size=512)
+      fdl_clts.append(fdl)
+    
+    # Creates FastDataLoader for server data
+    x, y = extract_x_and_y(df_server, tokenizer)
+    fdl_srv = FastDataLoader(x, y, num_labels=2, batch_size=512)
+
+    return DummyDataContainer(clients_tr=fdl_clts, 
+                              clients_te= [fdl_srv]*num_clients if client_test else [None]*num_clients, 
+                              server_data=fdl_srv, 
+                              num_classes=2)
 
 
 def load_parameters() -> list:
@@ -120,9 +138,10 @@ def main(log_name: str):
   
 
 if __name__ == "__main__":
-  if len(sys.argv) < 4:
+  if len(sys.argv) < 2:
     print("USAGE: python3 federated_learning.py LOG_NAME")
     exit()
-
+  
   log_name = sys.argv[1]
+
   main(log_name)

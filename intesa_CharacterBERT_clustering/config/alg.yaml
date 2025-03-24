@@ -10,15 +10,15 @@ hyperparameters:
         # Batch size
         batch_size: 512
         # Number of local epochs
-        epoch: 20
+        epoch: 1
         # The loss function (loss name from torch.nn)
         loss: CrossEntropyLoss
         # HPs of the optimizer (the type of optimizer depends on the algorithm)
         optimizer:
             # if omitted, the default optimizer is SGD (optimizer name from torch.optim)
             name: AdamW
-            lr: 0.01 #0.00005
-            weight_decay: 0.001
+            lr: 0.01
+            weight_decay: 0.0005
         # HPs of the scheduler (scheduler name from torch.optim.lr_scheduler)
         # this is optional
         scheduler:
