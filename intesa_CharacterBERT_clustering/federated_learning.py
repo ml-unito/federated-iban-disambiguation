@@ -11,12 +11,12 @@ from fluke.data import DataSplitter
 from fluke.algorithms.fedavg import FedAVG
 from fluke.data.datasets import DataContainer, DummyDataContainer, FastDataLoader
 from fluke.evaluation import ClassificationEval
-# from lib.download import download_pre_trained_model
+from lib.download import download_pre_trained_model
 from sklearn.model_selection import train_test_split
 from datetime import datetime
 from transformers import BertTokenizer
 
-# download_pre_trained_model()
+download_pre_trained_model()
 # from lib.CBertClassif import *
 from lib.CBertClassifFrz import *
 # from lib.CBertClassifFrzSep import *
@@ -27,8 +27,8 @@ with open('./config/fl_parameters.json', "r") as data_file:
 	fl_parameters = json.load(data_file)
 
 
-# DIR_DATASET_PATH = "./dataset/4Clients/"  #fl_parameters["dir_dataset_path"]
-DIR_DATASET_PATH = "./dataset/Train/benchmark_intesa_preprocessed/"  
+DIR_DATASET_PATH = "./dataset/4Clients/"  #fl_parameters["dir_dataset_path"]
+# DIR_DATASET_PATH = "./dataset/Train/benchmark_intesa_preprocessed/"  
 EXP_PATH = fl_parameters["config"]["exp_path"]
 ALG_PATH = fl_parameters["config"]["alg_path"]
 SAVE_MODELS = fl_parameters["save_models"]

@@ -52,6 +52,7 @@ exp:
     device: cuda:0
     # The seed (reproducibility)
     seed: 42
+    inmemory: true
 # Evaluation configuration
 eval:
     # The task to perform which determines the evaluation metric (only classification is currently supported)
@@ -69,7 +70,7 @@ logger:
     name: WandBLog
     project: fl-ner
     entity: mlgroup
-    tags: ["flner", "test", "fluke"]
+    tags: ["flner", "test", "fluke", "2 epochs", "4 clients", "10 rounds", "CBertClassifFrz"]
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log
@@ -80,6 +81,6 @@ protocol:
     # % of eligible clients, i.e., participants, in each round
     eligible_perc: 1
     # Total number of clients partcipating in the federation
-    n_clients: 1
+    n_clients: 4
     # Total number of rounds
-    n_rounds: 20
+    n_rounds: 10
