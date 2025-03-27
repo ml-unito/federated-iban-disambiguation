@@ -6,7 +6,7 @@ import yaml
 import time
 from fluke import DDict
 import fluke.utils.log as log
-from fluke import GlobalSettings
+from fluke import FlukeENV
 from fluke.data import DataSplitter
 from fluke.algorithms.fedavg import FedAVG
 from fluke.data.datasets import DataContainer, DummyDataContainer, FastDataLoader
@@ -97,7 +97,7 @@ def load_parameters() -> list:
 def main(log_name: str):
   config_exp, config_alg = load_parameters()
 
-  settings = GlobalSettings()
+  settings = FlukeENV()
   settings.set_seed(config_exp["exp"]["seed"])
   settings.set_device(config_exp["exp"]["device"]) 
 
