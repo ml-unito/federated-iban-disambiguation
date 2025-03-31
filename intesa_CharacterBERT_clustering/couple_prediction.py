@@ -52,8 +52,8 @@ def train_model(model, optimizer, scheduler, criterion, num_epochs: int, batch_s
     validation_accuracy = []
     validation_f1 = []
 
-    early_stopping_train = EarlyStopping(patience=3, delta=0.001)
-    early_stopping_val = EarlyStopping(patience=3, delta=0.001)
+    # early_stopping_train = EarlyStopping(patience=3, delta=0.001)
+    # early_stopping_val = EarlyStopping(patience=3, delta=0.001)
     saveCriteria = SaveBestModel(BEST_MODEL_PATH, 0.015)
     writeLog("\n\nTraining step")
     init = time.time()
@@ -68,16 +68,6 @@ def train_model(model, optimizer, scheduler, criterion, num_epochs: int, batch_s
         loss_t, metrics_t = train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler)
         training_loss.append(loss_t)
         training_accuracy.append(metrics_t["accuracy"])
-
-        if LOG_WANDB:
-            wandb.log({
-                "train_loss": loss_t,
-                "train_accuracy": metrics_t["accuracy"],
-                "train_precision": metrics_t["precision"],
-                "train_recall": metrics_t["recall"],
-                "train_f1": metrics_t["f1"],
-                "train_epoch": epoch
-            })
 
         # --------------------------------------
         # Evaluate on validation set
@@ -97,6 +87,12 @@ def train_model(model, optimizer, scheduler, criterion, num_epochs: int, batch_s
         
         if LOG_WANDB:
             wandb.log({
+                "train_loss": loss_t,
+                "train_accuracy": metrics_t["accuracy"],
+                "train_precision": metrics_t["precision"],
+                "train_recall": metrics_t["recall"],
+                "train_f1": metrics_t["f1"],
+                "train_epoch": epoch,
                 "val_loss": loss_v,
                 "val_accuracy": metrics_v["accuracy"],
                 "val_precision": metrics_v["precision"],
@@ -106,9 +102,9 @@ def train_model(model, optimizer, scheduler, criterion, num_epochs: int, batch_s
             })
         
         # Evaluate The early stopping
-        if early_stopping_train(loss_t) or early_stopping_val(loss_v):
-            writeLog("\nEarly stopping after {} epochs!".format(epoch + 1))
-            break
+        # if early_stopping_train(loss_t) or early_stopping_val(loss_v):
+        #     writeLog("\nEarly stopping after {} epochs!".format(epoch + 1))
+        #     break
     
     end = time.time()
     writeLog("\n\nTraining time: " + str((end - init) / 60) + " minutes")
