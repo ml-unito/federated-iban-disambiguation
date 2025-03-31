@@ -19,26 +19,25 @@ from fluke.utils import Configuration
 from fluke.utils import OptimizerConfigurator, get_loss, get_model
 from fluke.utils.log import get_logger
 from rich.progress import track
+from lib.datasetManipulation import *
 
 
 download_pre_trained_model()
 # from lib.CBertClassif import *
 from lib.CBertClassifFrz import *
-
 # from lib.CBertClassifFrzSep import *
-from lib.datasetManipulation import *
 
 
 with open("./config/fl_parameters.json", "r") as data_file:
     fl_parameters = json.load(data_file)
 
 
-DIR_DATASET_PATH = "./dataset/4Clients/"  # fl_parameters["dir_dataset_path"]
-# DIR_DATASET_PATH = "./dataset/Train/benchmark_intesa_preprocessed/"
+DIR_DATASET_PATH = "./dataset/4Clients/"
 EXP_PATH = fl_parameters["config"]["exp_path"]
 ALG_PATH = fl_parameters["config"]["alg_path"]
 SAVE_MODELS = fl_parameters["save_models"]
 PATH_SAVE_MODELS = fl_parameters["path_save_models"]
+
 
 
 def extract_x_and_y(dataset: pd.DataFrame, tokenizer) -> list:
@@ -103,6 +102,7 @@ def create_dummy_data_container(
             num_classes=2,
         )
 
+
 def load_parameters() -> list:
     config_file_exp = open(EXP_PATH)
     config_exp = yaml.safe_load(config_file_exp)
@@ -112,8 +112,8 @@ def load_parameters() -> list:
 
     return DDict(config_exp), DDict(config_alg)
 
-def clients_only():
 
+def clients_only():
     config_exp, config_alg = load_parameters()
 
     settings = FlukeENV()
@@ -160,13 +160,15 @@ def clients_only():
         optimizer_cfg = OptimizerConfigurator(
             optimizer_cfg=hp.client.optimizer, scheduler_cfg=hp.client.scheduler
         )
+        model.to(device)
         optimizer, scheduler = optimizer_cfg(model)
         evaluator = ClassificationEval(
             eval_every=1, n_classes=datasets.num_classes
         )
-        model.to(device)
+        
         for e in range(epochs):
             model.train()
+            model.to(device)
             for _, (X, y) in enumerate(train_loader):
                 X, y = X.to(device), y.to(device)
                 optimizer.zero_grad()
@@ -183,7 +185,7 @@ def clients_only():
 
         log.pretty_log(client_eval, title=f"Client [{i}] Performance")
         client_evals.append(client_eval)
-        model.cpu()
+        #model.cpu()
 
     for e in range(epochs):
         for c in running_evals:
@@ -194,4 +196,5 @@ def clients_only():
     log.pretty_log(client_mean, title="Overall local performance")
 
 
-clients_only()
+if __name__ == "__main__":
+    clients_only()
