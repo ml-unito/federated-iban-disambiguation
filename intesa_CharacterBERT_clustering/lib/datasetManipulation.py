@@ -42,7 +42,7 @@ def balance_dataset(dataset_train, label):
     return balancedDataset.sample(frac=1, random_state=42).reset_index(drop=True)
 
 
-def create_pairs(dataset):
+def create_pairs(dataset) -> pd.DataFrame:
     """ Create pairs of names with their labels. 
         We use the symbol '@' to separate the names.
     """
@@ -93,7 +93,7 @@ def prepocess_dataset(dataset):
     return dataset.drop_duplicates()
 
 
-def tokenize_dataset(dataframe, tokenizer):
+def tokenize_dataset(dataframe, tokenizer) -> list:
     """ 
         Tokenize the dataset for the encoding layer of the CharacterBERT model.
         The tokenization is done with the symbol '@' to separate the names.
@@ -105,7 +105,7 @@ def tokenize_dataset(dataframe, tokenizer):
         return dataframe['text'].apply(lambda x: ['[CLS]'] + tokenizer.tokenize(' '.join([x.split("@")[0]])) + ['[SEP]'] + tokenizer.tokenize(' '.join([x.split("@")[1]])) + ['[SEP]'])
         
 
-def tokenize_dataset_pair(dataframe, tokenizer):
+def tokenize_dataset_pair(dataframe, tokenizer) -> list:
     if not tokenizer:
         return dataframe['text'].apply(
             lambda x: 
