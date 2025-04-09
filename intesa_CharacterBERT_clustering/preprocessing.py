@@ -60,11 +60,11 @@ def remove_numbers_blocks(text: str) -> str:
   return text
 
 
-def dataset_preprocessing(dataset: pd.DataFrame) -> pd.DataFrame:
-  log = open("./out/log_dataset_preprocessing.txt", "w")
+def dataset_preprocessing(dataset: pd.DataFrame, name_log: str) -> pd.DataFrame:
+  log = open("./out/"+name_log+".txt", "w")
   log.write("NAMES CHANGED IN DATASET\n\n\n")
 
-  dataset = dataset.rename(columns={"Unnamed: 0": "index"})
+  dataset = dataset.reset_index()
   dataset.fillna(0, inplace=True)
   dataset["OldName"] = dataset["Name"]
 
@@ -111,9 +111,34 @@ def dataset_preprocessing(dataset: pd.DataFrame) -> pd.DataFrame:
 
 
 def main():
-  dataset = pd.read_csv("./dataset/benchmark_intesa.csv")
-  new_datasets = dataset_preprocessing(dataset=dataset)
-  new_datasets.to_csv("./dataset/benchmark_intesa_preprocessed.csv")
+  # dataset = pd.read_csv("./dataset/benchmark_intesa.csv")
+  # new_datasets = dataset_preprocessing(dataset=dataset)
+  # new_datasets.to_csv("./dataset/benchmark_intesa_preprocessed.csv")
+
+  df_client1 = pd.read_csv("./dataset/split_dataset/client1_train.csv")
+  df_client2 = pd.read_csv("./dataset/split_dataset/client2_train.csv")
+  df_client3 = pd.read_csv("./dataset/split_dataset/client3_train.csv")
+  df_client4 = pd.read_csv("./dataset/split_dataset/client4_train.csv")
+  df_test = pd.read_csv("./dataset/split_dataset/df_test.csv")
+  df_train = pd.read_csv("./dataset/split_dataset/df_train.csv")
+  
+  df_client1_new = dataset_preprocessing(dataset=df_client1, name_log="log_df_client1")
+  df_client1_new.to_csv("./dataset/split_dataset/client1_train_pp.csv")
+
+  df_client2_new = dataset_preprocessing(dataset=df_client2, name_log="log_df_client2")
+  df_client2_new.to_csv("./dataset/split_dataset/client2_train_pp.csv")
+
+  df_client3_new = dataset_preprocessing(dataset=df_client3, name_log="log_df_client3")
+  df_client3_new.to_csv("./dataset/split_dataset/client3_train_pp.csv")
+
+  df_client4_new = dataset_preprocessing(dataset=df_client4, name_log="log_df_client4")
+  df_client4_new.to_csv("./dataset/split_dataset/client4_train_pp.csv")
+
+  df_test_new = dataset_preprocessing(dataset=df_test, name_log="log_df_test")
+  df_test_new.to_csv("./dataset/split_dataset/test_pp.csv")
+
+  df_train_new = dataset_preprocessing(dataset=df_train, name_log="log_df_train")
+  df_train_new.to_csv("./dataset/split_dataset/train_pp.csv")
 
 
 
