@@ -26,6 +26,7 @@ class CBertClassifFrz(nn.Module):
         self.character_bert = CharacterBertModel.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
         
         # Freeze the CharacterBert model
+        self.character_bert.eval()
         for param in self.character_bert.parameters():
             param.requires_grad = False
             
