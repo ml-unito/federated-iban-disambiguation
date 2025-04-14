@@ -3,6 +3,7 @@ import sys
 import pandas as pd
 import json
 import yaml
+import os
 import time
 from typing import Tuple
 from fluke import DDict
@@ -33,13 +34,14 @@ ALG_PATH = fl_parameters["config"]["alg_path"]
 
 SAVE_MODELS = fl_parameters["save_models"]
 PATH_SAVE_MODELS = fl_parameters["path_save_models"]
+DATE_AND_TIME = str(datetime.now()).split(".")[0].replace(" ", "_")
 
 DIR_DATASET_PATH = fl_parameters["dir_dataset_path"]
 TRAIN_PATH = fl_parameters["train_path"]
 TEST_PATH = fl_parameters["test_path"]
 
 
-def extract_x_and_y(dataset: pd.DataFrame, tokenizer) -> list:
+def extract_x_and_y(dataset: pd.DataFrame, tokenizer) -> Tuple[torch.Tensor, torch.Tensor]:
   tokenized_texts = tokenize_dataset(dataset, tokenizer)
   x, y = lookup_table(tokenized_texts, dataset)
   return x, y
@@ -55,14 +57,14 @@ def create_couple_df(df_path: str) -> pd.DataFrame:
   return cp_df
 
 
-def create_dummy_data_container(num_clients: int, client_test=False) -> DummyDataContainer:
+def create_dummy_data_container(num_clients: int, train_path: str, test_path: str, dir_dataset_path: str, client_test=False) -> DummyDataContainer:
   # Loads tokenizer
   tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
   if num_clients == 1:
     # Loads datasets
-    cp_train_df = create_couple_df(df_path=TRAIN_PATH)
-    cp_test_df = create_couple_df(df_path=TEST_PATH)
+    cp_train_df = create_couple_df(df_path=train_path)
+    cp_test_df = create_couple_df(df_path=test_path)
 
     X_train, y_train = extract_x_and_y(cp_train_df, tokenizer)
     X_test, y_test = extract_x_and_y(cp_test_df, tokenizer)
@@ -77,8 +79,8 @@ def create_dummy_data_container(num_clients: int, client_test=False) -> DummyDat
                               num_classes=2)
   else:
     # Loads client datasets and server dataset
-    cp_df_clients = [create_couple_df(df_path=DIR_DATASET_PATH + "client" + str(i) + "_train_pp.csv") for i in range(1, num_clients+1)]
-    cp_df_server = create_couple_df(df_path=TEST_PATH)
+    cp_df_clients = [create_couple_df(df_path=dir_dataset_path + "client" + str(i) + "_train_pp.csv") for i in range(1, num_clients+1)]
+    cp_df_server = create_couple_df(df_path=test_path)
 
     # Creates FastDataLoader for each client data
     fdl_clts = []
@@ -97,24 +99,26 @@ def create_dummy_data_container(num_clients: int, client_test=False) -> DummyDat
                               num_classes=2)
 
 
-def load_parameters() -> Tuple[DDict, DDict]:
-  config_file_exp = open(EXP_PATH)
+def load_parameters(exp_path: str, alg_path: str) -> Tuple[DDict, DDict]:
+  config_file_exp = open(exp_path)
   config_exp = yaml.safe_load(config_file_exp)
 
-  config_file_alg = open(ALG_PATH)
+  config_file_alg = open(alg_path)
   config_alg = yaml.safe_load(config_file_alg)
 
   return DDict(config_exp), DDict(config_alg)
 
 
 def main(log_name: str):
-  config_exp, config_alg = load_parameters()
+  config_exp, config_alg = load_parameters(EXP_PATH, ALG_PATH)
 
   settings = FlukeENV()
   settings.set_seed(config_exp["exp"]["seed"])
   settings.set_device(config_exp["exp"]["device"]) 
 
-  datasets = create_dummy_data_container(num_clients=config_exp["protocol"]["n_clients"], client_test=True)
+  datasets = create_dummy_data_container(num_clients=config_exp["protocol"]["n_clients"], 
+                                         train_path=TRAIN_PATH, test_path=TEST_PATH, dir_dataset_path=DIR_DATASET_PATH, 
+                                         client_test=True)
 
   settings.set_evaluator(ClassificationEval(eval_every=1, n_classes=datasets.num_classes))
   settings.set_eval_cfg(config_exp["eval"])
@@ -135,8 +139,11 @@ def main(log_name: str):
   end_time = time.time()
 
   if SAVE_MODELS:
-    algorithm.save("./out/federated_learning_models/")
-    print("\nClients model and server model are saved in \"" + "./out/federated_learning_models\""+ " directory.\n")
+    if not os.path.exists(PATH_SAVE_MODELS):
+      os.makedirs(PATH_SAVE_MODELS)
+    os.makedirs(DATE_AND_TIME)
+    algorithm.save(PATH_SAVE_MODELS + DATE_AND_TIME)
+    print("\nClients model and server model are saved in \"" + PATH_SAVE_MODELS + DATE_AND_TIME + " directory.\n")
 
   # Adds information into log
   general_info_log = {}
