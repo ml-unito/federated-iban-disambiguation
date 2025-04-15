@@ -1,30 +1,19 @@
 import copy
-import sys
 import pandas as pd
 import json
-import yaml
-import time
-from fluke import DDict
-import fluke.utils.log as log
 from fluke import FlukeENV
 from fluke.data import DataSplitter
-from fluke.algorithms.fedavg import FedAVG
-from fluke.data.datasets import DataContainer, DummyDataContainer, FastDataLoader
 from fluke.evaluation import ClassificationEval
-from lib.download import download_pre_trained_model
-from sklearn.model_selection import train_test_split
-from datetime import datetime
-from transformers import BertTokenizer
-from fluke.utils import Configuration
 from fluke.utils import OptimizerConfigurator, get_loss, get_model
 from fluke.utils.log import get_logger
 from rich.progress import track
 from lib.datasetManipulation import *
+from federated_learning import load_parameters, create_dummy_data_container
 
 
-download_pre_trained_model()
-# from lib.CBertClassif import *
-from lib.CBertClassifFrz import *
+# download_pre_trained_model()
+from lib.CBertClassif import *
+# from lib.CBertClassifFrz import *
 # from lib.CBertClassifFrzSep import *
 
 
@@ -32,95 +21,25 @@ with open("./config/fl_parameters.json", "r") as data_file:
     fl_parameters = json.load(data_file)
 
 
-DIR_DATASET_PATH = "./dataset/4Clients/"
+DIR_DATASET_PATH = fl_parameters["dir_dataset_path"]
+TRAIN_PATH = fl_parameters["train_path"]
+TEST_PATH = fl_parameters["test_path"]
 EXP_PATH = fl_parameters["config"]["exp_path"]
 ALG_PATH = fl_parameters["config"]["alg_path"]
 SAVE_MODELS = fl_parameters["save_models"]
 PATH_SAVE_MODELS = fl_parameters["path_save_models"]
 
 
-
-def extract_x_and_y(dataset: pd.DataFrame, tokenizer) -> list:
-    tokenized_texts = tokenize_dataset(dataset, tokenizer)
-    x, y = lookup_table(tokenized_texts, dataset)
-    return x, y
-
-
-def create_dummy_data_container(
-    num_clients: int, client_test=False
-) -> DummyDataContainer:
-    # Loads tokenizer
-    tokenizer = BertTokenizer.from_pretrained(
-        "./character_bert_model/pretrained-models/general_character_bert/"
-    )
-
-    if num_clients == 1:
-        # Loads datasets
-        df = pd.read_csv(DIR_DATASET_PATH + "benchmark_intesa_preprocessed_couple.csv")
-        x, y = extract_x_and_y(df, tokenizer)
-
-        X_train, X_test, y_train, y_test = train_test_split(
-            x, y, train_size=0.8, random_state=42, stratify=y
-        )
-        X_test, X_val, y_test, y_val = train_test_split(
-            X_test, y_test, train_size=0.5, random_state=42, stratify=y_test
-        )
-
-        # Creates FastDataLoader for client data and server data
-        fdl_clt = FastDataLoader(X_train, y_train, num_labels=2, batch_size=512)
-        fdl_srv = FastDataLoader(X_test, y_test, num_labels=2, batch_size=512)
-
-        return DummyDataContainer(
-            clients_tr=[fdl_clt],
-            clients_te=[fdl_srv] if client_test else [None],
-            server_data=fdl_srv,
-            num_classes=2,
-        )
-    else:
-        # Loads client datasets and server dataset
-        df_clients = [
-            pd.read_csv(DIR_DATASET_PATH + "client" + str(i) + "_train_couple.csv")
-            for i in range(1, num_clients + 1)
-        ]
-        df_server = pd.read_csv(DIR_DATASET_PATH + "server_test_couple.csv")
-
-        # Creates FastDataLoader for each client data
-        fdl_clts = []
-        for df_client in df_clients:
-            x, y = extract_x_and_y(df_client, tokenizer)
-            fdl = FastDataLoader(x, y, num_labels=2, batch_size=512)
-            fdl_clts.append(fdl)
-
-        # Creates FastDataLoader for server data
-        x, y = extract_x_and_y(df_server, tokenizer)
-        fdl_srv = FastDataLoader(x, y, num_labels=2, batch_size=512)
-
-        return DummyDataContainer(
-            clients_tr=fdl_clts,
-            clients_te=[fdl_srv] * num_clients if client_test else [None] * num_clients,
-            server_data=fdl_srv,
-            num_classes=2,
-        )
-
-
-def load_parameters() -> list:
-    config_file_exp = open(EXP_PATH)
-    config_exp = yaml.safe_load(config_file_exp)
-
-    config_file_alg = open(ALG_PATH)
-    config_alg = yaml.safe_load(config_file_alg)
-
-    return DDict(config_exp), DDict(config_alg)
-
-
 def clients_only():
-    config_exp, config_alg = load_parameters()
+    config_exp, config_alg = load_parameters(EXP_PATH, ALG_PATH)
 
     settings = FlukeENV()
     settings.set_seed(config_exp["exp"]["seed"])
     settings.set_device(config_exp["exp"]["device"]) 
 
-    datasets = create_dummy_data_container(num_clients=config_exp["protocol"]["n_clients"], client_test=True)
+    datasets = create_dummy_data_container(num_clients=config_exp["protocol"]["n_clients"], 
+                                           train_path=TRAIN_PATH, test_path=TEST_PATH, dir_dataset_path=DIR_DATASET_PATH, 
+                                           client_test=True)
 
     settings.set_evaluator(ClassificationEval(eval_every=1, n_classes=datasets.num_classes))
     settings.set_eval_cfg(config_exp["eval"])
@@ -128,16 +47,12 @@ def clients_only():
     device = FlukeENV().get_device()
 
     hp = config_alg.hyperparameters
-    data_splitter = DataSplitter(
-        dataset=datasets
-    )
-    (clients_tr_data, clients_te_data), _ = data_splitter.assign(
-        config_exp.protocol.n_clients, hp.client.batch_size
-    )
+    data_splitter = DataSplitter(dataset=datasets)
+    (clients_tr_data, clients_te_data), _ = data_splitter.assign(config_exp.protocol.n_clients, hp.client.batch_size)
 
     criterion = get_loss(hp.client.loss)
     client_evals = []
-    epochs =20
+    epochs = 20
 
     progress = track(
         enumerate(zip(clients_tr_data, clients_te_data)),
