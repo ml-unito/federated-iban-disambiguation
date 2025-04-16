@@ -139,9 +139,6 @@ def main(log_name: str):
   end_time = time.time()
 
   if SAVE_MODELS:
-    if not os.path.exists(PATH_SAVE_MODELS):
-      os.makedirs(PATH_SAVE_MODELS)
-    os.makedirs(DATE_AND_TIME)
     algorithm.save(PATH_SAVE_MODELS + DATE_AND_TIME)
     print("\nClients model and server model are saved in \"" + PATH_SAVE_MODELS + DATE_AND_TIME + " directory.\n")
 
