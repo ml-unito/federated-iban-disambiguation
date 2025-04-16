@@ -10,7 +10,7 @@ hyperparameters:
         # Batch size
         batch_size: 512
         # Number of local epochs
-        epoch: 2
+        local_epochs: 2
         # The loss function (loss name from torch.nn)
         loss: CrossEntropyLoss
         # HPs of the optimizer (the type of optimizer depends on the algorithm)
