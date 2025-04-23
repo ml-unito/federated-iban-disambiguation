@@ -1,6 +1,9 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from lib.datasetManipulation import *
+import typer
+
+app = typer.Typer()
 
 DIR_PATH = "./dataset/"
 DATASET_PATH = "benchmark_intesa.csv"
@@ -20,7 +23,7 @@ def test_datasets(datasets: list, prob_shared: float):
 def split_dataset(dataset: pd.DataFrame, train_size: float, random_state=42):
   iban_list = dataset.AccountNumber.unique()
   isShared = dataset.groupby('AccountNumber', sort=False)['IsShared'].first().loc[iban_list].values
-  x_iban_list, y_iban_list = train_test_split(iban_list, train_size=train_size, stratify=isShared)#, random_state=random_state)
+  x_iban_list, y_iban_list = train_test_split(iban_list, train_size=train_size, stratify=isShared, random_state=random_state)
   
   df_x = dataset.loc[dataset.AccountNumber.isin(x_iban_list)]
   df_y = dataset.loc[dataset.AccountNumber.isin(y_iban_list)]
@@ -43,7 +46,7 @@ def get_shared_prob(df):
   return round(df[df['IsShared'] == 1]['AccountNumber'].nunique() / len(set(df["AccountNumber"])) * 100, 2)
 
 
-def create_train_test_split(dataset):
+def create_train_test_split(dataset, seed=42):
   generating = True
   num_generation = 0
 
@@ -52,12 +55,12 @@ def create_train_test_split(dataset):
     num_generation += 1
 
     # Split dataset for train and test (80-20)
-    df_train, df_test = split_dataset(dataset, train_size=0.8)
+    df_train, df_test = split_dataset(dataset, train_size=0.8, random_state=seed)
 
     # Split dataset between four client, with ratio 40-40-10-10
-    x,y = split_dataset(df_train, 0.8)
-    df_client1, df_client2 = split_dataset(x, 0.5)
-    df_client3, df_client4 = split_dataset(y, 0.5)
+    x,y = split_dataset(df_train, 0.8, random_state=seed)
+    df_client1, df_client2 = split_dataset(x, 0.5, random_state=seed)
+    df_client3, df_client4 = split_dataset(y, 0.5, random_state=seed)
 
     # Test datasets generated: if they not respects shared proportion, the new datasets will generate.
     is_correct = test_datasets(datasets=[df_test, df_train, df_client1, df_client2, df_client3, df_client4],
@@ -105,13 +108,12 @@ def generate_couple_datasets():
   print("Couple datasets is created.")
 
 
-
-def main():
+@app.command()
+def split(seed: int = 42):
   dataset = pd.read_csv(DIR_PATH + DATASET_PATH, index_col=0)
-
-  create_train_test_split(dataset)
+  create_train_test_split(dataset, seed=seed)
 
   
 
 if __name__ == "__main__":
-  main()
+  app()
