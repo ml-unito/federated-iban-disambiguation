@@ -4,3 +4,5 @@ wandb/
 intesa_CharacterBERT_clustering/venv.nosync
 intesa_CharacterBERT_clustering/.DS_Store
 .DS_Store
+venv.nosync/*
+.venv/

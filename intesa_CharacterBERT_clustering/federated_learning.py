@@ -5,7 +5,7 @@ import json
 import yaml
 import os
 import time
-from typing import Tuple
+from typing import Optional, Tuple
 from fluke import DDict
 import fluke.utils.log as log
 from fluke import FlukeENV
@@ -55,6 +55,25 @@ def create_couple_df(df_path: str) -> pd.DataFrame:
   cp_df = balance_dataset(cp_df, "label")
 
   return cp_df
+
+
+def create_data_container_with_full_dataset(num_clients: int, train_path: str, test_path: str, dir_dataset_path: str, client_test=False) -> DataContainer:  
+
+  # Loads tokenizer
+  tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
+
+  cp_train_df = create_couple_df(df_path=train_path)
+  cp_test_df = create_couple_df(df_path=test_path)
+
+  X_train, y_train = extract_x_and_y(cp_train_df, tokenizer)
+  X_test, y_test = extract_x_and_y(cp_test_df, tokenizer)
+
+  return DataContainer(X_train,
+                       y_train,
+                       X_test,
+                       y_test,
+                       2)
+
 
 
 def create_dummy_data_container(num_clients: int, train_path: str, test_path: str, dir_dataset_path: str, client_test=False) -> DummyDataContainer:
