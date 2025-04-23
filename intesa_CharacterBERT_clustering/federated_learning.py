@@ -57,7 +57,7 @@ def create_couple_df(df_path: str) -> pd.DataFrame:
   return cp_df
 
 
-def create_data_container_with_full_dataset(num_clients: int, train_path: str, test_path: str, dir_dataset_path: str, client_test=False) -> DataContainer:  
+def create_data_container_with_full_dataset(num_clients: int, train_path: str, test_path: str, dir_dataset_path: str, client_test=False, seed=None) -> DataContainer:  
 
   # Loads tokenizer
   tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
