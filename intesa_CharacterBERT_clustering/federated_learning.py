@@ -5,6 +5,7 @@ import json
 import yaml
 import os
 import time
+import torch
 from typing import Optional, Tuple
 from fluke import DDict
 import fluke.utils.log as log
@@ -20,8 +21,8 @@ from transformers import BertTokenizer
 from lib.datasetManipulation import *
 
 download_pre_trained_model()
-# from lib.CBertClassif import *
-from lib.CBertClassifFrz import *
+from lib.CBertClassif import *
+#from lib.CBertClassifFrz import *
 # from lib.CBertClassifFrzSep import *
 
 
@@ -76,7 +77,7 @@ def create_data_container_with_full_dataset(num_clients: int, train_path: str, t
 
 
 
-def create_dummy_data_container(num_clients: int, train_path: str, test_path: str, dir_dataset_path: str, client_test=False) -> DummyDataContainer:
+def create_dummy_data_container(num_clients: int, train_path: str, test_path: str, dir_dataset_path: str, client_test=False, seed=None) -> DummyDataContainer:
   # Loads tokenizer
   tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 

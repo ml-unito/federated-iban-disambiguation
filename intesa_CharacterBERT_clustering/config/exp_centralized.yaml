@@ -11,6 +11,7 @@ data:
         test_path: ./dataset/split_dataset/test_pp.csv
         dir_dataset_path: ./dataset/split_dataset/
         client_test: true
+        seed: 23517
         # Potential parameters for loading the dataset correctly
     #     # (see the documentation of fluke.data.datasets)
     #     # if no parameters are needed, simply do not specify anything
@@ -77,6 +78,7 @@ logger:
     name: WandBLog
     project: fl-ner
     entity: mlgroup
+    group: giulia-1
     tags: ["flner", "test", "fluke-centralized", "20 epochs", "CBertClassifFrz"]
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias

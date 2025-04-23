@@ -11,6 +11,7 @@ data:
         test_path: ./dataset/split_dataset/test_pp.csv
         dir_dataset_path: ./dataset/split_dataset/
         client_test: true
+        seed: 23517
         # Potential parameters for loading the dataset correctly
     #     # (see the documentation of fluke.data.datasets)
     #     # if no parameters are needed, simply do not specify anything
@@ -72,17 +73,21 @@ eval:
     server: true
     # Whether to evaluate the client local models on the server-side test set
     locals: false
+# Saving configuration
+save:
+    # The path where to save the models
+    path: ./out/fl_models
+    # The frequency of saving the models (in rounds)
+    save_every: 10
+    # Whether to save only the global model
+    global_only: true
 # Logger configuration
 logger:
     name: WandBLog
     project: fl-ner
     entity: mlgroup
+    group: giulia-1
     tags: ["flner", "test", "fluke", "2 local epochs", "4 clients", "10 rounds", "CBertClassifFrz"]
-# logger:
-#     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
-#     lname: Log
-#     # `wandb` parameters. Leave empty if `name` is `Log`
-#     params: null
 # FL protocol configuration
 protocol:
     # % of eligible clients, i.e., participants, in each round
