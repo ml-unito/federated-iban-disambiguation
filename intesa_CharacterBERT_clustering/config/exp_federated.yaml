@@ -1,4 +1,3 @@
----
 # Dataset configuration
 data:
     # Dataset loading config
@@ -59,7 +58,7 @@ exp:
     # The device to load the tensors (auto, cpu, cuda, mps, cuda:0, etc.)
     device: cuda:0
     # The seed (reproducibility)
-    seed: 42
+    seed: 23517
     inmemory: true
 # Evaluation configuration
 eval:
@@ -78,7 +77,8 @@ logger:
     name: WandBLog
     project: fl-ner
     entity: mlgroup
-    tags: ["fluke", "NERClassifier", "FrozenBert"]
+    group: Roberto-1
+    tags: ["flner", "federated", "NERClassifier", 'BertFrozen']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log
@@ -91,4 +91,4 @@ protocol:
     # Total number of clients partcipating in the federation
     n_clients: 4
     # Total number of rounds
-    n_rounds: 10
+    n_rounds: 20

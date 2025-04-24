@@ -5,12 +5,15 @@ from fluke.algorithms.lg_fedavg import LGFedAVGClient
 from torch.nn import Module
 from fluke.data import FastDataLoader
 from typing import Iterable
+from rich.console import Console
 
+console = Console()
 
 # PretrainedBert
 class PretrainedBertClient(LGFedAVGClient):
     def fit(self, override_local_epochs = 0):
-        if self._last_round == 0:
+        if self._last_round == 1:
+            console.log(f"Freezing bert modelf for client {self.index}")
             for param in self.model.get_local().parameters():
                 param.requires_grad = False 
 

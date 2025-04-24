@@ -22,9 +22,9 @@ class NERClassifier_D(nn.Module):
         hidden_logits = self.relu(self.hidden(pooled_output))
         logits = self.classifier(hidden_logits)
 
-        x = self.sigmoid(logits)
+        # x = self.sigmoid(logits)
 
-        return x
+        return logits
 
 class NERClassifier_E(nn.Module):
     def __init__(self):
