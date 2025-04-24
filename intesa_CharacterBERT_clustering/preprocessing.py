@@ -20,11 +20,11 @@ def generate_stop_words_regex() -> str:
     if len(words) > 1:
       regex += "("
       for word in words:
-        regex += "(" + word + ")" + "(\s{0,1})"
-      regex = regex[:-9] + ")|"
+        regex += r"(" + word + r")" + r"(\s{0,1})"
+      regex = regex[:-9] + r")|"
     elif len(words) == 1:
       word = words[0]
-      regex += "((\s){1}|^)("+ word +")((\s){1}|$)" + "|"
+      regex += r"((\s){1}|^)("+ word +r")((\s){1}|$)" + "|"
 
   regex = regex[:-1]
   
@@ -41,7 +41,7 @@ def remove_unnecessary_punctuation(text: str) -> str:
 
 
 def remove_multiple_spaces(text: str) -> str:
-	return re.sub(re.compile('\s+'), ' ', text)
+	return re.sub(re.compile(r'\s+'), ' ', text)
 
 
 def assign_most_common_name(names: str) -> str:
