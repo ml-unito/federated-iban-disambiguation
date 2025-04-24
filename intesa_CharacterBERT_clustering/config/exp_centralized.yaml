@@ -2,6 +2,7 @@
 data:
     # Dataset loading config
     dataset:
+        seed: 42
     #     # Dataset's name
     #     # Currently supported: mnist, svhn, mnistm, femnist, emnist, cifar10, cifar100,
     #     #                      tiny_imagenet, shakespeare, fashion_mnist, cinic10
@@ -77,6 +78,7 @@ logger:
     name: WandBLog
     project: fl-ner
     entity: mlgroup
+    group: Roberto-1
     tags: ["flner", "test", "fluke-centralized", "20 epochs", "CBertClassifFrz"]
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias

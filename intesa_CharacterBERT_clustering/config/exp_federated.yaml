@@ -1,3 +1,4 @@
+---
 # Dataset configuration
 data:
     # Dataset loading config
@@ -77,7 +78,7 @@ logger:
     name: WandBLog
     project: fl-ner
     entity: mlgroup
-    tags: ["flner", "test", "fluke", "2 local epochs", "4 clients", "10 rounds", "CBertClassifFrz"]
+    tags: ["fluke", "NERClassifier", "FrozenBert"]
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log
