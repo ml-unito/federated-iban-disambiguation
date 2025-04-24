@@ -37,9 +37,7 @@ class NERClassifier_E(nn.Module):
         return outputs
 
 class NERClassifier(nets.EncoderHeadNet):
-    def __init__(self,
-                hidden_size: tuple[int, int] = (200, 100),
-                softmax: bool = False):
+    def __init__(self):
         """
         NERClassifier is a neural network model for Named Entity Recognition (NER) tasks.
         """
