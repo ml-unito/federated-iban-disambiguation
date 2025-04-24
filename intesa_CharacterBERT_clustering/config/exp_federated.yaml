@@ -65,11 +65,11 @@ eval:
     # The task to perform which determines the evaluation metric (only classification is currently supported)
     task: classification
     # Whether to evaluate the client model before the client local training starts
-    pre_fit: false
+    pre_fit: true
     # Whether to evaluate the client model after the client local training
-    post_fit: false
+    post_fit: true
     # Whether to evaluate the global model on the server-side test set
-    server: true
+    server: false
     # Whether to evaluate the client local models on the server-side test set
     locals: false
 # Logger configuration

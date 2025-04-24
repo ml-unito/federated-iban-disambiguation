@@ -56,7 +56,7 @@ data:
 # Generic settings for the experiment
 exp:
     # The device to load the tensors (auto, cpu, cuda, mps, cuda:0, etc.)
-    device: cpu
+    device: cuda:0
     # The seed (reproducibility)
     seed: 42
     inmemory: true
