@@ -1,0 +1,32 @@
+# Hyperparameters (HPs) of the algorithm
+# Name of the algorithm: this must be the fully qualified name of the algorithm's class
+# This means that you can define your own algorithm and use it here
+# name: fluke.algorithms.fedavg.FedAVG
+name: lib.algorithms.PretrainedBertClient
+# Please refer to the algorithm's implementation to know which are its HPs
+hyperparameters:
+    # HPs of the clients
+    client:
+        batch_size: 512
+        local_epochs: 2
+        bert_pretrain_epochs: 10
+        bert_freeze_params: true
+        loss: CrossEntropyLoss
+        optimizer:
+            name: AdamW
+            lr: 0.01
+            weight_decay: 0.0005
+        scheduler:
+            # if omitted, the default scheduler is StepLR
+            name: StepLR
+            gamma: 0.995
+            step_size: 10
+        model: lib.models.NERClassifier
+    server:
+        # Whether to weight the client's contribution
+        # If not hyperparametera are needed set to {}
+        weighted: true
+    # The model (neural network) to federate.
+    # This can be the name of a neural network included in `fluke.nets` or
+    # the fully qualified name of an user defined class
+    model: lib.models.NERClassifier_D
