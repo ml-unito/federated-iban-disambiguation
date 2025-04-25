@@ -64,17 +64,10 @@ class PretrainedBertClient(LGFedAVGClient):
                 loss.backward()
                 optimizer.step()
 
-
-        
-            
-
-
 class PretrainedBert(PersonalizedFL):
     def get_client_class(self):
         return PretrainedBertClient
     
-    def get_server_class(self):
-        return PretrainedBertServer
 
 # LocalBert
 
