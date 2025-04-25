@@ -9,8 +9,8 @@ from rich.console import Console
 
 console = Console()
 
-# PretrainedBert
-class PretrainedBertClient(LGFedAVGClient):
+# FrozenBert
+class FrozenBertClient(LGFedAVGClient):
     def fit(self, override_local_epochs = 0):
         if self._last_round == 1:
             console.log(f"Freezing bert modelf for client {self.index}")
@@ -20,24 +20,24 @@ class PretrainedBertClient(LGFedAVGClient):
         return super().fit(override_local_epochs)
 
 
-class PretrainedBert(PersonalizedFL):
-    def get_client_class(self):
-        return PretrainedBertClient
-
-# FrozenBert
-
-class FrozenBertClient(Client):
-    pass
-
-class FrozenBertServer(Server):
-    pass
-
 class FrozenBert(PersonalizedFL):
     def get_client_class(self):
         return FrozenBertClient
+
+# FrozenBert
+
+class PretrainedBertClient(Client):
+    pass
+
+class PretrainedBertServer(Server):
+    pass
+
+class PretrainedBert(PersonalizedFL):
+    def get_client_class(self):
+        return PretrainedBertClient
     
     def get_server_class(self):
-        return FrozenBertServer
+        return PretrainedBertServer
 
 # LocalBert
 
