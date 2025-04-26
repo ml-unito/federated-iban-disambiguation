@@ -5,10 +5,7 @@ from fluke.algorithms.lg_fedavg import LGFedAVGClient
 from torch.nn import Module
 from fluke.data import FastDataLoader
 from typing import Iterable
-from rich.console import Console
 from fluke.utils import FlukeENV
-
-console = Console()
 
 # FrozenBert
 class FrozenBertClient(LGFedAVGClient):
