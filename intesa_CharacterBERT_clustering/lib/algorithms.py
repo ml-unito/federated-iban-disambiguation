@@ -25,8 +25,7 @@ class FrozenBert(PersonalizedFL):
     def get_client_class(self):
         return FrozenBertClient
 
-# FrozenBert
-
+# PretrainedBert
 class PretrainedBertClient(LGFedAVGClient):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
