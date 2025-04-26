@@ -1,17 +1,12 @@
-from fluke.client import Client
-from fluke.server import Server
 from fluke.algorithms import PersonalizedFL
 from fluke.algorithms.lg_fedavg import LGFedAVGClient
-from torch.nn import Module
-from fluke.data import FastDataLoader
-from typing import Iterable
 from fluke.utils import FlukeENV
 
 # FrozenBert
 class FrozenBertClient(LGFedAVGClient):
     def fit(self, override_local_epochs = 0):
         console = FlukeENV().get_progress_bar('clients').console
-        
+
         if self._last_round == 1:
             console.log(f"Freezing bert modelf for client {self.index}")
             for param in self.model.get_local().parameters():
