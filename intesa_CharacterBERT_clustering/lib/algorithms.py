@@ -29,6 +29,13 @@ class FrozenBert(PersonalizedFL):
 class PretrainedBertClient(LGFedAVGClient):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        if not "bert_pretrain_epochs" in kwargs:
+            raise ValueError("bert_pretrain_epochs is required")
+        
+        if not "bert_freeze_params" in kwargs:
+            raise ValueError("bert_freeze_params is required")
+
         self.hyper_params.update(bert_pretrain_epochs=kwargs["bert_pretrain_epochs"])
         self.hyper_params.update(bert_freeze_params=kwargs["bert_freeze_params"])
 
@@ -46,23 +53,7 @@ class PretrainedBertClient(LGFedAVGClient):
     
     def pretrain_bert(self):
         # Pretrain the BERT model on local data
-        # This is a placeholder for the actual pretraining logic
-        # Implement your pretraining logic here
-        
-        bert = self.model.get_local()
-        bert.train()
-
-        optimizer = self.optimizer_cfg.get_optimizer(bert.parameters())
-        for epoch in range(self.hyper_params.bert_pretrain_epochs):
-            console.log(f"Pretraining BERT model for client {self.index} - Epoch {epoch + 1}/{self.local_epochs}")
-            # Iterate over the training set
-            for batch in self.train_set:
-                inputs, labels = batch
-                optimizer.zero_grad()
-                outputs = bert(inputs)
-                loss = self.loss_fn(outputs, labels)
-                loss.backward()
-                optimizer.step()
+        super().fit(override_local_epochs=self.hyper_params.bert_pretrain_epochs)
 
 class PretrainedBert(PersonalizedFL):
     def get_client_class(self):
@@ -70,16 +61,21 @@ class PretrainedBert(PersonalizedFL):
     
 
 # LocalBert
+# ------------------------------------------------------
+# Not necessary? It should be exactly as PretrainedBert, but without the
+# pretraining step and the freeze of the bert model parameters.
+# In the end one can use the PretrainedBertClient with 0 epochs and 
+# False for the freeze parameter.
 
-class LocalBertClient(Client):
-    pass
+# class LocalBertClient(Client):
+#     pass
 
-class LocalBertServer(Server):
-    pass
+# class LocalBertServer(Server):
+#     pass
 
-class LocalBert(PersonalizedFL):
-    def get_client_class(self):
-        return LocalBertClient
+# class LocalBert(PersonalizedFL):
+#     def get_client_class(self):
+#         return LocalBertClient
     
-    def get_server_class(self):
-        return LocalBertServer
+#     def get_server_class(self):
+#         return LocalBertServer

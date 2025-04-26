@@ -2,7 +2,7 @@
 # Name of the algorithm: this must be the fully qualified name of the algorithm's class
 # This means that you can define your own algorithm and use it here
 # name: fluke.algorithms.fedavg.FedAVG
-name: lib.algorithms.PretrainedBertClient
+name: lib.algorithms.PretrainedBert
 # Please refer to the algorithm's implementation to know which are its HPs
 hyperparameters:
     # HPs of the clients
