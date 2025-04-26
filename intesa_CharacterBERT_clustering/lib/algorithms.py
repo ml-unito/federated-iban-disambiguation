@@ -6,6 +6,7 @@ from torch.nn import Module
 from fluke.data import FastDataLoader
 from typing import Iterable
 from rich.console import Console
+from fluke.utils import FlukeENV
 
 console = Console()
 
@@ -53,7 +54,11 @@ class PretrainedBertClient(LGFedAVGClient):
     
     def pretrain_bert(self):
         # Pretrain the BERT model on local data
+        console = FlukeENV().get_progress_bar('clients').console
+        console.log(f"Pretraining BERT model for client {self.index}")
         super().fit(override_local_epochs=self.hyper_params.bert_pretrain_epochs)
+        console.log(f"Finished pretraining BERT model for client {self.index}")
+
 
 class PretrainedBert(PersonalizedFL):
     def get_client_class(self):
