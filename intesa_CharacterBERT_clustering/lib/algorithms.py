@@ -45,11 +45,6 @@ class PretrainedBertClient(LGFedAVGClient):
         if self._last_round == 1:
             self.pretrain_bert()
 
-            # Freeze BERT model parameters if specified
-            if self.hyper_params.bert_freeze_params:
-                for param in self.model.get_local().parameters():
-                    param.requires_grad = False
-
         return super().fit(override_local_epochs)
     
     def pretrain_bert(self):
@@ -59,6 +54,11 @@ class PretrainedBertClient(LGFedAVGClient):
         super().fit(override_local_epochs=self.hyper_params.bert_pretrain_epochs)
         console.log(f"Finished pretraining BERT model for client {self.index}")
 
+        # Freeze BERT model parameters if specified
+        if self.hyper_params.bert_freeze_params:
+            console.log(f"Freezing BERT model parameters for client {self.index}")
+            for param in self.model.get_local().parameters():
+                param.requires_grad = False
 
 class PretrainedBert(PersonalizedFL):
     def get_client_class(self):
