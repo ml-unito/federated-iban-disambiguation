@@ -10,6 +10,8 @@ from fluke.utils import FlukeENV
 # FrozenBert
 class FrozenBertClient(LGFedAVGClient):
     def fit(self, override_local_epochs = 0):
+        console = FlukeENV().get_progress_bar('clients').console
+        
         if self._last_round == 1:
             console.log(f"Freezing bert modelf for client {self.index}")
             for param in self.model.get_local().parameters():
