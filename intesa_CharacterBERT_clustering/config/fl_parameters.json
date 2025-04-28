@@ -6,6 +6,6 @@
   "dir_dataset_path": "./dataset/split_dataset/",
   "train_path": "./dataset/split_dataset/train_pp.csv",
   "test_path": "./dataset/split_dataset/test_pp.csv",
-  "save_models": false,
-  "path_save_models": "./out/federated_learning_models/"
+  "save_models": true,
+  "path_save_models": "./out/fl_models/"
 }
