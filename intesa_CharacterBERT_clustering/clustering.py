@@ -13,6 +13,7 @@ from lib.datasetManipulation import *
 from transformers import BertTokenizer
 from lib.download import download_pre_trained_model
 from lib.trainingUtilities import compute_metrics
+from tqdm import tqdm
 
 download_pre_trained_model()
 import lib.CBertClassif as cbert
@@ -25,10 +26,10 @@ JSON_NAME = "clusters_" + DATE_NAME + ".json"
 DATASET_BUILD = "labelled_testSet_" + DATE_NAME + ".csv"
 DEBUG_MODE = False
 DEVICE = "cuda:0"
-LOG_WANDB = True
+LOG_WANDB = False
 
 # parameters
-saveToFile = SaveOutput('./out/clustering/Log/', LOG_NAME, printAll=True, debug=DEBUG_MODE)
+saveToFile = SaveOutput('./out/clustering/Log/', LOG_NAME, printAll=False, debug=DEBUG_MODE)
 with open('./config/parameters.json', "r") as data_file:
     parameters = json.load(data_file)
 batch_size = parameters['batch_size']
@@ -97,7 +98,60 @@ def eval_is_shared_pred(account_entities: dict):
             num_iban_correct_pred_shared += 1
     
     return real, predictions, num_iban_correct_pred_shared
-    
+
+
+def find_partial_cliques(G: nx.Graph, min_size=3, max_size=6, tolerance=1):
+    partial_cliques = []
+
+    nodes = list(G.nodes)
+    for k in range(min_size, max_size + 1):
+        for subset in combinations(nodes, k):
+            subgraph = G.subgraph(subset)
+            num_edges = subgraph.number_of_edges()
+            max_edges = k * (k - 1) // 2
+            missing_edges = max_edges - num_edges
+
+            if missing_edges <= tolerance:
+                score = num_edges / max_edges
+                partial_cliques.append((subset, score, missing_edges))
+
+    partial_cliques.sort(key=lambda x: (-len(x[0]), -x[1], x[2]))  # prioritize larger cliques, higher scores, fewer missing
+    return partial_cliques
+
+
+def create_clusters_from_cliques(G: nx.Graph, iban: str, account_entities: dict, df: pd.DataFrame):
+    # cliques = find_partial_cliques(G)
+
+    # for clique, score, missing in cliques:
+    #     saveToFile(f"Clique: {clique}, Score: {score:.2f}, Missing Edges: {missing}")
+
+    #     clique_list = list(clique)
+    #     representative_name = max(clique, key=len)
+    #     r_nodes = [el for el in clique_list]
+    #     account_entities[iban]['holders'].append({
+    #         "cluster_name": representative_name,
+    #         "names_list": r_nodes,
+    #         "holder_from_cluster_name": df[(df['Name'] == representative_name) & (df['AccountNumber'] == iban)]['Holder'].tolist()[0]
+    #     })
+    pass
+
+
+def create_clusters_from_connected_components(G: nx.Graph, iban: str, account_entities: dict, df: pd.DataFrame):
+    '''Create the clusters by listing the connected components and selecting the
+      representative as the longest name in each cluster'''
+
+    clusters = list(nx.connected_components(G))
+
+    for cluster in clusters:
+        cluster_list = list(cluster)
+        representative_name = max(cluster, key=len)
+        r_nodes = [el for el in cluster_list]
+        account_entities[iban]['holders'].append({
+            "cluster_name": representative_name,
+            "names_list": r_nodes,
+            "holder_from_cluster_name": df[(df['Name'] == representative_name) & (df['AccountNumber'] == iban)]['Holder'].tolist()[0]
+        })
+
 
 def create_graph(names1: list, names2: list, predicted: list, iban) -> nx.Graph:
     '''Create the graph of connected components per IBAN.'''
@@ -106,7 +160,8 @@ def create_graph(names1: list, names2: list, predicted: list, iban) -> nx.Graph:
     G.add_nodes_from(list(set(names1) | set(names2)))
     
     for i in range(len(predicted)): # Add edges based on predictions
-        if predicted[i] == 0: G.add_edge(names1[i], names2[i])
+        if predicted[i] == 0: 
+            G.add_edge(names1[i], names2[i])
 
     if len(predicted) != len(names1):
         saveToFile(iban +  " " + str(len(predicted)) + " " + str(len(names1)) + " " + str(len(names2)))
@@ -119,7 +174,7 @@ def clustering(couple_df: pd.DataFrame, df: pd.DataFrame) -> dict:
 
     couple_df_groupby_iban = couple_df.groupby("iban")
 
-    for _, group in couple_df_groupby_iban:
+    for _, group in tqdm(couple_df_groupby_iban, desc="Creates clusters"):
         shared = group['IsShared'].iloc[0]
         iban = group['iban'].iloc[0]
         names1 = group['name1'].tolist()
@@ -134,21 +189,8 @@ def clustering(couple_df: pd.DataFrame, df: pd.DataFrame) -> dict:
 
         G = create_graph(names1, names2, predicted, iban)
 
-        # -------------------------------------------------------
-        # Create the clusters by listing the connected components
-        # and selecting the representative as the longest name in each cluster
-        # -------------------------------------------------------
-        clusters = list(nx.connected_components(G))
-
-        for cluster in clusters:
-            cluster_list = list(cluster)
-            representative_name = max(cluster, key=len)
-            r_nodes = [el for el in cluster_list]
-            account_entities[iban]['holders'].append({
-                    "cluster_name": representative_name,
-                    "names_list": r_nodes,
-                    "holder_from_cluster_name": df[(df['Name'] == representative_name) & (df['AccountNumber'] == iban)]['Holder'].tolist()[0]
-            })
+        create_clusters_from_connected_components(G, iban, account_entities, df)
+        # create_clusters_from_cliques(G, iban, account_entities, df)
     
     return account_entities
 
@@ -217,7 +259,7 @@ def load_model_with_weigths(model_name: str, path_weigths_model: str):
     else:
         print("Error: unknown model.")
 
-    weights = torch.load(path_weigths_model, weights_only=True)["modopt"]["model"]
+    weights = torch.load(path_weigths_model, weights_only=True)["modopt"]["model"] #errore con caricamento server fluke
     model.load_state_dict(weights)
     model.eval()
 
@@ -381,7 +423,7 @@ def main(model_name: str, weights_path: str, dataset_path: str):
     saveToFile("Loading dataset and model...")
     saveToFile("Dataset loaded...\n")
     
-    accounts_disambiguation(model_name, weights_path, dataset)
+    accounts_disambiguation(model_name, weights_path, dataset[:35])
 
     
 if __name__ == "__main__":
