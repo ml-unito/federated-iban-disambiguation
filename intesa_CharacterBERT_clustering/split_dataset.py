@@ -47,44 +47,38 @@ def get_shared_prob(df):
 
 
 def create_train_test_split(dataset, seed=42):
-  generating = True
-  num_generation = 0
+  # Split dataset for train and test (80-20)
+  df_train, df_test = split_dataset(dataset, train_size=0.8, random_state=seed)
 
-  print("Generating datasets ...")
-  while generating and num_generation <= 10:
-    num_generation += 1
+  # Split dataset between four client, with ratio 40-40-10-10
+  x,y = split_dataset(df_train, 0.8, random_state=seed)
+  df_client1, df_client2 = split_dataset(x, 0.5, random_state=seed)
+  df_client3, df_client4 = split_dataset(y, 0.5, random_state=seed)
 
-    # Split dataset for train and test (80-20)
-    df_train, df_test = split_dataset(dataset, train_size=0.8, random_state=seed)
-
-    # Split dataset between four client, with ratio 40-40-10-10
-    x,y = split_dataset(df_train, 0.8, random_state=seed)
-    df_client1, df_client2 = split_dataset(x, 0.5, random_state=seed)
-    df_client3, df_client4 = split_dataset(y, 0.5, random_state=seed)
-
-    # Test datasets generated: if they not respects shared proportion, the new datasets will generate.
-    is_correct = test_datasets(datasets=[df_test, df_train, df_client1, df_client2, df_client3, df_client4],
-                  prob_shared=get_shared_prob(dataset))
-    
-    if is_correct:
-      generating = False
-      print(f"Original dataset:\tlen {len(dataset)}\t\t\t prob shared {get_shared_prob(dataset)}")
-      print(f"\nclient1:\tlen {len(df_client1)}\t prob shared {get_shared_prob(df_client1)}")
-      print(f"client2:\tlen {len(df_client2)}\t prob shared {get_shared_prob(df_client2)}")
-      print(f"client3:\tlen {len(df_client3)}\t\t prob shared {get_shared_prob(df_client3)}")
-      print(f"client4:\tlen {len(df_client4)}\t\t prob shared {get_shared_prob(df_client4)}")
-      print(f"test:\t\tlen {len(df_test)}\t\t prob shared {get_shared_prob(df_test)}")
-      print(f"train:\t\tlen {len(df_train)}\t\t prob shared {get_shared_prob(df_train)}")
-      
-      # Save all dataset generated
-      if SAVE_DATASETS:
-        df_client1.to_csv(DIR_PATH + "split_dataset/client1_train.csv")
-        df_client2.to_csv(DIR_PATH + "split_dataset/client2_train.csv")
-        df_client3.to_csv(DIR_PATH + "split_dataset/client3_train.csv")
-        df_client4.to_csv(DIR_PATH + "split_dataset/client4_train.csv")
-        df_test.to_csv(DIR_PATH + "split_dataset/df_test.csv")
-        df_train.to_csv(DIR_PATH + "split_dataset/df_train.csv")
-        print("Datasets saved into " + DIR_PATH + "split_dataset/ directory.")
+  # Test datasets generated on shared proportion
+  is_correct = test_datasets(datasets=[df_test, df_train, df_client1, df_client2, df_client3, df_client4],
+                prob_shared=get_shared_prob(dataset))
+  if not is_correct:
+    print("Error of split generation: shared proportion is not respected.")
+    exit()
+  
+  print(f"Original dataset:\tlen {len(dataset)}\t\t\t prob shared {get_shared_prob(dataset)}")
+  print(f"\nclient1:\tlen {len(df_client1)}\t prob shared {get_shared_prob(df_client1)}")
+  print(f"client2:\tlen {len(df_client2)}\t prob shared {get_shared_prob(df_client2)}")
+  print(f"client3:\tlen {len(df_client3)}\t\t prob shared {get_shared_prob(df_client3)}")
+  print(f"client4:\tlen {len(df_client4)}\t\t prob shared {get_shared_prob(df_client4)}")
+  print(f"test:\t\tlen {len(df_test)}\t prob shared {get_shared_prob(df_test)}")
+  print(f"train:\t\tlen {len(df_train)}\t prob shared {get_shared_prob(df_train)}")
+  
+  # Save all dataset generated
+  if SAVE_DATASETS:
+    df_client1.to_csv(DIR_PATH + "split_dataset/client1_train.csv")
+    df_client2.to_csv(DIR_PATH + "split_dataset/client2_train.csv")
+    df_client3.to_csv(DIR_PATH + "split_dataset/client3_train.csv")
+    df_client4.to_csv(DIR_PATH + "split_dataset/client4_train.csv")
+    df_test.to_csv(DIR_PATH + "split_dataset/df_test.csv")
+    df_train.to_csv(DIR_PATH + "split_dataset/df_train.csv")
+    print("Datasets saved into " + DIR_PATH + "split_dataset/ directory.")
 
 
 def generate_couple_datasets():
