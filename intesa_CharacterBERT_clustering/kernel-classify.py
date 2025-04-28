@@ -32,14 +32,29 @@ def load_data(train_path: str, test_path: str):
 
     return train_df, test_df
 
+def get_features_from_pairs(s1, s2, n_features=4):
+    return [
+        sk.spectrum_kernel([s1], [s2], p=i)[0].item() for i in range(1, n_features + 1)
+    ]
 
-def save_data(fname, data):
-    sims =  [[sk.spectrum_kernel([s1],[s2],p=4)[0].item(), label] for s1,s2,label in data.itertuples(index=False)]
+def save_data(fname, data, oversample=False):
+    n_features = 7
+    sims = [ get_features_from_pairs(s1, s2, n_features=n_features) + [label] for s1, s2, label in data.itertuples(index=False)]
+    
+    if oversample:
+        from imblearn.over_sampling import SMOTE
+        sm = SMOTE(random_state=42)
+        X = [s[:n_features] for s in sims]
+        y = [s[n_features] for s in sims]
+
+        console.log(f"Oversampling data")
+        X_res, y_res = sm.fit_resample(X, y)
+        sims = [[*s[:n_features], label] for s, label in zip(X_res, y_res)]
 
     with open(fname, "w") as f:
-        f.write("similarity,label\n")
+        f.write(f"{','.join([f'p{i}' for i in range(1,n_features+1)])},label\n")
         for sim in sims:
-            f.write(f"{sim[0]},{sim[1]}\n")
+            f.write(f",".join([str(s) for s in sim]) + "\n")
     
 def data_already_saved():
     if os.path.exists("dataset/similarity_train.csv") and os.path.exists("dataset/similarity_test.csv"):
@@ -64,7 +79,7 @@ if not data_already_saved():
 
     if not os.path.exists("dataset/similarity_train.csv"):
         console.log("Saving train data")
-        save_data("dataset/similarity_train.csv", train)
+        save_data("dataset/similarity_train.csv", train, oversample=True)
 
     if not os.path.exists("dataset/similarity_test.csv"):
         console.log("Saving test data")
@@ -77,90 +92,26 @@ train, test = load_sim_data(
     test_path="dataset/similarity_test.csv"
 )
 
-console.log(f"train: {train.head()}")
-console.log(f"test: {test.head()}")
+# import logistic regression
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, accuracy_score
 
-console.log(f"min train: {train['similarity'].min()}")
-console.log(f"max train: {train['similarity'].max()}")
-console.log(f"min test: {test['similarity'].min()}")
-console.log(f"max test: {test['similarity'].max()}")
-
-train_max = int(train['similarity'].max())
-
-fps = []
-tps = []
-
-fps_test = []
-tps_test = []
-
-accuracy_train = []
-accuracy_test = []
-
-for threshold in range(train_max+1):
-    console.log(f"Threshold: {threshold}")
-    predicted_train = train['similarity'].apply(lambda x: 1 if x <= threshold else 0)
-    predicted_test = test['similarity'].apply(lambda x: 1 if x <= threshold else 0)
-
-    # print confusion matrix using sklearn
-    from sklearn.metrics import confusion_matrix
-    from sklearn.metrics import classification_report
-    from sklearn.metrics import accuracy_score
-
-    train_labels = train['label']
-    test_labels = test['label']
-    train_confusion_matrix = confusion_matrix(train_labels, predicted_train)
-    test_confusion_matrix = confusion_matrix(test_labels, predicted_test)
-
-    fps.append(train_confusion_matrix[0][1])
-    tps.append(train_confusion_matrix[1][1])
-
-    fps_test.append(test_confusion_matrix[0][1])
-    tps_test.append(test_confusion_matrix[1][1])
-
-    accuracy_score_train = accuracy_score(train_labels, predicted_train)
-    accuracy_score_test = accuracy_score(test_labels, predicted_test)
-
-    accuracy_train.append(accuracy_score_train)
-    accuracy_test.append(accuracy_score_test)
+# normalize using minmax scaler
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+train.iloc[:, :-1] = scaler.fit_transform(train.iloc[:, :-1])
+test.iloc[:, :-1] = scaler.transform(test.iloc[:, :-1])
 
 
-print("Max accuracy train: ", max(accuracy_train))
-print("Max accuracy test: ", max(accuracy_test))
-print("Max accuracy train index: ", accuracy_train.index(max(accuracy_train)))
-print("Max accuracy test index: ", accuracy_test.index(max(accuracy_test)))
+lr = LogisticRegression(max_iter=1000)
+train_x = train.iloc[:, :-1].values
+train_y = train.iloc[:, -1].values
+test_x = test.iloc[:, :-1].values
+test_y = test.iloc[:, -1].values
+lr.fit(train_x, train_y)
+predictions = lr.predict(test_x)
+console.log(f"Accuracy: {accuracy_score(test_y, predictions)}")
+console.log(f"Classification report:\n {classification_report(test_y, predictions)}")
 
-threshold = accuracy_train.index(max(accuracy_train))
-predicted_train = train['similarity'].apply(lambda x: 1 if x <= threshold else 0)
-predicted_test = test['similarity'].apply(lambda x: 1 if x <= threshold else 0)
-confusion_matrix_train = confusion_matrix(train_labels, predicted_train)
-confusion_matrix_test = confusion_matrix(test_labels, predicted_test)
-print("Train confusion matrix: ", confusion_matrix_train)
-print("Test confusion matrix: ", confusion_matrix_test)
-
-
-from matplotlib import pyplot as plt
-plt.plot(fps, tps, label="train")    
-plt.xlabel("False Positives")
-plt.ylabel("True Positives")
-plt.title("False Positives vs True Positives")
-plt.legend()
-plt.savefig("dataset/false_positives_vs_true_positives.png")
-plt.clf()
-
-plt.plot(fps_test, tps_test, label="test")
-plt.xlabel("False Positives")
-plt.ylabel("True Positives")
-plt.title("False Positives vs True Positives")
-plt.legend()
-plt.savefig("dataset/false_positives_vs_true_positives_test.png")
-plt.clf()
-
-plt.plot(range(train_max+1), accuracy_train, label="train")
-plt.plot(range(train_max+1), accuracy_test, label="test")
-plt.xlabel("Threshold")
-plt.ylabel("Accuracy")
-plt.title("Accuracy vs Threshold")
-plt.legend()
-plt.savefig("dataset/accuracy_vs_threshold.png")
-
-
+console.log(f"Coefs: {lr.coef_}")
+console.log(f"Intercept: {lr.intercept_}")
