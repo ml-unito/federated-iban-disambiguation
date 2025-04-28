@@ -41,12 +41,9 @@ def balance_dataset(dataset_train, label):
     # Shuffle dataset
     return balancedDataset.sample(frac=1, random_state=42).reset_index(drop=True)
 
+from typing import List, Tuple
 
-def create_pairs(dataset) -> pd.DataFrame:
-    """ Create pairs of names with their labels. 
-        We use the symbol '@' to separate the names.
-    """
-    
+def labeled_pairs(dataset) -> Tuple[List[Tuple[str, str]], List[int]]:
     pairs = []
     labels = []
     grouped = dataset.groupby('AccountNumber')
@@ -58,11 +55,11 @@ def create_pairs(dataset) -> pd.DataFrame:
             names = group['Name'].tolist()
             clusters = group['cluster'].tolist()
             if(len(names)) == 1:
-                pairs.append(" @ ".join([names[0], names[0]]))
+                pairs.append([names[0], names[0]])
                 labels.append(0)
             else:
                 for (name1, cluster1), (name2, cluster2) in combinations(zip(names, clusters), 2):
-                    pairs.append(" @ ".join([name1, name2]))
+                    pairs.append([name1, name2])
                     labels.append(0 if cluster1 == cluster2 else 1)
             
     else:
@@ -70,13 +67,20 @@ def create_pairs(dataset) -> pd.DataFrame:
             names = group['Name'].tolist()
             holders = group['Holder'].tolist()
             if(len(names)) == 1:
-                pairs.append(" @ ".join([names[0], names[0]]))
+                pairs.append([names[0], names[0]])
                 labels.append(0)
             else:
                 for (name1, holder1), (name2, holder2) in combinations(zip(names, holders), 2):
-                    pairs.append(" @ ".join([name1, name2]))
+                    pairs.append([name1, name2])
                     labels.append(0 if holder1 == holder2 else 1)
     
+    return pairs, labels
+
+
+def create_pairs(dataset) -> pd.DataFrame:
+    pairs,labels = labeled_pairs(dataset)
+
+    pairs = ['@'.join(pair) for pair in pairs]
     
     df = pd.DataFrame()
     df['text'] = pairs
