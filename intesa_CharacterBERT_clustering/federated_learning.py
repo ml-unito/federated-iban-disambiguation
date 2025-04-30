@@ -19,7 +19,6 @@ from datetime import datetime
 from transformers import BertTokenizer
 from lib.datasetManipulation import *
 
-download_pre_trained_model()
 # from lib.CBertClassif import *
 from lib.CBertClassifFrz import *
 # from lib.CBertClassifFrzSep import *
@@ -177,7 +176,8 @@ if __name__ == "__main__":
   if len(sys.argv) < 2:
     print("USAGE: python3 federated_learning.py LOG_NAME")
     exit()
-  
+
   log_name = sys.argv[1]
 
+  download_pre_trained_model()
   main(log_name)

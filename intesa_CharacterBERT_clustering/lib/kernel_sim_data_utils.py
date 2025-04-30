@@ -56,6 +56,7 @@ def tokenize(s: str):
 
     return batch_ids
 
+
 def bert_similarity(s1, s2, use_bert=False) -> list[float]:
     if not use_bert:
         return []
