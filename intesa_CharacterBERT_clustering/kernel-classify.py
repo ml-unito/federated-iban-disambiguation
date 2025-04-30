@@ -148,7 +148,7 @@ def nn_classify(seed: int, bert: bool = False):
     wandb.init(
         project="fl-ner",
         entity="mlgroup",
-        name=f"kernel-mlp-{seed}",
+        name=f"kernel-mlp-{seed}" if not bert else f"kernel-mlp-{seed}-w-bert",
         group="Roberto-1",
         tags=["flner", "centralized", "spectrum-kernel", "mlp", "w-bert"],
         config={
