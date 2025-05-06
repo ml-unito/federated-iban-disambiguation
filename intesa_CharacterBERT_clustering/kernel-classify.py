@@ -9,7 +9,7 @@ from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 
 from lib.datasetManipulation import labeled_pairs
-from lib.kernel_sim_data_utils import load_df, load_sim_data, save_sim_data
+from lib.kernel_sim_data_utils import load_df, load_sim_data, save_sim_data, load_client_df
 import lib.string_kernels as sk
 from federated_learning import create_couple_df
 
@@ -24,10 +24,11 @@ import wandb
 app = Typer()
 console = Console()
 
-DF_TRAIN_PATH = "dataset/split_dataset/df_train.csv"
-DF_TEST_PATH = "dataset/split_dataset/df_test.csv"
+DF_TRAIN_PATH = "dataset/split_dataset/df_train_pp.csv"
+DF_TEST_PATH = "dataset/split_dataset/df_test_pp.csv"
 SIM_TRAIN_PATH = "dataset/similarity_train_seed_%d%s.csv"
 SIM_TEST_PATH = "dataset/similarity_test_seed_%d%s.csv"
+DF_DIR_PATH = "dataset/split_dataset/"
 
 # COMMANDS
 
@@ -52,6 +53,17 @@ def create_dataset(seed: int, n_features: int = 7, overwrite: bool = False, use_
     else:
         console.log("Saving test data")
         save_sim_data(sim_test_path, test, n_features, oversample=False, use_bert=use_bert)
+
+@app.command()
+def create_clients_datasets(seed: int, clients: int, n_features: int = 7, overwrite: bool = False, use_bert: bool = True):
+    for client in range(1, clients+1):
+        sim_path = "dataset/similarity_client" + str(client) + "_train_seed_" + str(seed) + ("_w-bert" if use_bert else "") + ".csv"
+        df_client = load_client_df(DF_DIR_PATH + "client" + str(client) + "_train_pp.csv")
+        if os.path.exists(sim_path) and not overwrite:
+            console.log(f"Client " + str(client) + " train data already exists at {sim_path}")
+        else:
+            console.log("Saving client " + str(client) + " train data")
+            save_sim_data(sim_path, df_client, n_features, oversample=True, use_bert=use_bert)
 
 @app.command()
 def show_dataset(seed: int):

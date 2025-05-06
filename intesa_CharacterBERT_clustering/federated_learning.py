@@ -19,6 +19,9 @@ from datetime import datetime
 from transformers import BertTokenizer
 from lib.datasetManipulation import *
 
+from lib.kernel_sim_data_utils import load_sim_data
+from sklearn.preprocessing import MinMaxScaler
+
 # from lib.CBertClassif import *
 from lib.CBertClassifFrz import *
 # from lib.CBertClassifFrzSep import *
@@ -57,7 +60,6 @@ def create_couple_df(df_path: str) -> pd.DataFrame:
 
 
 def create_data_container_with_full_dataset(num_clients: int, train_path: str, test_path: str, dir_dataset_path: str, client_test=False, seed=None) -> DataContainer:  
-
   # Loads tokenizer
   tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
@@ -72,7 +74,6 @@ def create_data_container_with_full_dataset(num_clients: int, train_path: str, t
                        X_test,
                        y_test,
                        2)
-
 
 
 def create_dummy_data_container(num_clients: int, train_path: str, test_path: str, dir_dataset_path: str, client_test=False) -> DummyDataContainer:
@@ -115,6 +116,54 @@ def create_dummy_data_container(num_clients: int, train_path: str, test_path: st
                               clients_te= [fdl_srv]*num_clients if client_test else [None]*num_clients, 
                               server_data=fdl_srv, 
                               num_classes=2)
+
+
+def create_dc_kernel(sim_train_path: str, sim_test_path: str, seed: int, bert: bool) -> DataContainer:
+  train, test = load_sim_data(
+      train_path=sim_train_path % (seed, "_w-bert" if bert else ""),
+      test_path=sim_test_path % (seed, "_w-bert" if bert else "")
+  )
+  
+  scaler = MinMaxScaler()
+  train.iloc[:, :-1] = scaler.fit_transform(train.iloc[:, :-1])
+  test.iloc[:, :-1] = scaler.transform(test.iloc[:, :-1])
+
+  # Convert data to PyTorch tensors
+  train_x = torch.tensor(train.iloc[:, :-1].values, dtype=torch.float32)
+  train_y = torch.tensor(train.iloc[:, -1].values, dtype=torch.long)
+  test_x = torch.tensor(test.iloc[:, :-1].values, dtype=torch.float32)
+  test_y = torch.tensor(test.iloc[:, -1].values, dtype=torch.long)
+
+  return DataContainer(train_x, train_y, test_x, test_y, 2)
+
+
+def create_ddc_kernel(clients: int, sim_train_path: str, sim_test_path: str, seed: int, bert: bool, client_test: bool=False) -> DummyDataContainer:
+  df_clients = [pd.read_csv(sim_train_path % (n, seed, "_w-bert" if bert else "")) for n in range(1,clients+1)]
+  df_server = pd.read_csv(sim_test_path % (seed, "_w-bert" if bert else ""))
+
+  # Creates FastDataLoader for each client data
+  fdl_clts = []
+  scaler = MinMaxScaler()
+  for df_client in df_clients:
+    df_client.iloc[:, :-1] = scaler.fit_transform(df_client.iloc[:, :-1])
+
+    x = torch.tensor(df_client.iloc[:, :-1].values, dtype=torch.float32)
+    y = torch.tensor(df_client.iloc[:, -1].values, dtype=torch.long)
+    
+    fdl = FastDataLoader(x, y, num_labels=2, batch_size=1024)
+    fdl_clts.append(fdl)
+  
+  # Creates FastDataLoader for server data
+  df_server.iloc[:, :-1] = scaler.fit_transform(df_server.iloc[:, :-1])
+
+  x = torch.tensor(df_server.iloc[:, :-1].values, dtype=torch.float32)
+  y = torch.tensor(df_server.iloc[:, -1].values, dtype=torch.long)
+  fdl_srv = FastDataLoader(x, y, num_labels=2, batch_size=1024)
+
+  return DummyDataContainer(clients_tr=fdl_clts,
+                            clients_te= [fdl_srv]*clients if client_test else [None]*clients, 
+                            server_data=fdl_srv, 
+                            num_classes=2)
 
 
 def load_parameters(exp_path: str, alg_path: str) -> Tuple[DDict, DDict]:

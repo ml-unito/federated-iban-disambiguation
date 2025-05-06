@@ -34,6 +34,16 @@ def load_df(train_path: str, test_path: str):
 
     return train_df, test_df
 
+def load_client_df(df_path: str):
+    cp_df = pd.read_csv(df_path)
+    pairs, labels = labeled_pairs(cp_df)
+    xy = list(zip(pairs, labels))
+
+    xy = [[pair[0], pair[1], label] for pair, label in xy]
+    df = pd.DataFrame(xy, columns=["str1", "str2", "label"])
+
+    return df
+
 def kernel_features_from_pairs(s1, s2, n_features=4):
     return [
         sk.spectrum_kernel([s1], [s2], p=i)[0].item() for i in range(1, n_features + 1)
