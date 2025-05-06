@@ -179,7 +179,7 @@ def main(log_name: str):
   settings.set_seed(config_exp["exp"]["seed"])
   settings.set_device(config_exp["exp"]["device"]) 
 
-  datasets = create_dummy_data_container(num_clients=config_exp["protocol"]["n_clients"], 
+  datasets = create_ddc_cbert(num_clients=config_exp["protocol"]["n_clients"], 
                                          train_path=TRAIN_PATH, test_path=TEST_PATH, dir_dataset_path=DIR_DATASET_PATH, 
                                          client_test=True)
 
