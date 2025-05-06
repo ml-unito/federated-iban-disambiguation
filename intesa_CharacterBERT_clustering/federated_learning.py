@@ -59,7 +59,7 @@ def create_couple_df(df_path: str) -> pd.DataFrame:
   return cp_df
 
 
-def create_data_container_with_full_dataset(num_clients: int, train_path: str, test_path: str, dir_dataset_path: str, client_test=False, seed=None) -> DataContainer:  
+def create_dc_cbert(train_path: str, test_path: str) -> DataContainer:  
   # Loads tokenizer
   tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
@@ -69,14 +69,10 @@ def create_data_container_with_full_dataset(num_clients: int, train_path: str, t
   X_train, y_train = extract_x_and_y(cp_train_df, tokenizer)
   X_test, y_test = extract_x_and_y(cp_test_df, tokenizer)
 
-  return DataContainer(X_train,
-                       y_train,
-                       X_test,
-                       y_test,
-                       2)
+  return DataContainer(X_train, y_train, X_test, y_test, 2)
 
 
-def create_dummy_data_container(num_clients: int, train_path: str, test_path: str, dir_dataset_path: str, client_test=False) -> DummyDataContainer:
+def create_ddc_cbert(num_clients: int, train_path: str, test_path: str, dir_dataset_path: str, client_test=False) -> DummyDataContainer:
   # Loads tokenizer
   tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 

@@ -2,16 +2,12 @@
 data:
     # Dataset loading config
     dataset:
-        seed: 42
     #     # Dataset's name
     #     # Currently supported: mnist, svhn, mnistm, femnist, emnist, cifar10, cifar100,
     #     #                      tiny_imagenet, shakespeare, fashion_mnist, cinic10
-        name: federated_learning.create_data_container_with_full_dataset
-        num_clients: 4
+        name: federated_learning.create_dc_cbert
         train_path: ./dataset/split_dataset/train_pp.csv
         test_path: ./dataset/split_dataset/test_pp.csv
-        dir_dataset_path: ./dataset/split_dataset/
-        client_test: true
         # Potential parameters for loading the dataset correctly
     #     # (see the documentation of fluke.data.datasets)
     #     # if no parameters are needed, simply do not specify anything
