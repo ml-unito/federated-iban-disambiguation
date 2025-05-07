@@ -8,10 +8,8 @@ from sklearn.metrics import classification_report, accuracy_score
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 
-from lib.datasetManipulation import labeled_pairs
 from lib.kernel_sim_data_utils import load_df, load_sim_data, save_sim_data, load_client_df
 import lib.string_kernels as sk
-from federated_learning import create_couple_df
 
 from lib.mlp import MLP
 from torch.utils.data import DataLoader, TensorDataset
@@ -86,7 +84,6 @@ def classify(seed: int):
     train.iloc[:, :-1] = scaler.fit_transform(train.iloc[:, :-1])
     test.iloc[:, :-1] = scaler.transform(test.iloc[:, :-1])
 
-
     lr = LogisticRegression(max_iter=1000)
     train_x = train.iloc[:, :-1].values
     train_y = train.iloc[:, -1].values
@@ -116,7 +113,6 @@ def classify(seed: int):
     )
 
     # create wandb table for the performance metrics
-    table = wandb.Table(columns=["metric", "value"])
     cr_test = classification_report(test_y, test_preds, output_dict=True)
     cr_train = classification_report(train_y, lr.predict(train_x), output_dict=True)
 
@@ -139,8 +135,6 @@ def classify(seed: int):
 
     wandb.log({"train_metrics": train_table})
     wandb.log({"test_metrics": test_table})
-    
-
     wandb.log({"train_accuracy": accuracy_score(train_y, train_preds)})
     wandb.log({"test_accuracy": accuracy_score(test_y, test_preds)})
     wandb.log({"train_macro_f1": cr_train["macro avg"]["f1-score"]})
@@ -179,10 +173,8 @@ def nn_classify(seed: int, bert: bool = False):
     test_x = torch.tensor(test.iloc[:, :-1].values, dtype=torch.float32)
     test_y = torch.tensor(test.iloc[:, -1].values, dtype=torch.long)
     train_dataset = TensorDataset(train_x, train_y)
-    test_dataset = TensorDataset(test_x, test_y)
     train_loader = DataLoader(train_dataset, batch_size=1024, shuffle=True)
-    # test_loader = DataLoader(test_dataset, batch_size=1024, shuffle=False)
-
+    
     # Initialize model, loss function, and optimizer
     model = MLP(input_dim=train_x.shape[1], hidden_dim=128, output_dim=2)
     model = model.to("cuda:0")
@@ -214,7 +206,6 @@ def nn_classify(seed: int, bert: bool = False):
                     
                     train_accuracy = cr_train["accuracy"]
                     test_accuracy = cr_test["accuracy"]
-
                     train_f1 = cr_train["macro avg"]["f1-score"]
                     test_f1 = cr_test["macro avg"]["f1-score"]
                     f1_train_label_1 = cr_train["1"]["f1-score"]
@@ -241,24 +232,27 @@ def nn_classify(seed: int, bert: bool = False):
     with torch.no_grad():
         train_preds = model(train_x.to("cuda:0")).argmax(dim=1).cpu().numpy()
         test_preds = model(test_x.to("cuda:0")).argmax(dim=1).cpu().numpy()
-        train_accuracy = accuracy_score(train_y.numpy(), train_preds)
-        test_accuracy = accuracy_score(test_y.numpy(), test_preds)
+
         train_cr = classification_report(train_y.numpy(), train_preds, output_dict=True)
         test_cr = classification_report(test_y.numpy(), test_preds, output_dict=True)
+
         console.log(f"Train classification report:\n {train_cr}")
         console.log(f"Test classification report:\n {test_cr}")
+        
         train_table = wandb.Table(columns=["metric", "value"])
-        train_table.add_data("accuracy", train_accuracy)
+        train_table.add_data("accuracy", train_cr["accuracy"])
         train_table.add_data("macro_f1", train_cr["macro avg"]["f1-score"])
         train_table.add_data("precision", train_cr["macro avg"]["precision"])
         train_table.add_data("recall", train_cr["macro avg"]["recall"])
         train_table.add_data("support", train_cr["macro avg"]["support"])
+
         test_table = wandb.Table(columns=["metric", "value"])
-        test_table.add_data("accuracy", test_accuracy)
+        test_table.add_data("accuracy", test_cr["accuracy"])
         test_table.add_data("macro_f1", test_cr["macro avg"]["f1-score"])
         test_table.add_data("precision", test_cr["macro avg"]["precision"])
         test_table.add_data("recall", test_cr["macro avg"]["recall"])
         test_table.add_data("support", test_cr["macro avg"]["support"])
+        
         wandb.log({"train_metrics": train_table})
         wandb.log({"test_metrics": test_table})
         
