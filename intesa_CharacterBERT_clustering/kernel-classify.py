@@ -29,6 +29,60 @@ DF_TEST_PATH = "dataset/split_dataset/df_test.csv"
 SIM_TRAIN_PATH = "dataset/similarity_train_seed_%d%s.csv"
 SIM_TEST_PATH = "dataset/similarity_test_seed_%d%s.csv"
 
+def log_metrics(step, model, train_x, train_y, test_x, test_y, running_loss, print_classification_report=False):
+    with torch.no_grad():
+        train_preds = model(train_x.to("cuda:0")).argmax(dim=1).cpu().numpy()
+        test_preds = model(test_x.to("cuda:0")).argmax(dim=1).cpu().numpy()
+
+        cr_train = classification_report(train_y.numpy(), train_preds, output_dict=True)
+        cr_train_str = classification_report(train_y.numpy(), train_preds, output_dict=False)
+        cr_test = classification_report(test_y.numpy(), test_preds, output_dict=True)
+        cr_test_str = classification_report(test_y.numpy(), test_preds, output_dict=False)
+        
+        train_accuracy = cr_train["accuracy"]
+        test_accuracy = cr_test["accuracy"]
+        train_f1 = cr_train["macro avg"]["f1-score"]
+        test_f1 = cr_test["macro avg"]["f1-score"]
+        f1_train_label_1 = cr_train["1"]["f1-score"]
+        f1_train_label_0 = cr_train["0"]["f1-score"]
+        f1_test_label_1 = cr_test["1"]["f1-score"]
+        f1_test_label_0 = cr_test["0"]["f1-score"]
+        precizione_train_label_1 = cr_train["1"]["precision"]
+        precision_train_label_0 = cr_train["0"]["precision"]
+        precision_test_label_1 = cr_test["1"]["precision"]
+        precision_test_label_0 = cr_test["0"]["precision"]
+        recall_train_label_1 = cr_train["1"]["recall"]
+        recall_train_label_0 = cr_train["0"]["recall"]
+        recall_test_label_1 = cr_test["1"]["recall"]
+        recall_test_label_0 = cr_test["0"]["recall"]
+
+        if print_classification_report:
+            console.print("Train classification report")
+            console.print(cr_train_str)
+            console.print("Test classification report")
+            console.print(cr_test_str)
+
+        wandb.log(step =step, 
+                    data={
+            "train_loss": running_loss / step,
+            "train_accuracy": train_accuracy,
+            "test_accuracy": test_accuracy,
+            "train_macro_f1": train_f1,
+            "test_macro_f1": test_f1,
+            "train_f1_label_1": f1_train_label_1,
+            "train_f1_label_0": f1_train_label_0,
+            "test_f1_label_1": f1_test_label_1,
+            "test_f1_label_0": f1_test_label_0,
+            "train_precision_label_1": precizione_train_label_1,
+            "train_precision_label_0": precision_train_label_0,
+            "test_precision_label_1": precision_test_label_1,
+            "test_precision_label_0": precision_test_label_0,
+            "train_recall_label_1": recall_train_label_1,
+            "train_recall_label_0": recall_train_label_0,
+            "test_recall_label_1": recall_test_label_1,
+            "test_recall_label_0": recall_test_label_0
+        })
+
 # COMMANDS
 
 @app.command()
@@ -149,8 +203,8 @@ def nn_classify(seed: int, bert: bool = False):
         project="fl-ner",
         entity="mlgroup",
         name=f"kernel-mlp-{seed}" if not bert else f"kernel-mlp-{seed}-w-bert",
-        group="Roberto-1",
-        tags=["flner", "centralized", "spectrum-kernel", "mlp", "w-bert"],
+        group="w-bert" if bert else "no-bert",
+        tags=["flner", "centralized", "spectrum-kernel", "mlp", "w-bert" if bert else "no-bert"],
         config={
             "seed": seed,
             "train_size": len(train),
@@ -166,8 +220,8 @@ def nn_classify(seed: int, bert: bool = False):
     train_y = torch.tensor(train.iloc[:, -1].values, dtype=torch.long)
     test_x = torch.tensor(test.iloc[:, :-1].values, dtype=torch.float32)
     test_y = torch.tensor(test.iloc[:, -1].values, dtype=torch.long)
+
     train_dataset = TensorDataset(train_x, train_y)
-    test_dataset = TensorDataset(test_x, test_y)
     train_loader = DataLoader(train_dataset, batch_size=1024, shuffle=True)
     # test_loader = DataLoader(test_dataset, batch_size=1024, shuffle=False)
 
@@ -193,62 +247,12 @@ def nn_classify(seed: int, bert: bool = False):
 
             if step % 10 == 0:
                 model.eval()
-                with torch.no_grad():
-                    train_preds = model(train_x.to("cuda:0")).argmax(dim=1).cpu().numpy()
-                    test_preds = model(test_x.to("cuda:0")).argmax(dim=1).cpu().numpy()
-
-                    cr_train = classification_report(train_y.numpy(), train_preds, output_dict=True)
-                    cr_test = classification_report(test_y.numpy(), test_preds, output_dict=True)
-                    
-                    train_accuracy = cr_train["accuracy"]
-                    test_accuracy = cr_test["accuracy"]
-
-                    train_f1 = cr_train["macro avg"]["f1-score"]
-                    test_f1 = cr_test["macro avg"]["f1-score"]
-                    f1_train_label_1 = cr_train["1"]["f1-score"]
-                    f1_train_label_0 = cr_train["0"]["f1-score"]
-                    f1_test_label_1 = cr_test["1"]["f1-score"]
-                    f1_test_label_0 = cr_test["0"]["f1-score"]
-
-                    wandb.log(step =step, 
-                              data={
-                        "train_loss": running_loss / step,
-                        "train_accuracy": train_accuracy,
-                        "test_accuracy": test_accuracy,
-                        "train_macro_f1": train_f1,
-                        "test_macro_f1": test_f1,
-                        "train_f1_label_1": f1_train_label_1,
-                        "train_f1_label_0": f1_train_label_0,
-                        "test_f1_label_1": f1_test_label_1,
-                        "test_f1_label_0": f1_test_label_0
-                    })
-                    model.train()
+                log_metrics(step, model, train_x, train_y, test_x, test_y, running_loss)
+                model.train()
         
     # Evaluate the model
     model.eval()
-    with torch.no_grad():
-        train_preds = model(train_x.to("cuda:0")).argmax(dim=1).cpu().numpy()
-        test_preds = model(test_x.to("cuda:0")).argmax(dim=1).cpu().numpy()
-        train_accuracy = accuracy_score(train_y.numpy(), train_preds)
-        test_accuracy = accuracy_score(test_y.numpy(), test_preds)
-        train_cr = classification_report(train_y.numpy(), train_preds, output_dict=True)
-        test_cr = classification_report(test_y.numpy(), test_preds, output_dict=True)
-        console.log(f"Train classification report:\n {train_cr}")
-        console.log(f"Test classification report:\n {test_cr}")
-        train_table = wandb.Table(columns=["metric", "value"])
-        train_table.add_data("accuracy", train_accuracy)
-        train_table.add_data("macro_f1", train_cr["macro avg"]["f1-score"])
-        train_table.add_data("precision", train_cr["macro avg"]["precision"])
-        train_table.add_data("recall", train_cr["macro avg"]["recall"])
-        train_table.add_data("support", train_cr["macro avg"]["support"])
-        test_table = wandb.Table(columns=["metric", "value"])
-        test_table.add_data("accuracy", test_accuracy)
-        test_table.add_data("macro_f1", test_cr["macro avg"]["f1-score"])
-        test_table.add_data("precision", test_cr["macro avg"]["precision"])
-        test_table.add_data("recall", test_cr["macro avg"]["recall"])
-        test_table.add_data("support", test_cr["macro avg"]["support"])
-        wandb.log({"train_metrics": train_table})
-        wandb.log({"test_metrics": test_table})
+    log_metrics(step, model, train_x, train_y, test_x, test_y, running_loss, print_classification_report=True)
         
 
 if __name__ == "__main__":
