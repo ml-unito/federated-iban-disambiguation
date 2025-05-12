@@ -5,7 +5,7 @@ data:
     #     # Dataset's name
     #     # Currently supported: mnist, svhn, mnistm, femnist, emnist, cifar10, cifar100,
     #     #                      tiny_imagenet, shakespeare, fashion_mnist, cinic10
-    #     name: federated_learning.create_dummy_data_container
+    #     name: federated_learning.create_ddc_cbert
     #     # Potential parameters for loading the dataset correctly
     #     # (see the documentation of fluke.data.datasets)
     #     # if no parameters are needed, simply do not specify anything

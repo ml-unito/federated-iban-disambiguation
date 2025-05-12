@@ -135,10 +135,10 @@ def main():
   df_client4_new.to_csv("./dataset/split_dataset/client4_train_pp.csv")
 
   df_test_new = dataset_preprocessing(dataset=df_test, name_log="log_df_test")
-  df_test_new.to_csv("./dataset/split_dataset/test_pp.csv")
+  df_test_new.to_csv("./dataset/split_dataset/df_test_pp.csv")
 
   df_train_new = dataset_preprocessing(dataset=df_train, name_log="log_df_train")
-  df_train_new.to_csv("./dataset/split_dataset/train_pp.csv")
+  df_train_new.to_csv("./dataset/split_dataset/df_train_pp.csv")
 
 
 

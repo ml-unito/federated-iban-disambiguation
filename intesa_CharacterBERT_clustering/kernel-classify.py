@@ -8,10 +8,8 @@ from sklearn.metrics import classification_report, accuracy_score
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 
-from lib.datasetManipulation import labeled_pairs
-from lib.kernel_sim_data_utils import load_df, load_sim_data, save_sim_data
+from lib.kernel_sim_data_utils import load_df, load_sim_data, save_sim_data, load_client_df
 import lib.string_kernels as sk
-from federated_learning import create_couple_df
 
 from lib.mlp import MLP
 from torch.utils.data import DataLoader, TensorDataset
@@ -24,21 +22,27 @@ import wandb
 app = Typer()
 console = Console()
 
-DF_TRAIN_PATH = "dataset/split_dataset/df_train.csv"
-DF_TEST_PATH = "dataset/split_dataset/df_test.csv"
+DF_TRAIN_PATH = "dataset/split_dataset/df_train_pp.csv"
+DF_TEST_PATH = "dataset/split_dataset/df_test_pp.csv"
 SIM_TRAIN_PATH = "dataset/similarity_train_seed_%d%s.csv"
 SIM_TEST_PATH = "dataset/similarity_test_seed_%d%s.csv"
+DF_DIR_PATH = "dataset/split_dataset/"
+
 
 def log_metrics(step, model, train_x, train_y, test_x, test_y, running_loss, print_classification_report=False):
     with torch.no_grad():
         train_preds = model(train_x.to("cuda:0")).argmax(dim=1).cpu().numpy()
         test_preds = model(test_x.to("cuda:0")).argmax(dim=1).cpu().numpy()
 
-        cr_train = classification_report(train_y.numpy(), train_preds, output_dict=True)
-        cr_train_str = classification_report(train_y.numpy(), train_preds, output_dict=False)
-        cr_test = classification_report(test_y.numpy(), test_preds, output_dict=True)
-        cr_test_str = classification_report(test_y.numpy(), test_preds, output_dict=False)
-        
+        cr_train = classification_report(
+            train_y.numpy(), train_preds, output_dict=True)
+        cr_train_str = classification_report(
+            train_y.numpy(), train_preds, output_dict=False)
+        cr_test = classification_report(
+            test_y.numpy(), test_preds, output_dict=True)
+        cr_test_str = classification_report(
+            test_y.numpy(), test_preds, output_dict=False)
+
         train_accuracy = cr_train["accuracy"]
         test_accuracy = cr_test["accuracy"]
         train_f1 = cr_train["macro avg"]["f1-score"]
@@ -62,50 +66,71 @@ def log_metrics(step, model, train_x, train_y, test_x, test_y, running_loss, pri
             console.print("Test classification report")
             console.print(cr_test_str)
 
-        wandb.log(step =step, 
-                    data={
-            "train_loss": running_loss / step,
-            "train_accuracy": train_accuracy,
-            "test_accuracy": test_accuracy,
-            "train_macro_f1": train_f1,
-            "test_macro_f1": test_f1,
-            "train_f1_label_1": f1_train_label_1,
-            "train_f1_label_0": f1_train_label_0,
-            "test_f1_label_1": f1_test_label_1,
-            "test_f1_label_0": f1_test_label_0,
-            "train_precision_label_1": precizione_train_label_1,
-            "train_precision_label_0": precision_train_label_0,
-            "test_precision_label_1": precision_test_label_1,
-            "test_precision_label_0": precision_test_label_0,
-            "train_recall_label_1": recall_train_label_1,
-            "train_recall_label_0": recall_train_label_0,
-            "test_recall_label_1": recall_test_label_1,
-            "test_recall_label_0": recall_test_label_0
-        })
+        wandb.log(step=step,
+                  data={
+                      "train_loss": running_loss / step,
+                      "train_accuracy": train_accuracy,
+                      "test_accuracy": test_accuracy,
+                      "train_macro_f1": train_f1,
+                      "test_macro_f1": test_f1,
+                      "train_f1_label_1": f1_train_label_1,
+                      "train_f1_label_0": f1_train_label_0,
+                      "test_f1_label_1": f1_test_label_1,
+                      "test_f1_label_0": f1_test_label_0,
+                      "train_precision_label_1": precizione_train_label_1,
+                      "train_precision_label_0": precision_train_label_0,
+                      "test_precision_label_1": precision_test_label_1,
+                      "test_precision_label_0": precision_test_label_0,
+                      "train_recall_label_1": recall_train_label_1,
+                      "train_recall_label_0": recall_train_label_0,
+                      "test_recall_label_1": recall_test_label_1,
+                      "test_recall_label_0": recall_test_label_0
+                  })
 
 # COMMANDS
+
 
 @app.command()
 def create_dataset(seed: int, n_features: int = 7, overwrite: bool = False, use_bert: bool = True):
     sim_train_path = SIM_TRAIN_PATH % (seed, "_w-bert" if use_bert else "")
     sim_test_path = SIM_TEST_PATH % (seed, "_w-bert" if use_bert else "")
 
-    train,test = load_df(
+    train, test = load_df(
         train_path=DF_TRAIN_PATH,
-        test_path=DF_TEST_PATH 
+        test_path=DF_TEST_PATH
     )
 
     if os.path.exists(sim_train_path) and not overwrite:
         console.log(f"Train data already exists at {sim_train_path}")
     else:
         console.log("Saving train data")
-        save_sim_data(sim_train_path, train, n_features, oversample=True, use_bert=use_bert)
+        save_sim_data(sim_train_path, train, n_features,
+                      oversample=True, use_bert=use_bert)
 
     if os.path.exists(sim_test_path) and not overwrite:
         console.log(f"Test data already exists at {sim_test_path}")
     else:
         console.log("Saving test data")
-        save_sim_data(sim_test_path, test, n_features, oversample=False, use_bert=use_bert)
+        save_sim_data(sim_test_path, test, n_features,
+                      oversample=False, use_bert=use_bert)
+
+
+@app.command()
+def create_clients_datasets(seed: int, clients: int, n_features: int = 7, overwrite: bool = False, use_bert: bool = True):
+    for client in range(1, clients+1):
+        sim_path = "dataset/similarity_client" + \
+            str(client) + "_train_seed_" + str(seed) + \
+            ("_w-bert" if use_bert else "") + ".csv"
+        df_client = load_client_df(
+            DF_DIR_PATH + "client" + str(client) + "_train_pp.csv")
+        if os.path.exists(sim_path) and not overwrite:
+            console.log(f"Client " + str(client) +
+                        " train data already exists at {sim_path}")
+        else:
+            console.log("Saving client " + str(client) + " train data")
+            save_sim_data(sim_path, df_client, n_features,
+                          oversample=True, use_bert=use_bert)
+
 
 @app.command()
 def show_dataset(seed: int):
@@ -117,6 +142,7 @@ def show_dataset(seed: int):
     console.log(f"Train data:\n {train.head()}")
     console.log(f"Test data:\n {test.head()}")
 
+
 @app.command()
 def classify(seed: int):
     train, test = load_sim_data(
@@ -127,7 +153,6 @@ def classify(seed: int):
     scaler = MinMaxScaler()
     train.iloc[:, :-1] = scaler.fit_transform(train.iloc[:, :-1])
     test.iloc[:, :-1] = scaler.transform(test.iloc[:, :-1])
-
 
     lr = LogisticRegression(max_iter=1000)
     train_x = train.iloc[:, :-1].values
@@ -158,9 +183,9 @@ def classify(seed: int):
     )
 
     # create wandb table for the performance metrics
-    table = wandb.Table(columns=["metric", "value"])
     cr_test = classification_report(test_y, test_preds, output_dict=True)
-    cr_train = classification_report(train_y, lr.predict(train_x), output_dict=True)
+    cr_train = classification_report(
+        train_y, lr.predict(train_x), output_dict=True)
 
     console.log(f"Train classification report:\n {cr_train}")
     console.log(f"Test classification report:\n {cr_test}")
@@ -181,12 +206,11 @@ def classify(seed: int):
 
     wandb.log({"train_metrics": train_table})
     wandb.log({"test_metrics": test_table})
-    
-
     wandb.log({"train_accuracy": accuracy_score(train_y, train_preds)})
     wandb.log({"test_accuracy": accuracy_score(test_y, test_preds)})
     wandb.log({"train_macro_f1": cr_train["macro avg"]["f1-score"]})
     wandb.log({"test_macro_f1": cr_test["macro avg"]["f1-score"]})
+
 
 @app.command()
 def nn_classify(seed: int, bert: bool = False):
@@ -204,7 +228,8 @@ def nn_classify(seed: int, bert: bool = False):
         entity="mlgroup",
         name=f"kernel-mlp-{seed}" if not bert else f"kernel-mlp-{seed}-w-bert",
         group="w-bert" if bert else "no-bert",
-        tags=["flner", "centralized", "spectrum-kernel", "mlp", "w-bert" if bert else "no-bert"],
+        tags=["flner", "centralized", "spectrum-kernel",
+              "mlp", "w-bert" if bert else "no-bert"],
         config={
             "seed": seed,
             "train_size": len(train),
@@ -223,7 +248,6 @@ def nn_classify(seed: int, bert: bool = False):
 
     train_dataset = TensorDataset(train_x, train_y)
     train_loader = DataLoader(train_dataset, batch_size=1024, shuffle=True)
-    # test_loader = DataLoader(test_dataset, batch_size=1024, shuffle=False)
 
     # Initialize model, loss function, and optimizer
     model = MLP(input_dim=train_x.shape[1], hidden_dim=128, output_dim=2)
@@ -247,13 +271,15 @@ def nn_classify(seed: int, bert: bool = False):
 
             if step % 10 == 0:
                 model.eval()
-                log_metrics(step, model, train_x, train_y, test_x, test_y, running_loss)
+                log_metrics(step, model, train_x, train_y,
+                            test_x, test_y, running_loss)
                 model.train()
-        
+
     # Evaluate the model
     model.eval()
-    log_metrics(step, model, train_x, train_y, test_x, test_y, running_loss, print_classification_report=True)
-        
+    log_metrics(step, model, train_x, train_y, test_x, test_y,
+                running_loss, print_classification_report=True)
+
 
 if __name__ == "__main__":
     app()
