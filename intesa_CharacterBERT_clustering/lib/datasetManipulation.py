@@ -1,5 +1,6 @@
 import pandas as pd
 from itertools import combinations
+from typing import List, Tuple
 
 
 
@@ -19,11 +20,7 @@ def save_dataset(dataset, path, mode="w", index=False, header=True):
     else: dataset.to_excel(path)
 
 
-def balance_dataset(dataset_train, label):
-    """ Undersample the majority class to match the 
-    number of samples in the minority class.
-    Possible classes are 0 or 1 """
-
+def balance_dataset(dataset_train:pd.DataFrame, label:str, oversample:bool=False) -> pd.DataFrame:
     class_0 = dataset_train[dataset_train[label] == 0]
     class_1 = dataset_train[dataset_train[label] == 1]
 
@@ -31,17 +28,24 @@ def balance_dataset(dataset_train, label):
         print("Dataset balanced yet!\nNo balancing needed\n")
         return dataset_train
 
-    if len(class_1) < len(class_0):
-        class_undersampled = class_0.sample(n=len(class_1), replace=False, random_state=42)
-        balancedDataset = pd.concat([class_undersampled, class_1])
+    if oversample:
+        if len(class_1) > len(class_0):
+            class_oversampled = class_0.sample(n=len(class_1), replace=True, random_state=42)
+            balancedDataset = pd.concat([class_oversampled, class_1])
+        else:
+            class_oversampled = class_1.sample(n=len(class_0), replace=True, random_state=42)
+            balancedDataset = pd.concat([class_oversampled, class_0])
     else:
-        class_undersampled = class_1.sample(n=len(class_0), replace=False, random_state=42)
-        balancedDataset = pd.concat([class_undersampled, class_0])
+        if len(class_1) < len(class_0):
+            class_undersampled = class_0.sample(n=len(class_1), replace=False, random_state=42)
+            balancedDataset = pd.concat([class_undersampled, class_1])
+        else:
+            class_undersampled = class_1.sample(n=len(class_0), replace=False, random_state=42)
+            balancedDataset = pd.concat([class_undersampled, class_0])
 
     # Shuffle dataset
     return balancedDataset.sample(frac=1, random_state=42).reset_index(drop=True)
 
-from typing import List, Tuple
 
 def labeled_pairs(dataset) -> Tuple[List[Tuple[str, str]], List[int]]:
     pairs = []

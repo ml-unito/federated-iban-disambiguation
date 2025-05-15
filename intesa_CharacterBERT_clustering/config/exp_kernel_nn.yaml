@@ -79,7 +79,7 @@ logger:
     project: fl-ner
     entity: mlgroup
     group: giulia-1
-    tags: ["flner", "fluke-federation", 'mlp', 'spectrum-kernel', '81789', "4 local epochs"]
+    tags: ["flner", "fluke-federation", 'mlp', 'spectrum-kernel', 'SEED', "4 local epochs", 'w-bert']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log
@@ -92,4 +92,4 @@ protocol:
     # Total number of clients partcipating in the federation
     n_clients: 4
     # Total number of rounds
-    n_rounds: 10
+    n_rounds: 20

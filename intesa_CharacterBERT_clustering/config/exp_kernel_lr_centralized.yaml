@@ -77,7 +77,7 @@ logger:
     project: fl-ner
     entity: mlgroup
     group: giulia-1
-    tags: ["flner", "fluke-centralized", 'lr', 'spectrum-kernel', 'dataset preprocessed', '81789']
+    tags: ["flner", "fluke-centralized", 'lr', 'spectrum-kernel', 'dataset preprocessed', 'SEED', '100 rounds']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log

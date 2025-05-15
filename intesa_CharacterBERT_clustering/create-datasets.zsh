@@ -9,6 +9,7 @@ for seed in $seeds; do
   uv run split_dataset.py --seed $seed
   uv run preprocessing.py
 
-  uv run kernel-classify.py create-dataset $seed --no-use-bert
+  #uv run kernel-classify.py create-dataset $seed --no-use-bert
   uv run kernel-classify.py create-dataset $seed --use-bert
+  #uv run kernel-classify.py create-clients-datasets $seed 4 --use-bert
 done

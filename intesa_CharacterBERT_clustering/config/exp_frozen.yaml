@@ -6,10 +6,9 @@ data:
     #     # Currently supported: mnist, svhn, mnistm, femnist, emnist, cifar10, cifar100,
     #     #                      tiny_imagenet, shakespeare, fashion_mnist, cinic10
         name: federated_learning.create_ddc_cbert
-        num_clients: 4
-        train_path: ./dataset/split_dataset/train_pp.csv
-        test_path: ./dataset/split_dataset/test_pp.csv
-        dir_dataset_path: ./dataset/split_dataset/
+        clients: 4
+        train_path: ./dataset/split_dataset/client%d_train_pp.csv
+        test_path: ./dataset/split_dataset/df_test_pp.csv
         client_test: true
         # Potential parameters for loading the dataset correctly
     #     # (see the documentation of fluke.data.datasets)
@@ -77,8 +76,8 @@ logger:
     name: WandBLog
     project: fl-ner
     entity: mlgroup
-    group: Roberto-1
-    tags: ["flner", "federated", "NERClassifier", 'BertFrozen']
+    group: FedAVG-FrozenBert-R20-E2-oversampling
+    tags: ["flner", "federated", "NERClassifier", 'BertFrozen', 'oversampling', '20 rounds', '2 local epochs', '4 clients', '23517']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log

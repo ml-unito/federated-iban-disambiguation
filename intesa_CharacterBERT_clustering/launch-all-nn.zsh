@@ -1,18 +1,68 @@
 
-# ./launchexp.zsh 23517 exp_pretrained alg_pretrained
-# ./launchexp.zsh 47874 exp_pretrained alg_pretrained
-# ./launchexp.zsh 9046 exp_pretrained alg_pretrained
-# ./launchexp.zsh 30921 exp_pretrained alg_pretrained
-# ./launchexp.zsh 81789 exp_pretrained alg_pretrained
+# uv run kernel-classify.py nn-classify 9046
+# uv run kernel-classify.py nn-classify 23517
+# uv run kernel-classify.py nn-classify 30921
+# uv run kernel-classify.py nn-classify 47874
+# uv run kernel-classify.py nn-classify 81789
 
-uv run kernel-classify.py nn-classify 9046
-uv run kernel-classify.py nn-classify 23517
-uv run kernel-classify.py nn-classify 30921
-uv run kernel-classify.py nn-classify 47874
-uv run kernel-classify.py nn-classify 81789
+# uv run kernel-classify.py nn-classify 9046 --bert
+# uv run kernel-classify.py nn-classify 23517 --bert
+# uv run kernel-classify.py nn-classify 30921 --bert
+# uv run kernel-classify.py nn-classify 47874 --bert
+# uv run kernel-classify.py nn-classify 81789 --bert
 
-uv run kernel-classify.py nn-classify 9046 --bert
-uv run kernel-classify.py nn-classify 23517 --bert
-uv run kernel-classify.py nn-classify 30921 --bert
-uv run kernel-classify.py nn-classify 47874 --bert
-uv run kernel-classify.py nn-classify 81789 --bert
+
+
+### MLP MODEL ###
+
+# Runs mlp model on fluke federation mode with bert feature
+# ./launchexp-nn.zsh 23517 exp_kernel_nn alg_kernel_nn use-bert federation
+# ./launchexp-nn.zsh 47874 exp_kernel_nn alg_kernel_nn use-bert federation
+# ./launchexp-nn.zsh 9046 exp_kernel_nn alg_kernel_nn use-bert federation
+# ./launchexp-nn.zsh 30921 exp_kernel_nn alg_kernel_nn use-bert federation
+# ./launchexp-nn.zsh 81789 exp_kernel_nn alg_kernel_nn use-bert federation
+
+# Runs mlp model on fluke federation mode
+# ./launchexp-nn.zsh 23517 exp_kernel_nn alg_kernel_nn no-use-bert federation
+# ./launchexp-nn.zsh 47874 exp_kernel_nn alg_kernel_nn no-use-bert federation
+# ./launchexp-nn.zsh 9046 exp_kernel_nn alg_kernel_nn no-use-bert federation
+# ./launchexp-nn.zsh 30921 exp_kernel_nn alg_kernel_nn no-use-bert federation
+# ./launchexp-nn.zsh 81789 exp_kernel_nn alg_kernel_nn no-use-bert federation
+
+# Runs mlp model on fluke centralized mode with bert feature
+# ./launchexp-nn.zsh 23517 exp_kernel_nn_centralized alg_kernel_nn use-bert centralized
+# ./launchexp-nn.zsh 47874 exp_kernel_nn_centralized alg_kernel_nn use-bert centralized
+# ./launchexp-nn.zsh 9046 exp_kernel_nn_centralized alg_kernel_nn use-bert centralized
+# ./launchexp-nn.zsh 30921 exp_kernel_nn_centralized alg_kernel_nn use-bert centralized
+# ./launchexp-nn.zsh 81789 exp_kernel_nn_centralized alg_kernel_nn use-bert centralized
+
+# Runs mlp model on fluke centralized mode
+# ./launchexp-nn.zsh 23517 exp_kernel_nn_centralized alg_kernel_nn no-use-bert centralized
+# ./launchexp-nn.zsh 47874 exp_kernel_nn_centralized alg_kernel_nn no-use-bert centralized
+# ./launchexp-nn.zsh 9046 exp_kernel_nn_centralized alg_kernel_nn no-use-bert centralized
+# ./launchexp-nn.zsh 30921 exp_kernel_nn_centralized alg_kernel_nn no-use-bert centralized
+# ./launchexp-nn.zsh 81789 exp_kernel_nn_centralized alg_kernel_nn no-use-bert centralized
+
+
+### LR MODEL ###
+
+# Runs lr model on fluke federation mode with bert feature
+# ./launchexp-nn.zsh 23517 exp_kernel_lr alg_kernel_lr use-bert federation
+# ./launchexp-nn.zsh 47874 exp_kernel_lr alg_kernel_lr use-bert federation
+# ./launchexp-nn.zsh 9046 exp_kernel_lr alg_kernel_lr use-bert federation
+# ./launchexp-nn.zsh 30921 exp_kernel_lr alg_kernel_lr use-bert federation
+# ./launchexp-nn.zsh 81789 exp_kernel_lr alg_kernel_lr use-bert federation
+
+# Runs lr model on fluke federation mode
+# ./launchexp-nn.zsh 23517 exp_kernel_lr alg_kernel_lr no-use-bert federation
+# ./launchexp-nn.zsh 47874 exp_kernel_lr alg_kernel_lr no-use-bert federation
+# ./launchexp-nn.zsh 9046 exp_kernel_lr alg_kernel_lr no-use-bert federation
+# ./launchexp-nn.zsh 30921 exp_kernel_lr alg_kernel_lr no-use-bert federation
+# ./launchexp-nn.zsh 81789 exp_kernel_lr alg_kernel_lr no-use-bert federation
+
+# Runs lr model on fluke centralized mode with bert feature
+# ./launchexp-nn.zsh 23517 exp_kernel_lr_centralized alg_kernel_lr use-bert centralized
+# ./launchexp-nn.zsh 47874 exp_kernel_lr_centralized alg_kernel_lr use-bert centralized
+# ./launchexp-nn.zsh 9046 exp_kernel_lr_centralized alg_kernel_lr use-bert centralized
+# ./launchexp-nn.zsh 30921 exp_kernel_lr_centralized alg_kernel_lr use-bert centralized
+# ./launchexp-nn.zsh 81789 exp_kernel_lr_centralized alg_kernel_lr use-bert centralized

@@ -18,6 +18,7 @@ from sklearn.model_selection import train_test_split
 from datetime import datetime
 from transformers import BertTokenizer
 from lib.datasetManipulation import *
+from rich.progress import track
 
 from lib.kernel_sim_data_utils import load_sim_data
 from sklearn.preprocessing import MinMaxScaler
@@ -49,12 +50,16 @@ def extract_x_and_y(dataset: pd.DataFrame, tokenizer) -> Tuple[torch.Tensor, tor
   return x, y
 
 
-def create_couple_df(df_path: str) -> pd.DataFrame:
+def create_couple_df(df_path: str, balance: bool=False) -> pd.DataFrame:
   df = pd.read_csv(df_path)
 
-  df = balance_dataset(df, "IsShared")
+  # if balance:
+  #   df = balance_dataset(df, "IsShared")
+  
   cp_df = create_pairs(df)
-  cp_df = balance_dataset(cp_df, "label")
+  
+  if balance:
+    cp_df = balance_dataset(cp_df, "label", oversample=True)
 
   return cp_df
 
@@ -63,8 +68,8 @@ def create_dc_cbert(train_path: str, test_path: str) -> DataContainer:
   # Loads tokenizer
   tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
-  cp_train_df = create_couple_df(df_path=train_path)
-  cp_test_df = create_couple_df(df_path=test_path)
+  cp_train_df = create_couple_df(df_path=train_path, balance=True)
+  cp_test_df = create_couple_df(df_path=test_path, balance=False)
 
   X_train, y_train = extract_x_and_y(cp_train_df, tokenizer)
   X_test, y_test = extract_x_and_y(cp_test_df, tokenizer)
@@ -72,44 +77,27 @@ def create_dc_cbert(train_path: str, test_path: str) -> DataContainer:
   return DataContainer(X_train, y_train, X_test, y_test, 2)
 
 
-def create_ddc_cbert(num_clients: int, train_path: str, test_path: str, dir_dataset_path: str, client_test=False) -> DummyDataContainer:
+def create_ddc_cbert(clients: int, train_path: str, test_path: str, client_test=False) -> DummyDataContainer:
   # Loads tokenizer
   tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
-  if num_clients == 1:
-    # Loads datasets
-    cp_train_df = create_couple_df(df_path=train_path)
-    cp_test_df = create_couple_df(df_path=test_path)
+  # Loads client datasets and server dataset
+  cp_df_clients = [create_couple_df(df_path=train_path % (i), balance=True) for i in range(1, clients+1)]
+  cp_df_server = create_couple_df(df_path=test_path, balance=False)
 
-    X_train, y_train = extract_x_and_y(cp_train_df, tokenizer)
-    X_test, y_test = extract_x_and_y(cp_test_df, tokenizer)
+  # Creates FastDataLoader for each client data
+  fdl_clts = []
+  for df_client in track(cp_df_clients, description="Loading clients datasets"):
+    x, y = extract_x_and_y(df_client, tokenizer)
+    fdl = FastDataLoader(x, y, num_labels=2, batch_size=512)
+    fdl_clts.append(fdl)
+  
+  # Creates FastDataLoader for server data
+  x, y = extract_x_and_y(cp_df_server, tokenizer)
+  fdl_srv = FastDataLoader(x, y, num_labels=2, batch_size=512)
 
-    # Creates FastDataLoader for client data and server data
-    fdl_clt = FastDataLoader(X_train, y_train, num_labels=2, batch_size=512)
-    fdl_srv = FastDataLoader(X_test, y_test, num_labels=2, batch_size=512)
-
-    return DummyDataContainer(clients_tr=[fdl_clt], 
-                              clients_te=[fdl_srv] if client_test else [None], 
-                              server_data=fdl_srv, 
-                              num_classes=2)
-  else:
-    # Loads client datasets and server dataset
-    cp_df_clients = [create_couple_df(df_path=dir_dataset_path + "client" + str(i) + "_train_pp.csv") for i in range(1, num_clients+1)]
-    cp_df_server = create_couple_df(df_path=test_path)
-
-    # Creates FastDataLoader for each client data
-    fdl_clts = []
-    for df_client in cp_df_clients:
-      x, y = extract_x_and_y(df_client, tokenizer)
-      fdl = FastDataLoader(x, y, num_labels=2, batch_size=512)
-      fdl_clts.append(fdl)
-    
-    # Creates FastDataLoader for server data
-    x, y = extract_x_and_y(cp_df_server, tokenizer)
-    fdl_srv = FastDataLoader(x, y, num_labels=2, batch_size=512)
-
-    return DummyDataContainer(clients_tr=fdl_clts, 
-                              clients_te= [fdl_srv]*num_clients if client_test else [None]*num_clients, 
+  return DummyDataContainer(clients_tr=fdl_clts, 
+                              clients_te= [fdl_srv]*clients if client_test else [None]*clients, 
                               server_data=fdl_srv, 
                               num_classes=2)
 

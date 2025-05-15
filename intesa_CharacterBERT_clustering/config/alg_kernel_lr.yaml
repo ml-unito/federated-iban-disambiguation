@@ -35,6 +35,6 @@ hyperparameters:
     # This can be the name of a neural network included in `fluke.nets` or
     # the fully qualified name of an user defined class
     model: lib.lr.LR
-    net_args:
-        input_dim: 7
+    net_args:   # input_dim is 8 with bert, else 7
+        input_dim: 8
         output_dim: 2
