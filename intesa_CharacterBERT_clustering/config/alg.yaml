@@ -17,7 +17,7 @@ hyperparameters:
         optimizer:
             # if omitted, the default optimizer is SGD (optimizer name from torch.optim)
             name: AdamW
-            lr: 0.01
+            lr: 0.000001
             weight_decay: 0.0005
         # HPs of the scheduler (scheduler name from torch.optim.lr_scheduler)
         # this is optional
@@ -34,5 +34,5 @@ hyperparameters:
     # The model (neural network) to federate.
     # This can be the name of a neural network included in `fluke.nets` or
     # the fully qualified name of an user defined class
-    # model: lib.CBertClassif.CBertClassif
-    model: lib.CBertClassifFrz.CBertClassifFrz
+    model: lib.CBertClassif.CBertClassif
+    # model: lib.CBertClassifFrz.CBertClassifFrz

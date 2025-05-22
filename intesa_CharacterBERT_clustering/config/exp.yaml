@@ -1,12 +1,16 @@
 # Dataset configuration
 data:
     # Dataset loading config
-    # dataset:
+    dataset:
     #     # Dataset's name
     #     # Currently supported: mnist, svhn, mnistm, femnist, emnist, cifar10, cifar100,
     #     #                      tiny_imagenet, shakespeare, fashion_mnist, cinic10
-    #     name: federated_learning.create_ddc_cbert
-    #     # Potential parameters for loading the dataset correctly
+        name: federated_learning.create_ddc_cbert
+        clients: 4
+        train_path: ./dataset/split_dataset/client%d_train_pp.csv
+        test_path: ./dataset/split_dataset/df_test_pp.csv
+        client_test: true
+        # Potential parameters for loading the dataset correctly
     #     # (see the documentation of fluke.data.datasets)
     #     # if no parameters are needed, simply do not specify anything
     #     # params: null
@@ -51,16 +55,16 @@ exp:
     # The device to load the tensors (auto, cpu, cuda, mps, cuda:0, etc.)
     device: cuda:0
     # The seed (reproducibility)
-    seed: 42
+    seed: 9046
     inmemory: true
 # Evaluation configuration
 eval:
     # The task to perform which determines the evaluation metric (only classification is currently supported)
     task: classification
     # Whether to evaluate the client model before the client local training starts
-    pre_fit: false
+    pre_fit: true
     # Whether to evaluate the client model after the client local training
-    post_fit: false
+    post_fit: true
     # Whether to evaluate the global model on the server-side test set
     server: true
     # Whether to evaluate the client local models on the server-side test set
@@ -70,7 +74,7 @@ logger:
     name: WandBLog
     project: fl-ner
     entity: mlgroup
-    tags: ["flner", "test", "fluke", "2 epochs", "4 clients", "10 rounds", "CBertClassifFrz"]
+    tags: ["flner", "test", "fluke", "2 epochs", "4 clients", "20 rounds", "CBertClassif", 'SEED', 'server-test', 'post-fit', 'pre-fit']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log
@@ -83,4 +87,4 @@ protocol:
     # Total number of clients partcipating in the federation
     n_clients: 4
     # Total number of rounds
-    n_rounds: 10
+    n_rounds: 20

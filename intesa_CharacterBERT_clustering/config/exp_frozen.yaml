@@ -57,7 +57,7 @@ exp:
     # The device to load the tensors (auto, cpu, cuda, mps, cuda:0, etc.)
     device: cuda:0
     # The seed (reproducibility)
-    seed: 23517
+    seed: 47874
     inmemory: true
 # Evaluation configuration
 eval:
@@ -76,8 +76,8 @@ logger:
     name: WandBLog
     project: fl-ner
     entity: mlgroup
-    group: FedAVG-FrozenBert-R20-E2-oversampling
-    tags: ["flner", "federated", "NERClassifier", 'BertFrozen', 'oversampling', '20 rounds', '2 local epochs', '4 clients', '23517']
+    group: FedAVG-FrozenBert-R10-E2-LR001-oversampling
+    tags: ["flner", "federated", "NERClassifier", 'BertFrozen', 'oversampling', '10 rounds', '2 local epochs', '4 clients', '47874', '0.001 learning rate', 'pre-fit', 'post-fit']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log
@@ -90,4 +90,4 @@ protocol:
     # Total number of clients partcipating in the federation
     n_clients: 4
     # Total number of rounds
-    n_rounds: 20
+    n_rounds: 11

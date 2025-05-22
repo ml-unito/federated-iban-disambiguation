@@ -10,7 +10,7 @@ data:
         sim_train_path: dataset/similarity_client%d_train_seed_%d%s.csv
         sim_test_path: dataset/similarity_test_seed_%d%s.csv
         seed: 81789
-        bert: false
+        bert: true
         client_test: true
         # Potential parameters for loading the dataset correctly
     #     # (see the documentation of fluke.data.datasets)
@@ -70,7 +70,7 @@ eval:
     # Whether to evaluate the client model after the client local training
     post_fit: true
     # Whether to evaluate the global model on the server-side test set
-    server: false
+    server: true
     # Whether to evaluate the client local models on the server-side test set
     locals: false
 # Logger configuration
@@ -79,7 +79,7 @@ logger:
     project: fl-ner
     entity: mlgroup
     group: giulia-1
-    tags: ["flner", "fluke-federation", 'lr', 'spectrum-kernel', 'SEED', "1 local epochs", '20 rounds', 'w-bert']
+    tags: ["flner", "fluke-federation", 'lr', 'spectrum-kernel', 'SEED', "1 local epochs", '20 rounds', 'server-test']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log

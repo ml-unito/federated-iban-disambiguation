@@ -27,6 +27,7 @@ fi
 
 echo -e "\033[0;32mStarting experiment...\033[0m"
 uv run fluke federation $exp $alg
+# uv run fluke centralized $exp $alg
 
 # echo -e "\033[0;32mGenerating kernel sim files ...\033[0m"
 # uv run kernel-classify.py create-dataset $seed 
