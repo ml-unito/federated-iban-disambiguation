@@ -115,12 +115,12 @@ def main():
   # new_datasets = dataset_preprocessing(dataset=dataset)
   # new_datasets.to_csv("./dataset/benchmark_intesa_preprocessed.csv")
 
-  df_client1 = pd.read_csv("./dataset/split_dataset/client1_train.csv")
-  df_client2 = pd.read_csv("./dataset/split_dataset/client2_train.csv")
-  df_client3 = pd.read_csv("./dataset/split_dataset/client3_train.csv")
-  df_client4 = pd.read_csv("./dataset/split_dataset/client4_train.csv")
-  df_test = pd.read_csv("./dataset/split_dataset/df_test.csv")
-  df_train = pd.read_csv("./dataset/split_dataset/df_train.csv")
+  df_client1 = pd.read_csv("./dataset/split_dataset/client1_train.csv").drop(columns=["Unnamed: 0"])
+  df_client2 = pd.read_csv("./dataset/split_dataset/client2_train.csv").drop(columns=["Unnamed: 0"])
+  df_client3 = pd.read_csv("./dataset/split_dataset/client3_train.csv").drop(columns=["Unnamed: 0"])
+  df_client4 = pd.read_csv("./dataset/split_dataset/client4_train.csv").drop(columns=["Unnamed: 0"])
+  df_test = pd.read_csv("./dataset/split_dataset/df_test.csv").drop(columns=["Unnamed: 0"])
+  df_train = pd.read_csv("./dataset/split_dataset/df_train.csv").drop(columns=["Unnamed: 0"])
   
   df_client1_new = dataset_preprocessing(dataset=df_client1, name_log="log_df_client1")
   df_client1_new.to_csv("./dataset/split_dataset/client1_train_pp.csv")
