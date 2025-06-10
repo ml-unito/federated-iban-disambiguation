@@ -9,7 +9,7 @@ data:
         clients: 4
         sim_train_path: dataset/similarity_client%d_train_seed_%d%s.csv
         sim_test_path: dataset/similarity_test_seed_%d%s.csv
-        seed: 47874
+        seed: 67895
         bert: false
         client_test: true
         # Potential parameters for loading the dataset correctly
@@ -59,7 +59,7 @@ exp:
     # The device to load the tensors (auto, cpu, cuda, mps, cuda:0, etc.)
     device: cuda:0
     # The seed (reproducibility)
-    seed: 47874
+    seed: 67895
     inmemory: true
 # Evaluation configuration
 eval:
@@ -73,13 +73,21 @@ eval:
     server: true
     # Whether to evaluate the client local models on the server-side test set
     locals: false
+# Saving configuration
+save:
+    # The path where to save the models
+    path: ./out/fl_models_SEED
+    # The frequency of saving the models (in rounds)
+    save_every: 10
+    # Whether to save only the global model
+    global_only: false
 # Logger configuration
 logger:
     name: WandBLog
     project: fl-ner
     entity: mlgroup
-    group: giulia-1
-    tags: ["flner", "fluke-federation", 'mlp', 'spectrum-kernel', '47874', "4 local epochs", '30 rounds', 'server-test']
+    group: FedAVG-kernel-mlp-R30-E4
+    tags: ["flner", "fluke-federation", 'mlp', 'spectrum-kernel', 'SEED', "4 local epochs", '30 rounds', 'server-test', 'pre-fit', 'post-fit']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log
