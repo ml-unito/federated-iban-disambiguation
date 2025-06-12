@@ -12,7 +12,6 @@ from collections import Counter
 from itertools import combinations
 from lib.datasetManipulation import *
 from transformers import BertTokenizer
-from lib.download import download_pre_trained_model
 from lib.trainingUtilities import compute_metrics
 from lib.mlp import MLP
 from sklearn.metrics import classification_report
@@ -433,6 +432,10 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
     saveToFile("Dataset path: " + dataset_path)
     saveToFile("Loading dataset and model...")
     saveToFile("Dataset loaded...\n")
+    saveToFile("Info dataset: " 
+               + str(dataset[dataset['IsShared'] == 1]['AccountNumber'].nunique()) + " shared iban, " 
+               + str(dataset[dataset['IsShared'] == 0]['AccountNumber'].nunique()) + " unshared iban, "
+               + str(len(dataset)) + " entries")
 
     original_dataset = dataset.copy(deep=True)
 
@@ -457,7 +460,13 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
             config={
                 "model": model,
                 "weights_path": weights_path,
-                "seed": seed
+                "seed": seed,
+                "iban": {
+                    "total": str(len(original_dataset.groupby("AccountNumber"))),
+                    "shared": str(dataset[dataset['IsShared'] == 1]['AccountNumber'].nunique()),
+                    "unshared": str(dataset[dataset['IsShared'] == 0]['AccountNumber'].nunique())
+                },
+                "entries": len(original_dataset)
             }
         )
     
@@ -502,8 +511,6 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
         
         pairs_df['predicted'] = test_preds
     
-    pairs_df.to_csv("./out/clustering/pairs_df/pairs_df_S"+str(seed)+".csv")
-
     # Clustering
     account_entities = clustering(pairs_df, dataset)
     set_predicted_shared_value(original_dataset, account_entities)
@@ -513,10 +520,10 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
     real, predictions, num_iban_correct_pred_shared = eval_is_shared_pred(account_entities)
     
     # Evaluate method on transaction holder prediction / Exact Holder prediction
-    number_transaction_ok = eval_transaction_holder_pred(original_dataset)
+    num_correct_transaction = eval_transaction_holder_pred(original_dataset)
     
     # Evaluate method on clustered Iban prediction
-    number_cluster_iban_ok, shared_not_clustered_iban = eval_cluster_iban_pred(original_dataset)
+    correctly_clustered_iban, wrong_clustered_shared_iban = eval_cluster_iban_pred(original_dataset)
         
     # Print statistics
     couple_df_groupby_iban = pairs_df.groupby("iban")
@@ -531,39 +538,36 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
 
     saveToFile("\n")
     saveToFile("Evaluation of the model on the correct clustered iban prediction...")
-    saveToFile("Number of iban exactly predicted: " + str(number_cluster_iban_ok))
+    saveToFile("Number of correctly clustered iban: " + str(correctly_clustered_iban))
     saveToFile("Number of iban: " + str(len(couple_df_groupby_iban)))    
-    if len(couple_df_groupby_iban) - number_cluster_iban_ok > 0:
-        saveToFile("Number of shared iban not correctly clustered: " + str(shared_not_clustered_iban))
-        saveToFile("Number of not shared iban not correctly clustered: " + str(len(couple_df_groupby_iban) - number_cluster_iban_ok - shared_not_clustered_iban))
+    if len(couple_df_groupby_iban) - correctly_clustered_iban > 0:
+        saveToFile("Number of wrong clustered shared iban: " + str(wrong_clustered_shared_iban))
+        saveToFile("Number of wrong clustered not shared iban: " + str(len(couple_df_groupby_iban) - correctly_clustered_iban - wrong_clustered_shared_iban))
         
-    saveToFile("- Correct Clustered Iban Accuracy:" + str(number_cluster_iban_ok / len(couple_df_groupby_iban)))
+    saveToFile("- Correct Clustered Iban Accuracy (correctly clustered iban / iban): " + str(correctly_clustered_iban / len(couple_df_groupby_iban)))
     saveToFile("")
     
     saveToFile("\n")
     saveToFile("Evaluation of the model on the correct transaction prediction...")
-    saveToFile("Number of transaction exactly predicted: " + str(number_transaction_ok))
-    saveToFile("Number of transaction:" + str(len(original_dataset)))    
-    saveToFile("- Transaction Holder Accuracy:" + str(number_transaction_ok / len(original_dataset)))
+    saveToFile("Number of transaction exactly predicted: " + str(num_correct_transaction))
+    saveToFile("Number of transaction: " + str(len(original_dataset)))    
+    saveToFile("- Transaction Holder Accuracy (correct transaction / iban): " + str(num_correct_transaction / len(original_dataset)))
     saveToFile("")
 
     results = {
         "is_shared_task": {
             "num_iban_correct_pred": num_iban_correct_pred_shared,
-            "num_iban": len(couple_df_groupby_iban),
             "metrics": metrics
         },
         "cluster_analysis": {
-            "num_iban_correct_pred": number_cluster_iban_ok,
-            "num_iban": len(couple_df_groupby_iban),
-            "num_shared_iban_not_correct_clustered": shared_not_clustered_iban,
-            "num_notshared_iban_not_correct_clustered": len(couple_df_groupby_iban) - number_cluster_iban_ok - shared_not_clustered_iban,
-            "accuracy": number_cluster_iban_ok / len(couple_df_groupby_iban)
+            "num_correctly_clustered_iban": correctly_clustered_iban,
+            "num_wrong_clustered_shared_iban": wrong_clustered_shared_iban,
+            "num_wrong_clustered_unshared_iban": len(couple_df_groupby_iban) - correctly_clustered_iban - wrong_clustered_shared_iban,
+            "accuracy": correctly_clustered_iban / len(couple_df_groupby_iban)
         },
         "transaction_analysis": {
-            "num_entry_correct_pred": number_transaction_ok,
-            "num_entry": len(original_dataset),
-            "accuracy": number_transaction_ok / len(original_dataset)
+            "num_entry_correct_pred": num_correct_transaction,
+            "accuracy": num_correct_transaction / len(original_dataset)
         }
     }
 
@@ -572,6 +576,12 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
         wandb.summary = results
         wandb.finish()
     
+    # Save couple prediction dataset
+    couple_df_path = "./out/clustering/couple_df/"
+    if not os.path.exists(couple_df_path):
+      os.makedirs(couple_df_path)
+    pairs_df.to_csv(couple_df_path + "couple_df_S"+str(seed)+".csv")
+
     # Export labelled dataset
     dataset_path = "./out/clustering/dataset_build/"
     if not os.path.exists(dataset_path):
