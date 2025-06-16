@@ -16,6 +16,7 @@ from lib.trainingUtilities import compute_metrics
 from lib.mlp import MLP
 from sklearn.metrics import classification_report
 from lib.kernel_sim_data_utils import create_sim_data
+from sklearn.preprocessing import MinMaxScaler
 
 # download_pre_trained_model()
 import lib.CBertClassifFrz as cbertfrz
@@ -29,7 +30,7 @@ JSON_NAME = "clusters_" + DATE_NAME + ".json"
 DATASET_BUILD = "labelled_testSet_" + DATE_NAME + ".csv"
 DEBUG_MODE = False
 DEVICE = "cuda:0"
-LOG_WANDB = False
+LOG_WANDB = True
 
 # parameters
 saveToFile = SaveOutput('./out/clustering/Log/', LOG_NAME, printAll=True, debug=DEBUG_MODE)
@@ -42,7 +43,8 @@ batch_size = parameters['batch_size']
 def eval_cluster_iban_pred(dataset: pd.DataFrame) -> Tuple[int, int]:
     '''It returns how many ibans have been correctly clustered, that is when
     each predicted holder matches the real holder. It also returns the number
-    of shared account ibans that have not been clustered correctly.'''
+    of shared account ibans that have not been clustered correctly. Both 
+    shared and unshared account transactions are analyzed in this metric.'''
 
     correctly_clustered_iban = 0
     wrong_clustered_shared_iban = 0
@@ -61,7 +63,8 @@ def eval_cluster_iban_pred(dataset: pd.DataFrame) -> Tuple[int, int]:
     
 
 def eval_transaction_holder_pred(dataset: pd.DataFrame) -> int:
-    '''It returns the number of entry with correct prediction of holder.'''
+    '''It returns the number of entry with correct prediction of holder. Both
+    shared and unshared account transactions are analyzed in this metric.'''
 
     return len(dataset.loc[dataset['Holder'] == dataset['Predicted_Holder']])
 
@@ -470,15 +473,15 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
             }
         )
     
-    # scaler = MinMaxScaler()
-    # dataset.iloc[:, :-1] = scaler.transform(dataset.iloc[:, :-1])
+    scaler = MinMaxScaler()
+    similarity.iloc[:, :-1] = scaler.fit_transform(similarity.iloc[:, :-1])
 
     # Convert data to PyTorch tensors
     test_x = torch.tensor(similarity.iloc[:, :-1].values, dtype=torch.float32)
     test_y = torch.tensor(similarity.iloc[:, -1].values, dtype=torch.long)
 
     # Couple prediction task
-    saveToFile("Evaluation of the model on test set on the couple prediction task...")
+    saveToFile("Evaluation of the model on test set on the couple prediction task...") 
     with torch.no_grad():
         test_preds = model(test_x.to(DEVICE)).argmax(dim=1).cpu().numpy()
         cr_test = classification_report(
@@ -497,6 +500,15 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
         recall_test_label_1 = cr_test["1"]["recall"]
         recall_test_label_0 = cr_test["0"]["recall"]
 
+        print("test_accuracy: "+str(test_accuracy)+"\n"+
+              "test_f1: "+str(test_f1)+"\n"+
+              "f1_test_label_1: "+str(f1_test_label_1)+"\n"+
+              "f1_test_label_0: "+str(f1_test_label_0)+"\n"+
+              "precision_test_label_1: "+str(precision_test_label_1)+"\n"+
+              "precision_test_label_0: "+str(precision_test_label_0)+"\n"+
+              "recall_test_label_1: "+str(recall_test_label_1)+"\n"+
+              "recall_test_label_0: "+str(recall_test_label_0))
+
         if LOG_WANDB:
             wandb.log({
                 "couple_prediction_accuracy": test_accuracy,
@@ -513,27 +525,38 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
     
     # Clustering
     account_entities = clustering(pairs_df, dataset)
-    set_predicted_shared_value(original_dataset, account_entities)
-    set_holder_predicted(original_dataset, account_entities)
+    set_predicted_shared_value(dataset, account_entities)
+    set_holder_predicted(dataset, account_entities)
 
     # Evaluate method on is shared prediction
     real, predictions, num_iban_correct_pred_shared = eval_is_shared_pred(account_entities)
     
     # Evaluate method on transaction holder prediction / Exact Holder prediction
-    num_correct_transaction = eval_transaction_holder_pred(original_dataset)
+    num_correct_transaction = eval_transaction_holder_pred(dataset)
     
     # Evaluate method on clustered Iban prediction
-    correctly_clustered_iban, wrong_clustered_shared_iban = eval_cluster_iban_pred(original_dataset)
+    correctly_clustered_iban, wrong_clustered_shared_iban = eval_cluster_iban_pred(dataset)
         
     # Print statistics
     couple_df_groupby_iban = pairs_df.groupby("iban")
 
     saveToFile("\n\nEvaluation of the model on the IsShared classification task...")
-    saveToFile("Number prediction IsShared OK: " + str(num_iban_correct_pred_shared))
+    saveToFile("Number of iban correctly predicted: " + str(num_iban_correct_pred_shared))
     saveToFile("Number of iban: " + str(len(couple_df_groupby_iban)))
-   
-    metrics = compute_metrics(predictions, real)
-    for el in metrics: saveToFile("- " + el +  ":" + str(metrics[el]))
+
+    isshared_metrics = classification_report(real, predictions, output_dict=True)
+    isshared_metrics_str = {
+        "accuracy": round(isshared_metrics["accuracy"], 4),
+        "f1" : round(isshared_metrics["macro avg"]["f1-score"],4),
+        "f1_l1" : round(isshared_metrics["1"]["f1-score"],4),
+        "f1_l0" : round(isshared_metrics["0"]["f1-score"],4),
+        "precision_l1" : round(isshared_metrics["1"]["precision"],4),
+        "precision_l0" : round(isshared_metrics["0"]["precision"],4),
+        "recall_l1" : round(isshared_metrics["1"]["recall"],4),
+        "recall_l0" : round(isshared_metrics["0"]["recall"],4)
+    }
+
+    for el in isshared_metrics_str: saveToFile("- " + el +  ":" + str(isshared_metrics_str[el]))
     saveToFile("")
 
     saveToFile("\n")
@@ -550,14 +573,14 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
     saveToFile("\n")
     saveToFile("Evaluation of the model on the correct transaction prediction...")
     saveToFile("Number of transaction exactly predicted: " + str(num_correct_transaction))
-    saveToFile("Number of transaction: " + str(len(original_dataset)))    
-    saveToFile("- Transaction Holder Accuracy (correct transaction / iban): " + str(num_correct_transaction / len(original_dataset)))
+    saveToFile("Number of transaction: " + str(len(dataset)))    
+    saveToFile("- Transaction Holder Accuracy (correct transaction / transaction): " + str(num_correct_transaction / len(dataset)))
     saveToFile("")
 
     results = {
         "is_shared_task": {
             "num_iban_correct_pred": num_iban_correct_pred_shared,
-            "metrics": metrics
+            "metrics": isshared_metrics_str
         },
         "cluster_analysis": {
             "num_correctly_clustered_iban": correctly_clustered_iban,
@@ -567,7 +590,7 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
         },
         "transaction_analysis": {
             "num_entry_correct_pred": num_correct_transaction,
-            "accuracy": num_correct_transaction / len(original_dataset)
+            "accuracy": num_correct_transaction / len(dataset)
         }
     }
 
@@ -580,12 +603,14 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
     couple_df_path = "./out/clustering/couple_df/"
     if not os.path.exists(couple_df_path):
       os.makedirs(couple_df_path)
-    pairs_df.to_csv(couple_df_path + "couple_df_S"+str(seed)+".csv")
+    pairs_df.to_csv(couple_df_path + "couple_df_S"+str(seed)+DATE_NAME+".csv")
 
-    # Export labelled dataset
+    # Export original labelled dataset
     dataset_path = "./out/clustering/dataset_build/"
     if not os.path.exists(dataset_path):
       os.makedirs(dataset_path)
+    set_predicted_shared_value(original_dataset, account_entities)
+    set_holder_predicted(original_dataset, account_entities)
     original_dataset.to_csv(dataset_path+DATASET_BUILD, index=False)
     
     # Save clusters on json file
