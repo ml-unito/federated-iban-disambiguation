@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 import torch
+from typing import Tuple
 from character_bert_model.modeling.character_bert import CharacterBertModel
 from character_bert_model.utils.character_cnn import CharacterIndexer
 
@@ -15,9 +16,12 @@ from rich.progress import track
 console = Console()
 
 
-def load_df(train_path: str, test_path: str):
+def load_df(train_path: str, test_path: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     cp_train_df = pd.read_csv(train_path)
     cp_test_df = pd.read_csv(test_path)
+
+    cp_train_df = cp_train_df.drop_duplicates(subset=["AccountNumber","Name","num occorrenze","IsShared","Holder","cluster"])
+    cp_test_df = cp_test_df.drop_duplicates(subset=["AccountNumber","Name","num occorrenze","IsShared","Holder","cluster"])
 
     train_pairs, train_labels = labeled_pairs(cp_train_df)
     test_pairs, test_labels = labeled_pairs(cp_test_df)
@@ -34,8 +38,11 @@ def load_df(train_path: str, test_path: str):
 
     return train_df, test_df
 
-def load_client_df(df_path: str):
+def load_client_df(df_path: str) -> pd.DataFrame:
     cp_df = pd.read_csv(df_path)
+
+    cp_df = cp_df.drop_duplicates(subset=["AccountNumber","Name","num occorrenze","IsShared","Holder","cluster"])
+
     pairs, labels = labeled_pairs(cp_df)
     xy = list(zip(pairs, labels))
 
