@@ -24,7 +24,7 @@ import lib.CBertClassifFrz as cbertfrz
 app = Typer()
 
 
-DATE_NAME = str(datetime.now()).split(".")[0].replace(" ", "_") 
+DATE_NAME = str(datetime.now()).split(".")[0].replace(" ", "_").replace(":", "-") 
 DEBUG_MODE = False
 DEVICE = "cuda:0"
 LOG_WANDB = True
