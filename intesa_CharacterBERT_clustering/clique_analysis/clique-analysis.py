@@ -17,7 +17,7 @@ def generate_clique_analysis_nx(df, iban):
     ibandata = ibandata.drop_duplicates(subset=["name1", "name2"])
 
     predicted = ibandata[ibandata["predicted"] == 0]
-    actual = ibandata[ibandata["label.1"] == 0]
+    actual = ibandata[ibandata["label"] == 0]
 
     # Create graphs
     G_predicted = nx.Graph()
@@ -58,7 +58,7 @@ def generate_clique_analysis_dot(df, iban):
     ibandata = ibandata.drop_duplicates(subset=["name1", "name2"])
 
     predicted = ibandata[ibandata["predicted"] == 0]
-    actual = ibandata[ibandata["label.1"] == 0]
+    actual = ibandata[ibandata["label"] == 0]
 
     nodes = set(ibandata["name1"]).union(set(ibandata["name2"]))
 
