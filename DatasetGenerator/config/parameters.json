@@ -1,5 +1,5 @@
 {
-  "path_output_file": "dataset.xlsx",
+  "path_output_dir": "./out/",
   "stats_from_dataset": false,
   "num_iban": 300,
   "min_range_entry": 1,

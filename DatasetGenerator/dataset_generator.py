@@ -6,6 +6,7 @@
 
 import re
 import sys
+import os
 import json
 import string
 import random
@@ -25,7 +26,7 @@ app = Typer()
 with open('./config/parameters.json', "r") as data_file:
   parameters = json.load(data_file)
 
-PATH_OUTPUT_FILE = parameters["path_output_file"]
+PATH_OUTPUT_DIR = parameters["path_output_dir"]
 
 # numero di iban
 NUM_IBAN = parameters["num_iban"]
@@ -361,6 +362,8 @@ def data_generator(faker_objects):
         entry_to_generate -= new_num_entry
     elif not is_shared:
       companies_info[list(companies_info.keys())[0]]["num_entry"] = num_iban_entry
+    
+    tot_entries = sum([info["num_entry"] for _,info in companies_info.items()])
 
     # Adding data generated in the dataset, possibly permuting company names
     # and addresses.
@@ -372,15 +375,15 @@ def data_generator(faker_objects):
           new_address = change_address_format(companies_info[name]["address"], country_code) if np.random.choice([0,1], p=[1-PROB_ADDRESS,PROB_ADDRESS]) else ""
           data.append({
             "BIC":bic, "AccountNumber":iban, "CTRYbnk":bic_country_code,
-            "Name":alias, "Address":new_address, "IsShared":is_shared, 
-            "Holder":name, "Cluster":cluster if is_shared else ""
+            "Name":alias, "Address":new_address, "num occorrenze":tot_entries,
+            "IsShared":is_shared, "Holder":name, "cluster":cluster if is_shared else ""
           })
       else:
         address = change_address_format(companies_info[name]["address"], country_code) if np.random.choice([0,1], p=[1-PROB_ADDRESS,PROB_ADDRESS]) else ""
         data.append({
           "BIC":bic, "AccountNumber":iban, "CTRYbnk":bic_country_code,
-          "Name":name, "Address":address, "IsShared":is_shared, 
-          "Holder":name, "Cluster":cluster if is_shared else ""
+          "Name":name, "Address":address, "num occorrenze":tot_entries,
+          "IsShared":is_shared, "Holder":name, "cluster":cluster if is_shared else ""
         })
       
       cluster += 1
@@ -396,7 +399,9 @@ def save_dataset(dataset, filePath):
 def get_dataset_filePath():
   """ return a new dataset name including actual datetime """
   now = datetime.now()
-  return "./output/dataset_" + now.strftime("%d-%m-%Y_%H-%M-%S") + ".csv"
+  if not os.path.exists(PATH_OUTPUT_DIR):
+    os.makedirs(PATH_OUTPUT_DIR)
+  return PATH_OUTPUT_DIR + "syn_dataset_" + now.strftime("%d-%m-%Y_%H-%M-%S") + ".csv"
 
 
 def print_dataset(dataset, maxLine = 20):
@@ -428,7 +433,7 @@ def save_used_parameters(dataset_file_name):
 
   json_object = json.dumps(param, indent=2)
 
-  with open(dataset_file_name[:-4] + "__parameters" + ".json", "w") as outfile:
+  with open(dataset_file_name[:-4] + "__params" + ".json", "w") as outfile:
     outfile.write(json_object)
 
 
