@@ -1,9 +1,13 @@
 
-# ./launchexp-clustering.zsh 9046 ./out/fl_models_9046_6df22ace74ed4c42b12fdc9517c9e30b/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-9046
-# ./launchexp-clustering.zsh 23517 ./out/fl_models_23517_e23dcd5a3af24033bd42b83d554e95fe/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-23517
-# ./launchexp-clustering.zsh 30921 ./out/fl_models_30921_e7a78b76142d49159aa78697530c3cd9/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-30921
-# ./launchexp-clustering.zsh 47874 ./out/fl_models_47874_8d73ace4029f4f84b62985a7bfe8a9ad/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-47874
-# ./launchexp-clustering.zsh 81789 ./out/fl_models_81789_dd25903a089744f695e5a31d577c3abc/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-81789
+# ./launchexp-clustering.zsh 9046 ./out/fl_models_9046_afb1bdd45bfa4c62a58aa14122450a9a/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-9046
+# ./launchexp-clustering.zsh 23517 ./out/fl_models_23517_5ebf65a2dbc14769aa0250bfe9ed488a/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-23517
+# ./launchexp-clustering.zsh 47874 ./out/fl_models_47874_c194c115e1034b208a3122f156e66090/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-47874
+# ./launchexp-clustering.zsh 81789 ./out/fl_models_81789_beae0be00c444c30bcfa62caccd2806a/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-81789
+# ./launchexp-clustering.zsh 67895 ./out/fl_models_67895_6b6da2a609cc42b4bfcdba5c26ec3d51/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-67895
 
-
-./launchexp-clustering.zsh 67895 ./out/fl_models_67895_77eeac970d13403e8aca038f7b5c1921/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-67895
+# unique version of server
+./launchexp-clustering.zsh 9046 ./out/fl_models_unique_9046_16658f8372f14bb58cb5b39b10387990/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-9046-unique--no-complex-iban
+./launchexp-clustering.zsh 23517 ./out/fl_models_unique_23517_aa38960e87884a2694cbc1ea4880cf75/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-23517-unique--no-complex-iban
+./launchexp-clustering.zsh 47874 ./out/fl_models_unique_47874_fb3600173d3c4af88279d76ec578473a/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-47874-unique--no-complex-iban
+./launchexp-clustering.zsh 81789 ./out/fl_models_unique_81789_b71a5f5202fb4e0c9b17a99ad4d96c11/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-81789-unique--no-complex-iban
+./launchexp-clustering.zsh 67895 ./out/fl_models_unique_67895_eef73bbaba1745c38ac2627d86580d84/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-67895-unique--no-complex-iban

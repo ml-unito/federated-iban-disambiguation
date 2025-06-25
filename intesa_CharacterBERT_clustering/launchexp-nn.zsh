@@ -53,3 +53,4 @@ else
 fi
 
 sed -i "s/'$seed'/'SEED'/" $exp 
+sed -i "s/fl_models_$seed/fl_models_SEED/" $exp 
