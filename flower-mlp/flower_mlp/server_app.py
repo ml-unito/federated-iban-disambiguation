@@ -3,6 +3,9 @@
 import yaml
 import flwr as fl
 import wandb
+import os
+import torch
+from datetime import datetime
 from flwr.common import Context, ndarrays_to_parameters
 
 from flower_mlp.task import MLP, get_parameters, weighted_average, DEVICE
@@ -14,9 +17,11 @@ def load_config(config_path):
 
 
 class FedAvgWithLogging(fl.server.strategy.FedAvg):
-    def __init__(self, eval_config, **kwargs):
+    def __init__(self, eval_config, rounds, path, **kwargs):
         super().__init__(**kwargs)
         self.eval_config = eval_config
+        self.rounds = rounds
+        self.path = path
 
     def aggregate_evaluate(self, server_round, results, failures):
         print(f"[DEBUG] Aggregate_evaluate: round={server_round}, results={len(results)}, failures={len(failures)}")
@@ -55,6 +60,18 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
             print(f"Round {server_round} completato: {metrics}")
 
         return aggregated_result
+    
+    def aggregate_fit(self, server_round, results, failures):
+        parameters_aggregated, metrics_aggregated = super().aggregate_fit(server_round, results, failures)
+
+        if parameters_aggregated is not None and server_round == self.rounds:
+            model = MLP(input_dim=7, hidden_dim=128, output_dim=2)
+            params = fl.common.parameters_to_ndarrays(parameters_aggregated)
+            state_dict = dict(zip(model.state_dict().keys(), [torch.tensor(p) for p in params]))
+            model.load_state_dict(state_dict)
+            torch.save(model.state_dict(),self.path + "global_model_R" + str(server_round) + ".pt")
+        
+        return parameters_aggregated, metrics_aggregated
 
 
 def init_wandb(config):
@@ -106,9 +123,15 @@ def server_fn(context: Context):
     dummy_model = MLP(input_dim=7, hidden_dim=128, output_dim=2)
     initial_parameters = ndarrays_to_parameters(get_parameters(dummy_model))
 
+    date = str(datetime.now()).split(".")[0].replace(" ", "_").replace(":", "-") 
+    path_model_dir = "./out/flwr_S"+str(config["data"]["dataset"]["seed"])+"_"+date+"/"
+    os.makedirs(path_model_dir)
+
     # Crea la strategia FedAvg con logging
     strategy = FedAvgWithLogging(
         eval_config=config["eval"],
+        rounds=config["protocol"]["n_rounds"],
+        path=path_model_dir,
         fraction_fit=1.0,  # Imposta a 1.0 per utilizzare tutti i client disponibili
         fraction_evaluate=1.0,
         min_fit_clients=4,  # Imposta a 1 per iniziare anche con un solo client

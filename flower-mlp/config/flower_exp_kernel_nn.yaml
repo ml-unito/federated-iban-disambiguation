@@ -7,8 +7,8 @@ data:
     #     #                      tiny_imagenet, shakespeare, fashion_mnist, cinic10
         name: federated_learning.create_ddc_kernel
         clients: 4
-        sim_train_path: dataset/similarity_client%d_train_seed_%d%s.csv
-        sim_test_path: dataset/similarity_test_seed_%d%s.csv
+        sim_train_path: ../intesa_CharacterBERT_clustering/dataset/similarity_client%d_train_seed_%d%s.csv
+        sim_test_path: ../intesa_CharacterBERT_clustering/dataset/similarity_test_seed_%d%s.csv
         seed: 9046
         #23517
         #47874

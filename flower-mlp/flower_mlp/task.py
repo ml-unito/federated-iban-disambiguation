@@ -12,6 +12,7 @@ import torch.optim as optim
 import wandb
 from sklearn.metrics import classification_report
 from torch.utils.data import DataLoader, TensorDataset
+from sklearn.preprocessing import MinMaxScaler
 
 
 # # Importa il modello MLP dal file lib/mlp.py
@@ -42,8 +43,9 @@ class MLP(nn.Module):
 
 # Classe per gestire il dataset
 class KernelDataset:
-    def __init__(self, csv_path):
+    def __init__(self, csv_path:str, is_train:bool):
         self.data = pd.read_csv(csv_path)
+        self.is_train = is_train
         
     def get_features_and_labels(self):
         # Prendi tutte le colonne tranne l'ultima come features
@@ -57,6 +59,12 @@ class KernelDataset:
         
         return features_tensor, labels_tensor
 
+    def scale_features(self, scaler:MinMaxScaler):
+        if self.is_train:
+            self.data.iloc[:, :-1] = scaler.fit_transform(self.data.iloc[:, :-1])
+        else:
+            self.data.iloc[:, :-1] = scaler.transform(self.data.iloc[:, :-1])
+
 
 fds = None  # Cache FederatedDataset
 
@@ -65,16 +73,21 @@ def load_data(client_id, config_data):
     """Carica i dati del client specificato."""
     train_path = config_data["dataset"]["sim_train_path"] % (client_id, config_data["dataset"]["seed"], "")
     test_path = config_data["dataset"]["sim_test_path"] % (config_data["dataset"]["seed"], "")
-    
+    scaler = MinMaxScaler()
+
     # Carica i dati di training
-    train_dataset = KernelDataset(train_path)
+    train_dataset = KernelDataset(train_path, is_train=True)
+    train_dataset.scale_features(scaler)
     train_features, train_labels = train_dataset.get_features_and_labels()
+
     train_tensor_dataset = TensorDataset(train_features, train_labels)
     trainloader = DataLoader(train_tensor_dataset, batch_size=1024, shuffle=True)
     
     # Carica i dati di test
-    test_dataset = KernelDataset(test_path)
+    test_dataset = KernelDataset(test_path, is_train=False)
+    test_dataset.scale_features(scaler)
     test_features, test_labels = test_dataset.get_features_and_labels()
+
     test_tensor_dataset = TensorDataset(test_features, test_labels)
     testloader = DataLoader(test_tensor_dataset, batch_size=1024)
     
