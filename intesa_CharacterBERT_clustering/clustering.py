@@ -4,6 +4,7 @@ import sys
 import os
 import wandb
 import pandas as pd
+from typer import Typer
 from typing import Tuple, Callable
 from lib.plot import *
 from lib.saveOutput import *
@@ -11,48 +12,65 @@ from collections import Counter
 from itertools import combinations
 from lib.datasetManipulation import *
 from transformers import BertTokenizer
-from lib.download import download_pre_trained_model
 from lib.trainingUtilities import compute_metrics
+from lib.mlp import MLP
+from sklearn.metrics import classification_report
+from lib.kernel_sim_data_utils import create_sim_data
+from sklearn.preprocessing import MinMaxScaler
 
-download_pre_trained_model()
-import lib.CBertClassif as cbert
+# download_pre_trained_model()
 import lib.CBertClassifFrz as cbertfrz
 
+app = Typer()
 
-DATE_NAME = str(datetime.now()).split(".")[0].replace(" ", "_") 
-LOG_NAME = "clustering_test_log_" + DATE_NAME + ".txt"
-JSON_NAME = "clusters_" + DATE_NAME + ".json"
-DATASET_BUILD = "labelled_testSet_" + DATE_NAME + ".csv"
+
+DATE_NAME = str(datetime.now()).split(".")[0].replace(" ", "_").replace(":", "-") 
 DEBUG_MODE = False
 DEVICE = "cuda:0"
 LOG_WANDB = True
+DIR_OUTPUT_PATH = "./out/clustering/"
 
 # parameters
-saveToFile = SaveOutput('./out/clustering/Log/', LOG_NAME, printAll=True, debug=DEBUG_MODE)
 with open('./config/parameters.json', "r") as data_file:
     parameters = json.load(data_file)
 batch_size = parameters['batch_size']
 
 
 
-def eval_cluster_iban_pred(dataset: pd.DataFrame):
-    number_cluster_iban_ok = 0
-    shared_not_clustered_iban = 0
-    for iban, group in dataset.groupby('AccountNumber'):
-        predicted_holder = group['Predicted_Holder'].tolist()
-        holder = group['Holder'].tolist()
-        check = [predicted_holder[i] == holder[i] for i in range(len(predicted_holder))]
-        number_cluster_iban_ok += 1 if all(check) else 0
-        if not all(check): 
-            saveToFile("IBAN: " + iban + " not correctly clustered! --> " + "Transaction OK: " + str(len([el for el in check if el == True])) + " / " + str(len(check)))
-            if dataset.loc[dataset['AccountNumber'] == iban]['IsShared'].tolist()[0] == 1: 
-                shared_not_clustered_iban += 1
+def eval_cluster_iban_pred(dataset: pd.DataFrame, excluded_ibans: list, log) -> Tuple[int, int]:
+    '''It returns how many ibans have been correctly clustered, that is when
+    each predicted holder matches the real holder. It also returns the number
+    of shared account ibans that have not been clustered correctly. Both 
+    shared and unshared account transactions are analyzed in this metric.'''
+
+    correctly_clustered_iban = 0
+    wrong_clustered_shared_iban = 0
     
-    return number_cluster_iban_ok, shared_not_clustered_iban
+    for iban, group in dataset.groupby('AccountNumber'):
+        if iban not in excluded_ibans:
+            predicted_holder = group['Predicted_Holder'].tolist()
+            holder = group['Holder'].tolist()
+            check = [predicted_holder[i] == holder[i] for i in range(len(predicted_holder))]
+            correctly_clustered_iban += 1 if all(check) else 0
+            if not all(check): 
+                log("IBAN: " + iban + " not correctly clustered! --> " + "Transaction OK: " + str(len([el for el in check if el == True])) + " / " + str(len(check)))
+                if dataset.loc[dataset['AccountNumber'] == iban]['IsShared'].tolist()[0] == 1: 
+                    wrong_clustered_shared_iban += 1
+    
+    return correctly_clustered_iban, wrong_clustered_shared_iban
     
 
-def eval_transaction_holder_pred(dataset: pd.DataFrame, account_entities: dict):
-    '''It returns the number of entry with correct prediction fo holder.'''
+def eval_transaction_holder_pred(dataset: pd.DataFrame, exluded_iban: list) -> int:
+    '''It returns the number of entry with correct prediction of holder, excluding
+    ibans in the list. Both shared and unshared account transactions are analyzed 
+    in this metric.'''
+
+    filtered_dataset = dataset[~dataset["AccountNumber"].isin(exluded_iban)]
+    return (filtered_dataset['Holder'] == filtered_dataset['Predicted_Holder']).sum()
+
+
+def set_holder_predicted(dataset: pd.DataFrame, account_entities: dict):
+    '''It sets the predicted holder and the representative name for each transaction in the dataset.'''
 
     dataset['Predicted_Holder'] = None #["" for el in range(len(dataset))]
     dataset['Representative_name'] = None #["" for el in range(len(dataset))]
@@ -64,30 +82,16 @@ def eval_transaction_holder_pred(dataset: pd.DataFrame, account_entities: dict):
             for name in holder["names_list"]:       
                 holder_dict[name] = holder['holder_from_cluster_name']
                 representative_names[name] = holder['cluster_name']
-         
-        for index, row in dataset.loc[dataset['AccountNumber'] == iban].iterrows():
-            dataset.loc[index,"Predicted_Holder"] = holder_dict[row['Name']]
-            dataset.loc[index,"Representative_name"] = representative_names[row['Name']]
-    
-    num_entry_correct_holder = len(dataset.loc[dataset['Holder'] == dataset['Predicted_Holder']])
+        
+        if holder_dict and representative_names:
+            for index, row in dataset.loc[dataset['AccountNumber'] == iban].iterrows():
+                dataset.loc[index,"Predicted_Holder"] = holder_dict[row['Name']]
+                dataset.loc[index,"Representative_name"] = representative_names[row['Name']]
 
-    return num_entry_correct_holder
-    
 
 def eval_is_shared_pred(account_entities: dict):
-    for iban in account_entities:
-        if len(account_entities[iban]['holders']) > 1: 
-            account_entities[iban]['predicted_shared'] = 1
-        elif len(account_entities[iban]['holders']) == 1: 
-            account_entities[iban]['predicted_shared'] = 0
-
-    # Correction on prediction holders
-    for iban in account_entities:
-        if account_entities[iban]['predicted_shared'] == 1 and account_entities[iban]['IsShared'] == 0:
-            for i,holder in enumerate(account_entities[iban]['holders']):
-                holder['holder_from_cluster_name'] = holder['holder_from_cluster_name'] + "_" + str(i)         
+    '''It calculates the number of correctly predicted ibans on is shared task.'''
     
-    # Is shared accuracy
     predictions = [account_entities[iban]['predicted_shared'] for iban in account_entities]
     real = [account_entities[iban]['IsShared'] for iban in account_entities]
     
@@ -99,7 +103,33 @@ def eval_is_shared_pred(account_entities: dict):
     return real, predictions, num_iban_correct_pred_shared
     
 
-def create_graph(names1: list, names2: list, predicted: list, iban) -> nx.Graph:
+def set_predicted_shared_value(dataset: pd.DataFrame, account_entities: dict):
+    '''It sets the account as shared (label 1) if there is more than one
+      cluster, otherwise it is classified as unshared (label 0). '''
+    
+    dataset['IsShared_pred'] = None
+
+    for iban in account_entities:
+        num_holders = len(account_entities[iban]['holders'])
+
+        # Case where iban is shared but clusters so at least 20 and are not stored
+        if num_holders == 0:
+            account_entities[iban]['predicted_shared'] = 1
+        else:
+            if num_holders > 1: 
+                account_entities[iban]['predicted_shared'] = 1
+                # Correction on prediction holders
+                if account_entities[iban]['IsShared'] == 0:
+                    for i,holder in enumerate(account_entities[iban]['holders']):
+                        holder['holder_from_cluster_name'] = holder['holder_from_cluster_name'] + "_" + str(i)
+            else: 
+                account_entities[iban]['predicted_shared'] = 0
+            
+            for index, row in dataset.loc[dataset['AccountNumber'] == iban].iterrows():
+                dataset.loc[index,"IsShared_pred"] = account_entities[iban]['predicted_shared']
+
+
+def create_graph(names1: list, names2: list, predicted: list, iban, log) -> nx.Graph:
     '''Create the graph of connected components per IBAN.'''
 
     G = nx.Graph()
@@ -109,19 +139,18 @@ def create_graph(names1: list, names2: list, predicted: list, iban) -> nx.Graph:
         if predicted[i] == 0: G.add_edge(names1[i], names2[i])
 
     if len(predicted) != len(names1):
-        saveToFile(iban +  " " + str(len(predicted)) + " " + str(len(names1)) + " " + str(len(names2)))
+        log(iban +  " " + str(len(predicted)) + " " + str(len(names1)) + " " + str(len(names2)))
 
     return G
 
 
-def clustering(couple_df: pd.DataFrame, df: pd.DataFrame) -> dict:
+def clustering(couple_df: pd.DataFrame, df: pd.DataFrame, log) -> Tuple[dict, list]:
     account_entities = {}
+    excluded_ibans = []
 
     couple_df_groupby_iban = couple_df.groupby("iban")
-
-    for _, group in couple_df_groupby_iban:
+    for iban, group in couple_df_groupby_iban:
         shared = group['IsShared'].iloc[0]
-        iban = group['iban'].iloc[0]
         names1 = group['name1'].tolist()
         names2 = group['name2'].tolist()
         predicted = group['predicted'].tolist()
@@ -132,25 +161,26 @@ def clustering(couple_df: pd.DataFrame, df: pd.DataFrame) -> dict:
             'holders': []
         }
 
-        G = create_graph(names1, names2, predicted, iban)
+        G = create_graph(names1, names2, predicted, iban, log)
 
-        # -------------------------------------------------------
         # Create the clusters by listing the connected components
         # and selecting the representative as the longest name in each cluster
-        # -------------------------------------------------------
         clusters = list(nx.connected_components(G))
 
-        for cluster in clusters:
-            cluster_list = list(cluster)
-            representative_name = max(cluster, key=len)
-            r_nodes = [el for el in cluster_list]
-            account_entities[iban]['holders'].append({
-                    "cluster_name": representative_name,
-                    "names_list": r_nodes,
-                    "holder_from_cluster_name": df[(df['Name'] == representative_name) & (df['AccountNumber'] == iban)]['Holder'].tolist()[0]
-            })
+        if len(clusters) < 20:
+            for cluster in clusters:
+                cluster_list = list(cluster)
+                representative_name = max(cluster, key=len)
+                r_nodes = [el for el in cluster_list]
+                account_entities[iban]['holders'].append({
+                        "cluster_name": representative_name,
+                        "names_list": r_nodes,
+                        "holder_from_cluster_name": df[(df['Name'] == representative_name) & (df['AccountNumber'] == iban)]['Holder'].tolist()[0]
+                })
+        else:
+            excluded_ibans.append(iban)
     
-    return account_entities
+    return account_entities, excluded_ibans
 
 
 def extract_x_and_y(df: pd.DataFrame) -> Tuple[list, list]:
@@ -205,50 +235,85 @@ def create_pairs_for_clustering(dataset: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def load_model_with_weigths(model_name: str, path_weigths_model: str):
-    model = None
-    test = None
-    if model_name == "CBertClassif":
-        model = cbert.CBertClassif().to(DEVICE)
-        test = cbert.test
-    elif model_name == "CBertClassifFrz":
-        model = cbertfrz.CBertClassifFrz().to(DEVICE)
-        test = cbertfrz.test
-    else:
-        print("Error: unknown model.")
+def create_pairs_kernel_clustering(dataset: pd.DataFrame):
+    labels = [] # The “label” column indicates whether the couple refers to the same cluster (label 0) or not (label 1)
+    ibans = []
+    names1 = []
+    names2 = []
+    isShared = []
+    dataset.fillna(0, inplace=True)
 
-    weights = torch.load(path_weigths_model, weights_only=True)["modopt"]["model"]
+    for iban, group in dataset.groupby('AccountNumber'):
+        names = group['Name'].tolist()
+        clusters = group['cluster'].tolist()
+        shared = group['IsShared'].iloc[0]
+        
+        if(len(names)) == 1:
+            labels.append(0)
+            ibans.append(iban)
+            isShared.append(shared)
+            names1.append(names[0])
+            names2.append(names[0])
+        else:
+            for (name1, cluster1), (name2, cluster2) in combinations(zip(names, clusters), 2):
+                labels.append(0 if cluster1 == cluster2 else 1)
+                ibans.append(iban)
+                isShared.append(shared)
+                names1.append(name1)
+                names2.append(name2)     
+    
+    df = pd.DataFrame()
+    df['iban'] = ibans
+    df['name1'] = names1
+    df['name2'] = names2
+    df['label'] = labels
+    df['IsShared'] = isShared
+    
+    return df
+
+
+@app.command()
+def cbert_accounts_disambiguation(weights_path: str, dataset_path: str, name_wandb: str="clustering"):
+    # Create output directory
+    path = DIR_OUTPUT_PATH + "clustering-cbert_" + DATE_NAME + "/"
+    os.makedirs(path)
+
+    log = SaveOutput(path, "log.txt", printAll=True, debug=DEBUG_MODE)
+
+    # load dataset
+    dataset = pd.read_csv(dataset_path)
+    log("Output Log " + str(datetime.now()) + "\n")
+    log("Dataset path: " + dataset_path)
+    log("Loading dataset and model...")
+    log("Dataset loaded...\n")
+    
+    # load model
+    model = cbertfrz.CBertClassifFrz().to(DEVICE)
+    weights = torch.load(weights_path, weights_only=True)["modopt"]["model"]
     model.load_state_dict(weights)
     model.eval()
-
-    return model, test
-
-
-def accounts_disambiguation(model_name: str, weights_path: str, dataset: pd.DataFrame, name_wandb: str="clustering"):
-    # load model
-    model, test = load_model_with_weigths(model_name, weights_path)
-
+    
     # Preprocess dataset
-    saveToFile("Pairing dataset...")
+    log("Pairing dataset...")
     dataset = prepocess_dataset(dataset)
-    saveToFile("\ndataset, IsShared statistics")
-    saveToFile(str(dataset.groupby('IsShared').size()))
+    log("\ndataset, IsShared statistics")
+    log(str(dataset.groupby('IsShared').size()))
     
     # Create pairs
     couple_df = create_pairs_for_clustering(dataset)
-    saveToFile("\nDataset Preview\n")
-    saveToFile(couple_df.drop("text",axis=1).head(30).to_markdown())
-    saveToFile("\ndataset, Label statistics")
-    saveToFile(str(couple_df.groupby('label').size()))
-    saveToFile("\nPreprocessed info:")
-    saveToFile(couple_df['text'][0])
-    saveToFile("")
+    log("\nDataset Preview\n")
+    log(couple_df.drop("text",axis=1).head(30).to_markdown())
+    log("\ndataset, Label statistics")
+    log(str(couple_df.groupby('label').size()))
+    log("\nPreprocessed info:")
+    log(couple_df['text'][0])
+    log("")
 
     if LOG_WANDB:
         wandb.init(
             project="fl-ner",
             entity="mlgroup",
-            tags=["flner", "test", "clustering", model_name],
+            tags=["flner", "test", "clustering", "CBertClassiFrz"],
             name=name_wandb,
             config={
                 "model": model,
@@ -264,33 +329,33 @@ def accounts_disambiguation(model_name: str, weights_path: str, dataset: pd.Data
     X, y = extract_x_and_y(couple_df)
     couple_df = couple_df.drop('text', axis=1)
     
-    saveToFile("\nTokenized text:")
-    for i in range(10): saveToFile(str(X[i]))
-    saveToFile("")
-    saveToFile("dataset proportion: " + str(Counter(y)))
+    log("\nTokenized text:")
+    for i in range(10): log(str(X[i]))
+    log("")
+    log("dataset proportion: " + str(Counter(y)))
 
 
     # Couple prediction task
-    saveToFile("Evaluation of the model on test set on the couple prediction task...")
+    log("Evaluation of the model on test set on the couple prediction task...")
     criterion = torch.nn.CrossEntropyLoss()
-    _, metrics, predictions, total_labels = test(model, X, y, batch_size, criterion)
-    saveToFile("Couple prediction task metrics:")
+    _, metrics, predictions, total_labels = cbertfrz.test(model, X, y, batch_size, criterion)
+    log("Couple prediction task metrics:")
     for el in metrics: 
-        saveToFile("- Couple prediction - " + el +  ":" + str(metrics[el]))
+        log("- Couple prediction - " + el +  ":" + str(metrics[el]))
 
     del total_labels, X, y
 
     couple_df['outputModel'] = predictions
     couple_df['predicted'] = [torch.argmax(pred).item() for pred in predictions]
 
-    saveToFile("\nDataset Preview\n")
-    saveToFile(couple_df.head(30).to_markdown())
-    saveToFile("")
-
+    log("\nDataset Preview\n")
+    log(couple_df.head(30).to_markdown())
+    log("")
 
     # Clustering
-    account_entities = clustering(couple_df, dataset)
-
+    account_entities = clustering(couple_df, dataset, log)
+    set_predicted_shared_value(dataset, account_entities)
+    set_holder_predicted(dataset, account_entities)
     
     # Evaluate method on is shared prediction
     real, predictions, num_iban_correct_pred_shared = eval_is_shared_pred(account_entities)
@@ -299,37 +364,37 @@ def accounts_disambiguation(model_name: str, weights_path: str, dataset: pd.Data
     number_transaction_ok = eval_transaction_holder_pred(dataset, account_entities)
     
     # Evaluate method on clustered Iban prediction
-    number_cluster_iban_ok, shared_not_clustered_iban = eval_cluster_iban_pred(dataset)
+    number_cluster_iban_ok, shared_not_clustered_iban = eval_cluster_iban_pred(dataset, log)
 
     
         
     # Print statistics
     couple_df_groupby_iban = couple_df.groupby("iban")
 
-    saveToFile("\n\nEvaluation of the model on the IsShared classification task...")
-    saveToFile("Number prediction IsShared OK: " + str(num_iban_correct_pred_shared))
-    saveToFile("Number of iban: " + str(len(couple_df_groupby_iban)))    
+    log("\n\nEvaluation of the model on the IsShared classification task...")
+    log("Number prediction IsShared OK: " + str(num_iban_correct_pred_shared))
+    log("Number of iban: " + str(len(couple_df_groupby_iban)))    
     metrics = compute_metrics(predictions, real)
-    for el in metrics: saveToFile("- " + el +  ":" + str(metrics[el]))
-    saveToFile("")
+    for el in metrics: log("- " + el +  ":" + str(metrics[el]))
+    log("")
 
-    saveToFile("\n")
-    saveToFile("Evaluation of the model on the correct clustered iban prediction...")
-    saveToFile("Number of iban exactly predicted: " + str(number_cluster_iban_ok))
-    saveToFile("Number of iban: " + str(len(couple_df_groupby_iban)))    
+    log("\n")
+    log("Evaluation of the model on the correct clustered iban prediction...")
+    log("Number of iban exactly predicted: " + str(number_cluster_iban_ok))
+    log("Number of iban: " + str(len(couple_df_groupby_iban)))    
     if len(couple_df_groupby_iban) - number_cluster_iban_ok > 0:
-        saveToFile("Number of shared iban not correctly clustered: " + str(shared_not_clustered_iban))
-        saveToFile("Number of not shared iban not correctly clustered: " + str(len(couple_df_groupby_iban) - number_cluster_iban_ok - shared_not_clustered_iban))
+        log("Number of shared iban not correctly clustered: " + str(shared_not_clustered_iban))
+        log("Number of not shared iban not correctly clustered: " + str(len(couple_df_groupby_iban) - number_cluster_iban_ok - shared_not_clustered_iban))
         
-    saveToFile("- Correct Clustered Iban Accuracy:" + str(number_cluster_iban_ok / len(couple_df_groupby_iban)))
-    saveToFile("")
+    log("- Correct Clustered Iban Accuracy:" + str(number_cluster_iban_ok / len(couple_df_groupby_iban)))
+    log("")
     
-    saveToFile("\n")
-    saveToFile("Evaluation of the model on the correct transaction prediction...")
-    saveToFile("Number of transaction exactly predicted: " + str(number_transaction_ok))
-    saveToFile("Number of transaction:" + str(len(dataset)))    
-    saveToFile("- Transaction Holder Accuracy:" + str(number_transaction_ok / len(dataset)))
-    saveToFile("")
+    log("\n")
+    log("Evaluation of the model on the correct transaction prediction...")
+    log("Number of transaction exactly predicted: " + str(number_transaction_ok))
+    log("Number of transaction:" + str(len(dataset)))    
+    log("- Transaction Holder Accuracy:" + str(number_transaction_ok / len(dataset)))
+    log("")
 
     results = {
         "is_shared_task": {
@@ -355,41 +420,209 @@ def accounts_disambiguation(model_name: str, weights_path: str, dataset: pd.Data
         wandb.log(results)
         wandb.summary = results
         wandb.finish()
-    
-    # Export labelled dataset
-    dataset_path = "./out/clustering/dataset_build/"
-    if not os.path.exists(dataset_path):
-      os.makedirs(dataset_path)
-    dataset.to_csv(dataset_path+DATASET_BUILD, index=False)
-    
+
+    # Save original labelled dataset
+    dataset.to_csv(DIR_OUTPUT_PATH + "labeled_dataset.csv", index=False)
+
     # Save clusters on json file
-    saveToFile("Exporting clusters on json file...")
-    path_clusters = "./out/clustering/clusters/"
-    if not os.path.exists(path_clusters):
-        os.makedirs(path_clusters)
-    json.dump(account_entities, open(path_clusters + JSON_NAME, "w", encoding="utf-8"), ensure_ascii=False, indent=4)
+    json.dump(account_entities, open(DIR_OUTPUT_PATH + "clusters.json", "w", encoding="utf-8"), ensure_ascii=False, indent=4)
 
     return results
     
 
-def main(model_name: str, weights_path: str, dataset_path: str):
-    # load dataset
-    dataset = load_dataset(dataset_path)
-    saveToFile("Output Log " + str(datetime.now()) + "\n")
-    saveToFile("Dataset path: " + dataset_path)
-    saveToFile("Model path: " + model_name)   
-    saveToFile("Loading dataset and model...")
-    saveToFile("Dataset loaded...\n")
+@app.command()
+def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: str, name_wandb: str="clustering"):
+    # Create output directory
+    path = DIR_OUTPUT_PATH + "clustering-kernel-S" + str(seed) + "_" + DATE_NAME + "/"
+    os.makedirs(path)
     
-    accounts_disambiguation(model_name, weights_path, dataset)
+    log = SaveOutput(path, "log.txt", printAll=True, debug=DEBUG_MODE)
+    
+    log("Output Log " + str(datetime.now()) + "\n")
+    log("Dataset path (seed "+str(seed)+"): " + dataset_path)
+    log("Weights model path: "+ weights_path)
 
+    # load dataset
+    dataset = pd.read_csv(dataset_path, index_col=0)
+
+    log("Info dataset: " 
+               + str(dataset[dataset['IsShared'] == 1]['AccountNumber'].nunique()) + " shared iban, " 
+               + str(dataset[dataset['IsShared'] == 0]['AccountNumber'].nunique()) + " unshared iban, "
+               + str(len(dataset)) + " entries")
+
+    original_dataset = dataset.copy(deep=True)
+
+    dataset = dataset.drop_duplicates(subset=["AccountNumber","Name","num occorrenze","IsShared","Holder","cluster"])
+
+    pairs_df = create_pairs_kernel_clustering(dataset)
+    similarity = create_sim_data(pairs_df[['name1', 'name2', 'label']], 7)
+    pairs_df = pd.concat([pairs_df, similarity.drop(columns=["label"])], axis=1)
+
+    # load model
+    weights = torch.load(weights_path, weights_only=True)["model"]
+    model = MLP(input_dim=7).to(DEVICE)
+    model.load_state_dict(weights)
+    model.eval()
+
+    if LOG_WANDB:
+        wandb.init(
+            project="fl-ner",
+            entity="mlgroup",
+            tags=["flner", "test", "clustering", str(seed), "kernel-mlp"],
+            name=name_wandb,
+            config={
+                "model": model,
+                "weights_path": weights_path,
+                "seed": seed,
+                "iban": {
+                    "total": str(len(original_dataset.groupby("AccountNumber"))),
+                    "shared": str(dataset[dataset['IsShared'] == 1]['AccountNumber'].nunique()),
+                    "unshared": str(dataset[dataset['IsShared'] == 0]['AccountNumber'].nunique())
+                },
+                "entries": len(original_dataset),
+                "output_path": path
+            }
+        )
     
+    scaler = MinMaxScaler()
+    similarity.iloc[:, :-1] = scaler.fit_transform(similarity.iloc[:, :-1])
+
+    # Convert data to PyTorch tensors
+    test_x = torch.tensor(similarity.iloc[:, :-1].values, dtype=torch.float32)
+    test_y = torch.tensor(similarity.iloc[:, -1].values, dtype=torch.long)
+
+    # Couple prediction task
+    log("\n\nEvaluation of the model on test set on the couple prediction task...") 
+    with torch.no_grad():
+        test_preds = model(test_x.to(DEVICE)).argmax(dim=1).cpu().numpy()
+        cr_test = classification_report(
+            test_y.numpy(), test_preds, output_dict=True)
+        cr_test_str = classification_report(
+            test_y.numpy(), test_preds, output_dict=False)
+        
+        print(cr_test_str)
+        
+        test_accuracy = cr_test["accuracy"]
+        test_f1 = cr_test["macro avg"]["f1-score"]
+        f1_test_label_1 = cr_test["1"]["f1-score"]
+        f1_test_label_0 = cr_test["0"]["f1-score"]
+        precision_test_label_1 = cr_test["1"]["precision"]
+        precision_test_label_0 = cr_test["0"]["precision"]
+        recall_test_label_1 = cr_test["1"]["recall"]
+        recall_test_label_0 = cr_test["0"]["recall"]
+
+        print("test_accuracy: "+str(test_accuracy)+"\n"+
+              "test_f1: "+str(test_f1)+"\n"+
+              "f1_test_label_1: "+str(f1_test_label_1)+"\n"+
+              "f1_test_label_0: "+str(f1_test_label_0)+"\n"+
+              "precision_test_label_1: "+str(precision_test_label_1)+"\n"+
+              "precision_test_label_0: "+str(precision_test_label_0)+"\n"+
+              "recall_test_label_1: "+str(recall_test_label_1)+"\n"+
+              "recall_test_label_0: "+str(recall_test_label_0))
+
+        if LOG_WANDB:
+            wandb.log({
+                "couple_prediction_accuracy": test_accuracy,
+                "couple_prediction_f1": test_f1,
+                "couple_prediction_f1_label_1": f1_test_label_1,
+                "couple_prediction_f1_label_0": f1_test_label_0,
+                "couple_prediction_precision_label_1": precision_test_label_1,
+                "couple_prediction_precision_label_0": precision_test_label_0,
+                "couple_prediction_recall_label_1": recall_test_label_1,
+                "couple_prediction_recall_label_0": recall_test_label_0
+            })
+        
+        pairs_df['predicted'] = test_preds
+    
+    # Clustering
+    account_entities, excluded_ibans = clustering(pairs_df, dataset, log)
+    set_predicted_shared_value(dataset, account_entities)
+    set_holder_predicted(dataset, account_entities)
+
+    # Evaluate method on is shared prediction
+    real, predictions, num_iban_correct_pred_shared = eval_is_shared_pred(account_entities)
+    
+    # Evaluate method on transaction holder prediction / Exact Holder prediction
+    num_correct_transaction = eval_transaction_holder_pred(dataset, excluded_ibans)
+    
+    # Evaluate method on clustered Iban prediction
+    correctly_clustered_iban, wrong_clustered_shared_iban = eval_cluster_iban_pred(dataset, excluded_ibans, log)
+        
+    # Print statistics
+    log("\n"+str(len(excluded_ibans))+" complex ibans exluded (more than 20 holders):\n"+str(excluded_ibans))
+
+    num_iban = len(pairs_df.groupby("iban"))
+    num_filtered_iban = num_iban - len(excluded_ibans)
+    num_filtered_transaction = (~dataset['AccountNumber'].isin(excluded_ibans)).sum().item()
+    isshared_metrics = classification_report(real, predictions, output_dict=True)
+    isshared_metrics_str = {
+        "accuracy": round(isshared_metrics["accuracy"], 4),
+        "f1" : round(isshared_metrics["macro avg"]["f1-score"],4),
+        "f1_l1" : round(isshared_metrics["1"]["f1-score"],4),
+        "f1_l0" : round(isshared_metrics["0"]["f1-score"],4),
+        "precision_l1" : round(isshared_metrics["1"]["precision"],4),
+        "precision_l0" : round(isshared_metrics["0"]["precision"],4),
+        "recall_l1" : round(isshared_metrics["1"]["recall"],4),
+        "recall_l0" : round(isshared_metrics["0"]["recall"],4)
+    }
+
+    results = {
+        "is_shared_task": {
+            "num_iban_correct_pred": num_iban_correct_pred_shared,
+            "metrics": isshared_metrics_str
+        },
+        "cluster_analysis": {
+            "num_correctly_clustered_iban": correctly_clustered_iban,
+            "num_wrong_clustered_shared_iban": wrong_clustered_shared_iban,
+            "num_wrong_clustered_unshared_iban": num_filtered_iban - correctly_clustered_iban - wrong_clustered_shared_iban,
+            "accuracy": correctly_clustered_iban / num_filtered_iban
+        },
+        "transaction_analysis": {
+            "num_entry_correct_pred": num_correct_transaction,
+            "accuracy": num_correct_transaction / num_filtered_transaction
+        }
+    }
+
+    if LOG_WANDB:
+        wandb.log(results)
+        wandb.summary = results
+        wandb.finish()
+
+    log("\n\nEvaluation of the model on the IsShared classification task...")
+    log("Number of iban correctly predicted: " + str(num_iban_correct_pred_shared))
+    log("Number of iban: " + str(num_iban))
+
+    for el in isshared_metrics_str: log("- " + el +  ":" + str(isshared_metrics_str[el]))
+    
+    log("\n\nEvaluation of the model on the correct clustered iban prediction...")
+    log("Number of correctly clustered iban: " + str(correctly_clustered_iban))
+    log("Number of iban: " + str(num_filtered_iban))    
+    if num_filtered_iban - correctly_clustered_iban > 0:
+        log("Number of wrong clustered shared iban: " + str(wrong_clustered_shared_iban))
+        log("Number of wrong clustered not shared iban: " + str(results["cluster_analysis"]["num_wrong_clustered_unshared_iban"]))
+    log("- Correct Clustered Iban Accuracy (correctly clustered iban / iban): " + str(results["cluster_analysis"]["accuracy"]))
+    
+    log("\n\nEvaluation of the model on the correct transaction prediction...")
+    log("Number of transaction exactly predicted: " + str(num_correct_transaction))
+    log("Number of transaction: " + str(num_filtered_transaction))    
+    log("- Transaction Holder Accuracy (correct transaction / transaction): " + str(results["transaction_analysis"]["accuracy"]))
+
+
+    print("Exporting results...")
+
+    # Save couple prediction dataset
+    pairs_df.to_csv(path + "labeled_couple_dataset.csv", index=False)    
+
+    # Save original labelled dataset
+    set_predicted_shared_value(original_dataset, account_entities)
+    set_holder_predicted(original_dataset, account_entities)
+    original_dataset.to_csv(path + "labeled_original_dataset.csv", index=False)
+
+    # Save clusters on json file
+    json.dump(account_entities, open(path + "clusters.json", "w", encoding="utf-8"), ensure_ascii=False, indent=4)
+
+    return results
+
+
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("\nType model and datasets, first!")
-        print("USAGE: python clustering.py MODEL_NAME WEIGHTS_PATH DATASET_PATH")
-        print("where, WEIGHTS_PATH is the path of the .pt model file")
-        print("where, DATASET_PATH is a .csv or .xlsx file")
-        exit()
-    
-    main(model_name=sys.argv[1], weights_path=sys.argv[2], dataset_path=sys.argv[3])
+    app()

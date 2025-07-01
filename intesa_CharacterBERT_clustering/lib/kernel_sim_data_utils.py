@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 import torch
+from typing import Tuple
 from character_bert_model.modeling.character_bert import CharacterBertModel
 from character_bert_model.utils.character_cnn import CharacterIndexer
 
@@ -15,9 +16,12 @@ from rich.progress import track
 console = Console()
 
 
-def load_df(train_path: str, test_path: str):
+def load_df(train_path: str, test_path: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     cp_train_df = pd.read_csv(train_path)
     cp_test_df = pd.read_csv(test_path)
+
+    cp_train_df = cp_train_df.drop_duplicates(subset=["AccountNumber","Name","num occorrenze","IsShared","Holder","cluster"])
+    cp_test_df = cp_test_df.drop_duplicates(subset=["AccountNumber","Name","num occorrenze","IsShared","Holder","cluster"])
 
     train_pairs, train_labels = labeled_pairs(cp_train_df)
     test_pairs, test_labels = labeled_pairs(cp_test_df)
@@ -34,8 +38,11 @@ def load_df(train_path: str, test_path: str):
 
     return train_df, test_df
 
-def load_client_df(df_path: str):
+def load_client_df(df_path: str) -> pd.DataFrame:
     cp_df = pd.read_csv(df_path)
+
+    cp_df = cp_df.drop_duplicates(subset=["AccountNumber","Name","num occorrenze","IsShared","Holder","cluster"])
+
     pairs, labels = labeled_pairs(cp_df)
     xy = list(zip(pairs, labels))
 
@@ -110,6 +117,30 @@ def save_sim_data(fname:str, data:pd.DataFrame, n_features, oversample:bool=Fals
         f.write(f"{','.join([f'p{i}' for i in range(1,n_features+1)])},label\n")
         for sim in sims:
             f.write(f",".join([str(s) for s in sim]) + "\n")
+
+def create_sim_data(data:pd.DataFrame, n_features, oversample:bool=False, use_bert:bool=False):
+    sims = []
+    for i, (s1, s2, label) in enumerate(track(data.itertuples(index=False), total=len(data))):
+        kernel_features = kernel_features_from_pairs(s1, s2, n_features=n_features)
+        bert_features = bert_similarity(s1, s2, use_bert=use_bert)
+        sims.append(kernel_features + bert_features + [label])
+    
+    n_features = len(sims[0]) - 1
+
+    if oversample:
+        from imblearn.over_sampling import SMOTE
+        sm = SMOTE(random_state=42)
+        X = [s[:n_features] for s in sims]
+        y = [s[n_features] for s in sims]
+
+        console.log(f"Oversampling data")
+        X_res, y_res = sm.fit_resample(X, y)
+        sims = [[*s[:n_features], label] for s, label in zip(X_res, y_res)]
+
+    df = pd.DataFrame(columns=[f'p{i}' for i in range(1,n_features+1)]+["label"], data=sims)
+    
+    return df
+    
 
 def load_sim_data(train_path: str, test_path: str):
     train_df = pd.read_csv(train_path)

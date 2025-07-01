@@ -6,6 +6,7 @@
 
 import re
 import sys
+import os
 import json
 import string
 import random
@@ -16,13 +17,16 @@ from faker import Faker
 from datetime import datetime
 from IPython.display import display
 from lib.permutations import generate_permutations
+from typer import Typer
+from rich.progress import track
 
+app = Typer()
 
 
 with open('./config/parameters.json', "r") as data_file:
   parameters = json.load(data_file)
 
-PATH_OUTPUT_FILE = parameters["path_output_file"]
+PATH_OUTPUT_DIR = parameters["path_output_dir"]
 
 # numero di iban
 NUM_IBAN = parameters["num_iban"]
@@ -81,7 +85,7 @@ def check_parameters():
 
 def create_faker_objects():
   faker_objects = dict()
-  for country_code in tqdm(FAKER_COUNTRY_CODES, desc="Faker objects generation"):
+  for country_code in track(FAKER_COUNTRY_CODES, description="Faker objects generation"):
     faker_objects[country_code] = Faker(country_code)
 
   return faker_objects
@@ -326,8 +330,9 @@ def change_address_format(address, country_code):
   return address
 
 
-def data_generator(dataset, faker_objects):
-  for i in tqdm(range(NUM_IBAN),desc="Dataset generation"):
+def data_generator(faker_objects):
+  data = []
+  for i in track(range(NUM_IBAN), description="Dataset generation"):
     # Generation of BIC code
     bic, bic_country_code = bic_manual_generator()
 
@@ -357,30 +362,33 @@ def data_generator(dataset, faker_objects):
         entry_to_generate -= new_num_entry
     elif not is_shared:
       companies_info[list(companies_info.keys())[0]]["num_entry"] = num_iban_entry
+    
+    tot_entries = sum([info["num_entry"] for _,info in companies_info.items()])
 
     # Adding data generated in the dataset, possibly permuting company names
     # and addresses.
-    iban_dataframe = create_dataset()
-    size_iban_dataframe = 0
+    cluster = 1.0
     for name,info in companies_info.items():
       if info["num_entry"] != 1:
         aliases = generate_permutations(name, info["num_entry"], T, C, V, EDIT)
         for alias in aliases:
           new_address = change_address_format(companies_info[name]["address"], country_code) if np.random.choice([0,1], p=[1-PROB_ADDRESS,PROB_ADDRESS]) else ""
-          iban_dataframe.loc[size_iban_dataframe] = [bic, iban, bic_country_code, alias, new_address, is_shared, name]
-          size_iban_dataframe += 1
+          data.append({
+            "BIC":bic, "AccountNumber":iban, "CTRYbnk":bic_country_code,
+            "Name":alias, "Address":new_address, "num occorrenze":tot_entries,
+            "IsShared":is_shared, "Holder":name, "cluster":cluster if is_shared else ""
+          })
       else:
         address = change_address_format(companies_info[name]["address"], country_code) if np.random.choice([0,1], p=[1-PROB_ADDRESS,PROB_ADDRESS]) else ""
-        iban_dataframe.loc[size_iban_dataframe] = [bic, iban, bic_country_code, name, address, is_shared, name]
-        size_iban_dataframe += 1
-    
-    dataset = pd.concat([dataset, iban_dataframe], ignore_index=True)
-
-  return dataset
-
-
-def create_dataset():
-  return pd.DataFrame(columns=["BIC", "AccountNumber", "CTRYbnk", "Name", "Address", "IsShared", "Holder"])
+        data.append({
+          "BIC":bic, "AccountNumber":iban, "CTRYbnk":bic_country_code,
+          "Name":name, "Address":address, "num occorrenze":tot_entries,
+          "IsShared":is_shared, "Holder":name, "cluster":cluster if is_shared else ""
+        })
+      
+      cluster += 1
+  
+  return pd.DataFrame(data)
 
 
 def save_dataset(dataset, filePath):
@@ -391,7 +399,9 @@ def save_dataset(dataset, filePath):
 def get_dataset_filePath():
   """ return a new dataset name including actual datetime """
   now = datetime.now()
-  return "./output/dataset_" + now.strftime("%d-%m-%Y_%H-%M-%S") + ".csv"
+  if not os.path.exists(PATH_OUTPUT_DIR):
+    os.makedirs(PATH_OUTPUT_DIR)
+  return PATH_OUTPUT_DIR + "syn_dataset_" + now.strftime("%d-%m-%Y_%H-%M-%S") + ".csv"
 
 
 def print_dataset(dataset, maxLine = 20):
@@ -423,29 +433,25 @@ def save_used_parameters(dataset_file_name):
 
   json_object = json.dumps(param, indent=2)
 
-  with open(dataset_file_name[:-4] + "__parameters" + ".json", "w") as outfile:
+  with open(dataset_file_name[:-4] + "__params" + ".json", "w") as outfile:
     outfile.write(json_object)
 
 
-def main():
-  empty_dataset = create_dataset()
-  faker_objects = create_faker_objects()
+@app.command()
+def run(show_preview:bool=False):
+  check_parameters()
 
-  dataset = data_generator(empty_dataset, faker_objects)
+  faker_objects = create_faker_objects()
+  dataset = data_generator(faker_objects)
 
   path = get_dataset_filePath()
   save_dataset(dataset, path)
   save_used_parameters(path)
+  print("Dataset and parameters used are saved in /output folders.")
 
-  if len(sys.argv) > 1 and sys.argv[1] == "show":
+  if show_preview:
     print_dataset(dataset)
 
 
 if __name__ == "__main__":
-  print("\nTYPE: \t 'python dataset_generator.py show'  for a preview of the dataset .........\n")
-  print("Check parameter...")
-  check_parameters()
-  print("Main...")
-  main()
-  print("Done...")
-  print("Dataset and parameters used are saved in /output folders.")
+    app()

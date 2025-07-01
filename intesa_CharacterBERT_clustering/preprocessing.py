@@ -1,8 +1,11 @@
 import string
 import pandas as pd
 import regex as re
+from typer import Typer
 from collections import Counter
 from unidecode import unidecode
+
+app = Typer()
 
 STOP_WORDS = ["CREDIT UNION", "CU", "SAVINGS", "VAT NUMBER", "VAT", "BILLS", "ACCOUNT", "BIC"]
 
@@ -109,18 +112,18 @@ def dataset_preprocessing(dataset: pd.DataFrame, name_log: str) -> pd.DataFrame:
   return dataset
 
 
-
-def main():
+@app.command()
+def split_dataset():
   # dataset = pd.read_csv("./dataset/benchmark_intesa.csv")
   # new_datasets = dataset_preprocessing(dataset=dataset)
   # new_datasets.to_csv("./dataset/benchmark_intesa_preprocessed.csv")
 
-  df_client1 = pd.read_csv("./dataset/split_dataset/client1_train.csv")
-  df_client2 = pd.read_csv("./dataset/split_dataset/client2_train.csv")
-  df_client3 = pd.read_csv("./dataset/split_dataset/client3_train.csv")
-  df_client4 = pd.read_csv("./dataset/split_dataset/client4_train.csv")
-  df_test = pd.read_csv("./dataset/split_dataset/df_test.csv")
-  df_train = pd.read_csv("./dataset/split_dataset/df_train.csv")
+  df_client1 = pd.read_csv("./dataset/split_dataset/client1_train.csv").drop(columns=["Unnamed: 0"])
+  df_client2 = pd.read_csv("./dataset/split_dataset/client2_train.csv").drop(columns=["Unnamed: 0"])
+  df_client3 = pd.read_csv("./dataset/split_dataset/client3_train.csv").drop(columns=["Unnamed: 0"])
+  df_client4 = pd.read_csv("./dataset/split_dataset/client4_train.csv").drop(columns=["Unnamed: 0"])
+  df_test = pd.read_csv("./dataset/split_dataset/df_test.csv").drop(columns=["Unnamed: 0"])
+  df_train = pd.read_csv("./dataset/split_dataset/df_train.csv").drop(columns=["Unnamed: 0"])
   
   df_client1_new = dataset_preprocessing(dataset=df_client1, name_log="log_df_client1")
   df_client1_new.to_csv("./dataset/split_dataset/client1_train_pp.csv")
@@ -141,6 +144,12 @@ def main():
   df_train_new.to_csv("./dataset/split_dataset/df_train_pp.csv")
 
 
+@app.command()
+def dataset(path:str):
+  df = pd.read_csv(path).drop(columns=["Unnamed: 0"])
+  df_new = dataset_preprocessing(dataset=df, name_log="log_df_preproc")
+  df_new.to_csv(path[:-4]+"_pp.csv")
+
 
 if __name__ == "__main__":
-  main()
+  app()

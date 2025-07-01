@@ -25,9 +25,9 @@
 ./launchexp-nn.zsh 23517 exp_kernel_nn alg_kernel_nn no-use-bert federation
 ./launchexp-nn.zsh 47874 exp_kernel_nn alg_kernel_nn no-use-bert federation
 ./launchexp-nn.zsh 9046 exp_kernel_nn alg_kernel_nn no-use-bert federation
-./launchexp-nn.zsh 30921 exp_kernel_nn alg_kernel_nn no-use-bert federation
+# ./launchexp-nn.zsh 30921 exp_kernel_nn alg_kernel_nn no-use-bert federation
 ./launchexp-nn.zsh 81789 exp_kernel_nn alg_kernel_nn no-use-bert federation
-
+./launchexp-nn.zsh 67895 exp_kernel_nn alg_kernel_nn no-use-bert federation
 
 ### LR MODEL ###
 
