@@ -1,0 +1,107 @@
+# Dataset configuration
+data:
+    # Dataset loading config
+    dataset:
+    #     # Dataset's name
+    #     # Currently supported: mnist, svhn, mnistm, femnist, emnist, cifar10, cifar100,
+    #     #                      tiny_imagenet, shakespeare, fashion_mnist, cinic10
+        name: federated_learning.create_ddc_kernel
+        clients: 4
+        sim_train_path: dataset/similarity_client%d_train_seed_%d%s.csv
+        sim_test_path: dataset/similarity_test_seed_%d%s.csv
+        seed: 9046
+        #23517
+        #47874
+        #9046
+        #30921
+        #81789
+        bert: false
+        client_test: true
+        # Potential parameters for loading the dataset correctly
+    #     # (see the documentation of fluke.data.datasets)
+    #     # if no parameters are needed, simply do not specify anything
+    #     # params: null
+    # IID/non-IID data distribution
+    distribution:
+        # NOT USED SINCE WE HAVE A ALREADY SPLIT THE DATA
+        # AND READ THE SPLIT FROM DISK
+        # Currently supported:
+        # - iid: Independent and Identically Distributed data.
+        # - qnt: Quantity skewed data.
+        # - classqnt: Class-wise quantity skewed data.
+        # - lblqnt: Label quantity skewed data.
+        # - dir: Label skewed data according to the Dirichlet distribution.
+        # - path : Pathological skewed data (each client has data from few classes).
+        # - covshift: Covariate shift skewed data.
+        name: iid
+        # Potential parameters of the disribution, e.g., `beta` for `dir`
+        # (see the documentation of fluke.data.DataSplitter)
+        # if no parameters are needed, simply do not specify anything
+
+    # Sampling percentage when loading the dataset.
+    # Thought to be used for debugging purposes
+    # The sampling is repeated at each round
+    sampling_perc: 1
+    # Client-side test set split percentage.
+    # If set to 0, the clients do not have a test set
+    # and the evaluation is done on the server side
+    client_split: 0.0
+    # Whether to keep the test set as provided by the dataset
+    # if set to false, and `server_test=false` then the dataset's test will be uniformly
+    # split among the clients
+    keep_test: true
+    # Whether the server has a test set
+    # Note: if `keep_test` is set to true, than the server will have such a test set
+    server_test: true
+    # The size of the server split
+    # (only used when `keep_test=false` and `server_test=true`)
+    server_split: 0.0
+    # Whether to use client-side a iid test set distribution regardless
+    # of the training data distribution
+    uniform_test: false
+# Generic settings for the experiment
+exp:
+    # The device to load the tensors (auto, cpu, cuda, mps, cuda:0, etc.)
+    device: cuda:0
+    # The seed (reproducibility)
+    seed: 9046
+    #23517
+    #47874
+    #9046
+    #30921
+    #81789
+    inmemory: true
+# Evaluation configuration
+eval:
+    # The task to perform which determines the evaluation metric (only classification is currently supported)
+    task: classification
+    # Whether to evaluate the client model before the client local training starts
+    pre_fit: true
+    # Whether to evaluate the client model after the client local training
+    post_fit: true
+    # Whether to evaluate the global model on the server-side test set
+    server: true
+    # Whether to evaluate the client local models on the server-side test set
+    locals: false
+# Logger configuration
+logger:
+    name: WandBLog
+    project: fl-ner
+    entity: mlgroup
+    group: matteo-1
+    tags: ["flner", "flower-federation", 'mlp', 'spectrum-kernel', '9046', "4 local epochs", '30 rounds', 'server-test']
+# logger:
+#     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
+#     lname: Log
+#     # `wandb` parameters. Leave empty if `name` is `Log`
+#     params: null
+# FL protocol configuration
+protocol:
+    # % of eligible clients, i.e., participants, in each round
+    eligible_perc: 1
+    # Total number of clients partcipating in the federation
+    n_clients: 4
+    # Total number of rounds
+    n_rounds: 30
+    # Local epochs for each client
+    local_epochs: 4

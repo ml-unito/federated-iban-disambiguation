@@ -6,3 +6,4 @@ intesa_CharacterBERT_clustering/.DS_Store
 .DS_Store
 venv.nosync/*
 .venv/
+myenv/

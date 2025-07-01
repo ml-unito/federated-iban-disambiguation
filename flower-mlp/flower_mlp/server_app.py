@@ -1,0 +1,133 @@
+"""flower-mlp: A Flower / PyTorch app."""
+
+import yaml
+import flwr as fl
+import wandb
+from flwr.common import Context, ndarrays_to_parameters
+
+from flower_mlp.task import MLP, get_parameters, weighted_average, DEVICE
+
+
+def load_config(config_path):
+    with open(config_path, "r") as file:
+        return yaml.safe_load(file)
+
+
+class FedAvgWithLogging(fl.server.strategy.FedAvg):
+    def __init__(self, eval_config, **kwargs):
+        super().__init__(**kwargs)
+        self.eval_config = eval_config
+
+    def aggregate_evaluate(self, server_round, results, failures):
+        print(f"[DEBUG] Aggregate_evaluate: round={server_round}, results={len(results)}, failures={len(failures)}")
+        
+        # Gestisci il caso di nessun risultato
+        if not results:
+            print(f"[WARN] Round {server_round}: Nessun risultato di valutazione ricevuto dai client.")
+            # Restituisci un risultato fittizio per evitare None
+            return 0.0, {"accuracy": 0.0, "loss": 0.0, "train_macro_f1": 0.0, "test_macro_f1": 0.0}
+            
+        aggregated_result = super().aggregate_evaluate(server_round, results, failures)
+        
+        # Se anche dopo l'aggregazione non ci sono risultati, crea un risultato vuoto
+        if aggregated_result is None:
+            print(f"[WARN] Round {server_round}: Aggregazione risultati fallita.")
+            return 0.0, {"accuracy": 0.0, "loss": 0.0, "train_macro_f1": 0.0, "test_macro_f1": 0.0}
+        
+        # Log delle metriche aggregate
+        loss, metrics = aggregated_result
+
+        # Log delle metriche aggregate solo se server=true nella configurazione
+        if (
+            aggregated_result is not None
+            and wandb.run is not None
+            and self.eval_config["server"]
+        ):
+            # Usa lo stesso schema di naming per la fase global
+            global_metrics = {"global/train_loss": loss, "round": server_round}
+
+            # Aggiungi tutte le metriche con il prefisso "global/"
+            for k, v in metrics.items():
+                global_metrics[f"global/{k}"] = v
+
+            # Log su WandB
+            wandb.log(global_metrics)
+            print(f"Round {server_round} completato: {metrics}")
+
+        return aggregated_result
+
+
+def init_wandb(config):
+    
+    logger_config = config["logger"]
+    
+    wandb.init(
+        project=logger_config["project"],
+        entity=logger_config["entity"],
+        group=logger_config["group"],
+        tags=logger_config["tags"] + ["global"],  # Solo tag global
+        config=config,
+        reinit=True,
+    )
+    
+    wandb.run.name = f"flower_mlp_{config['data']['dataset']['seed']}_{config['protocol']['n_clients']}CL_{config['protocol']['n_rounds']}R_BIS"
+
+    # Definisci un layout personalizzato per WandB
+    wandb.run.log_code(".")
+
+    # Configura la visualizzazione per le metriche principali - solo global
+    for metric in ["accuracy", "macro_f1", "micro_f1", "precision", "recall"]:  # Aggiunto micro_f1
+        for dataset in ["train", "test"]:
+            wandb.define_metric(f"global.{dataset}_{metric}", step_metric="round")
+
+
+def server_fn(context: Context):
+    # Carica la configurazione
+    config = load_config("config/flower_exp_kernel_nn.yaml")
+    
+    # Debug per verificare i valori di configurazione compreso il seeding
+    print(f"[DEBUG] Configurazione caricata: {config}")
+    print(f"[DEBUG] Seeding: {config['data']['dataset']['seed']}")
+    print(f"[DEBUG] Configurazione server: n_clients={config['protocol']['n_clients']}, "
+          f"rounds={config['protocol']['n_rounds']}")
+    
+    
+    # Assicurati che l'eval del server sia attivato
+    if not config["eval"]["server"]:
+        print("ATTENZIONE: La valutazione sul server è disabilitata (eval.server=false).")
+        print("Impostazione forzata a True per evitare errori.")
+        config["eval"]["server"] = True
+    
+    # Inizializza WandB se richiesto
+    if config.get("use_wandb", True):
+        init_wandb(config)
+
+    # Parametri iniziali
+    dummy_model = MLP(input_dim=7, hidden_dim=128, output_dim=2)
+    initial_parameters = ndarrays_to_parameters(get_parameters(dummy_model))
+
+    # Crea la strategia FedAvg con logging
+    strategy = FedAvgWithLogging(
+        eval_config=config["eval"],
+        fraction_fit=1.0,  # Imposta a 1.0 per utilizzare tutti i client disponibili
+        fraction_evaluate=1.0,
+        min_fit_clients=4,  # Imposta a 1 per iniziare anche con un solo client
+        min_evaluate_clients=4,
+        min_available_clients=4,
+        initial_parameters=initial_parameters,
+        evaluate_metrics_aggregation_fn=weighted_average,
+        fit_metrics_aggregation_fn=weighted_average,
+    )
+
+    # Configura il server con timeout
+    server_config = fl.server.ServerConfig(
+        num_rounds=config["protocol"]["n_rounds"],
+        round_timeout=600  # 10 minuti di timeout per round
+    )
+
+    # Crea e restituisci i componenti del server
+    return fl.server.ServerAppComponents(strategy=strategy, config=server_config)
+
+
+# Flower ServerApp
+app = fl.server.ServerApp(server_fn=server_fn)
