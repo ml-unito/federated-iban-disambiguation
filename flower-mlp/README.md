@@ -1,9 +1,11 @@
 # flower-mlp: A Flower / PyTorch app
 
-## Install dependencies and project
+## Create virtual environment and install dependencies
 
 ```bash
-pip install -e .
+uv venv
+source .venv/bin/activate
+uv sync
 ```
 
 ## Run with the Simulation Engine
@@ -21,6 +23,56 @@ Refer to the [How to Run Simulations](https://flower.ai/docs/framework/how-to-ru
 Follow this [how-to guide](https://flower.ai/docs/framework/how-to-run-flower-with-deployment-engine.html) to run the same app in this example but with Flower's Deployment Engine. After that, you might be interested in setting up [secure TLS-enabled communications](https://flower.ai/docs/framework/how-to-enable-tls-connections.html) and [SuperNode authentication](https://flower.ai/docs/framework/how-to-authenticate-supernodes.html) in your federation.
 
 You can run Flower on Docker too! Check out the [Flower with Docker](https://flower.ai/docs/framework/docker/index.html) documentation.
+
+### Run example with 4 clients
+
+In the `flower-mlp` directory, you need to open six terminals: 1 for server process, 4 for clients process, 1 for Flower App. 
+
+In the **server terminal**, start the SuperLink process in insecure mode:
+```bash
+uv run flower-superlink --insecure
+```
+
+After that, you launch four SuperNodes (**clients**) and connect them to the SuperLink (server).
+- in the first clients terminal, run this command:
+  ```bash
+  uv run flower-supernode \
+    --insecure \
+    --superlink 127.0.0.1:9092 \
+    --clientappio-api-address 127.0.0.1:9094 \
+    --node-config "partition-id=0 num-partitions=4"
+  ```
+- in the second clients terminal, run this command:
+  ```bash
+  uv run flower-supernode \
+    --insecure \
+    --superlink 127.0.0.1:9092 \
+    --clientappio-api-address 127.0.0.1:9095 \
+    --node-config "partition-id=1 num-partitions=4"
+  ```
+- in the second clients terminal, run this command:
+  ```bash
+  uv run flower-supernode \
+    --insecure \
+    --superlink 127.0.0.1:9092 \
+    --clientappio-api-address 127.0.0.1:9096 \
+    --node-config "partition-id=2 num-partitions=4"
+  ```
+- in the second clients terminal, run this command:
+  ```bash
+  uv run flower-supernode \
+    --insecure \
+    --superlink 127.0.0.1:9092 \
+    --clientappio-api-address 127.0.0.1:9097 \
+    --node-config "partition-id=3 num-partitions=4"
+  ```
+
+As a final step, in the last terminal run the **Flower App** and follow the ServerApp logs to track the execution of the run:
+```bash
+uv run flwr run . local-deployment --stream
+```
+
+At the end of federation the global model will be saved in the _.out/_ directory.
 
 ## Resources
 
