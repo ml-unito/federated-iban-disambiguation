@@ -87,7 +87,7 @@ def init_wandb(config):
         reinit=True,
     )
     
-    wandb.run.name = f"flower_mlp_{config['data']['dataset']['seed']}_{config['protocol']['n_clients']}CL_{config['protocol']['n_rounds']}R_BIS"
+    wandb.run.name = f"flower_kernel_mlp_{config['data']['dataset']['seed']}_{config['protocol']['n_clients']}CL_{config['protocol']['n_rounds']}R"
 
     # Definisci un layout personalizzato per WandB
     wandb.run.log_code(".")
