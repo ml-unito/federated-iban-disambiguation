@@ -74,9 +74,9 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
         return parameters_aggregated, metrics_aggregated
 
 
-def init_wandb(config):
-    
+def init_wandb(config: dict, path_model_dir: str):
     logger_config = config["logger"]
+    config["output_dir"] = path_model_dir
     
     wandb.init(
         project=logger_config["project"],
@@ -114,18 +114,18 @@ def server_fn(context: Context):
         print("ATTENZIONE: La valutazione sul server è disabilitata (eval.server=false).")
         print("Impostazione forzata a True per evitare errori.")
         config["eval"]["server"] = True
-    
-    # Inizializza WandB se richiesto
-    if config.get("use_wandb", True):
-        init_wandb(config)
-
-    # Parametri iniziali
-    dummy_model = MLP(input_dim=7, hidden_dim=128, output_dim=2)
-    initial_parameters = ndarrays_to_parameters(get_parameters(dummy_model))
 
     date = str(datetime.now()).split(".")[0].replace(" ", "_").replace(":", "-") 
     path_model_dir = "./out/flwr_S"+str(config["data"]["dataset"]["seed"])+"_"+date+"/"
     os.makedirs(path_model_dir)
+    
+    # Inizializza WandB se richiesto
+    if config.get("use_wandb", True):
+        init_wandb(config, path_model_dir)
+
+    # Parametri iniziali
+    dummy_model = MLP(input_dim=7, hidden_dim=128, output_dim=2)
+    initial_parameters = ndarrays_to_parameters(get_parameters(dummy_model))
 
     # Crea la strategia FedAvg con logging
     strategy = FedAvgWithLogging(
