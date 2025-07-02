@@ -459,7 +459,7 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
     pairs_df = pd.concat([pairs_df, similarity.drop(columns=["label"])], axis=1)
 
     # load model
-    weights = torch.load(weights_path, weights_only=True)["model"]
+    weights = torch.load(weights_path, weights_only=True)#["model"]
     model = MLP(input_dim=7).to(DEVICE)
     model.load_state_dict(weights)
     model.eval()
