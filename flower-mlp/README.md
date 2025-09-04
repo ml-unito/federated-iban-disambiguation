@@ -33,7 +33,7 @@ In the **server terminal**, start the SuperLink process in insecure mode:
 uv run flower-superlink --insecure
 ```
 
-After that, you launch four SuperNodes (**clients**) and connect them to the SuperLink (server).
+After that, you launch four SuperNodes (**clients**) and connect them to the SuperLink (server):
 - in the first clients terminal, run this command:
   ```bash
   uv run flower-supernode \
@@ -50,7 +50,7 @@ After that, you launch four SuperNodes (**clients**) and connect them to the Sup
     --clientappio-api-address 127.0.0.1:9095 \
     --node-config "partition-id=1 num-partitions=4"
   ```
-- in the second clients terminal, run this command:
+- in the third clients terminal, run this command:
   ```bash
   uv run flower-supernode \
     --insecure \
@@ -58,7 +58,7 @@ After that, you launch four SuperNodes (**clients**) and connect them to the Sup
     --clientappio-api-address 127.0.0.1:9096 \
     --node-config "partition-id=2 num-partitions=4"
   ```
-- in the second clients terminal, run this command:
+- in the fourth clients terminal, run this command:
   ```bash
   uv run flower-supernode \
     --insecure \
