@@ -17,7 +17,7 @@ hyperparameters:
         optimizer:
             # if omitted, the default optimizer is SGD (optimizer name from torch.optim)
             name: AdamW
-            lr: 0.001
+            lr: 0.01
             weight_decay: 0.0005
         # HPs of the scheduler (scheduler name from torch.optim.lr_scheduler)
         # this is optional

@@ -10,7 +10,7 @@ hyperparameters:
         # Batch size
         batch_size: 1024
         # Number of local epochs
-        local_epochs: 1
+        local_epochs: 2
         # The loss function (loss name from torch.nn)
         loss: CrossEntropyLoss
         # HPs of the optimizer (the type of optimizer depends on the algorithm)
@@ -36,5 +36,5 @@ hyperparameters:
     # the fully qualified name of an user defined class
     model: lib.lr.LR
     net_args:   # input_dim is 8 with bert, else 7
-        input_dim: 8
+        input_dim: 7
         output_dim: 2

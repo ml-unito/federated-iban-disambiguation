@@ -65,6 +65,7 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
         parameters_aggregated, metrics_aggregated = super().aggregate_fit(server_round, results, failures)
 
         if parameters_aggregated is not None and server_round == self.rounds:
+            # Saving the global model at the end of all rounds.
             model = MLP(input_dim=7, hidden_dim=128, output_dim=2)
             params = fl.common.parameters_to_ndarrays(parameters_aggregated)
             state_dict = dict(zip(model.state_dict().keys(), [torch.tensor(p) for p in params]))

@@ -55,7 +55,7 @@ exp:
     # The device to load the tensors (auto, cpu, cuda, mps, cuda:0, etc.)
     device: cuda:0
     # The seed (reproducibility)
-    seed: 9046
+    seed: 81789
     inmemory: true
 # Evaluation configuration
 eval:
@@ -74,7 +74,7 @@ logger:
     name: WandBLog
     project: fl-ner
     entity: mlgroup
-    tags: ["flner", "test", "fluke", "2 epochs", "4 clients", "20 rounds", "CBertClassif", 'SEED', 'server-test', 'post-fit', 'pre-fit']
+    tags: ["flner", "test", "fluke", "2 epochs", "4 clients", "10 rounds", "CBertClassif", 'SEED', 'server-test', 'post-fit', 'pre-fit']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log
@@ -87,4 +87,4 @@ protocol:
     # Total number of clients partcipating in the federation
     n_clients: 4
     # Total number of rounds
-    n_rounds: 20
+    n_rounds: 10
