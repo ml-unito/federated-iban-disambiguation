@@ -74,18 +74,12 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
    
     for i in tqdm(range(0, len(X_train), batch_size), desc="Training"):
         batch_X = X_train[i:i+batch_size]
-        batch_y = y_train[i:i+batch_size]
+        labels = y_train[i:i+batch_size]
         
-        batch_X_first_names, batch_X_second_names = zip(*batch_X)
-
-        # Convert batch to tensors  
-        input_ids_1 = indexer.as_padded_tensor(batch_X_first_names)
+        input_ids_1, input_ids_2 = zip(*batch_X)
         input_ids_1 = input_ids_1.to(device)
-
-        input_ids_2 = indexer.as_padded_tensor(batch_X_second_names)
         input_ids_2 = input_ids_2.to(device)
 
-        labels = torch.tensor(batch_y) 
         labels = labels.to(device)
 
         optimizer.zero_grad()

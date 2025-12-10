@@ -58,16 +58,11 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
     f1 = F1Score(task="multiclass", num_classes=2, top_k=1, average="micro")
 
     for i in tqdm(range(0, len(X_train), batch_size), desc="Training"):
-        batch_X = X_train[i:i+batch_size]
-        batch_y = y_train[i:i+batch_size]
-
-        # Convert batch to tensors  
-        input_ids = indexer.as_padded_tensor(batch_X)
-        labels = torch.tensor(batch_y)
+        input_ids = X_train[i:i+batch_size]
+        labels = y_train[i:i+batch_size]
          
         input_ids = input_ids.to(device)
         labels = labels.to(device)
-        # labels = labels.unsqueeze(1)
 
         optimizer.zero_grad()                               
         outputs = model(input_ids)

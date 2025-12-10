@@ -134,13 +134,13 @@ def train_model(model, optimizer, scheduler, criterion, num_epochs: int, batch_s
 
 def extract_x_and_y(df: pd.DataFrame, model_name: str, tokenizer) -> Tuple[list, list]:
     if model_name == "CBertClassifFrzSep":
-        X = tokenize_dataset_pair(df, tokenizer).tolist()
+        tokenized_texts = tokenize_dataset_pair(df, tokenizer).tolist()
     else:
-        X = tokenize_dataset(df, tokenizer).tolist()
-    
-    y = df['label'].tolist()
+        tokenized_texts = tokenize_dataset(df, tokenizer)
 
-    return X, y
+    x, y = cbert.lookup_table(tokenized_texts, df)
+
+    return x, y
 
 
 def loads_dataset(dataset_path: str): 
@@ -159,7 +159,7 @@ def loads_dataset(dataset_path: str):
     return dataset, couple_df_path
 
 
-def create_couple_dataframe(train_path: str, test_path: str, balance: bool) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def create_couple_dataframe(train_path: str, test_path: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     # -------------------------------------------------------
     # Load the dataset and print the preview on the log file
     # -------------------------------------------------------
@@ -168,59 +168,19 @@ def create_couple_dataframe(train_path: str, test_path: str, balance: bool) -> T
     test_df, cp_test_df_path = loads_dataset(test_path)
 
     # -------------------------------------------------------
-    # Preprocessing dataset.
-    # Eventually - ballancing the dataset on the IsShared column
-    # -------------------------------------------------------
-    
-    train_df = prepocess_dataset(train_df)
-    test_df = prepocess_dataset(test_df)
-
-    if balance:
-        train_df = balance_dataset(train_df, "IsShared")
-        writeLog("\n\nBalancing the new train dataset on the IsShared column")
-        writeLog("Dataset, IsShared statistics")
-        writeLog(str(train_df.groupby('IsShared').size()))
-
-        test_df = balance_dataset(test_df, "IsShared")
-        writeLog("\n\nBalancing the new test dataset on the IsShared column")
-        writeLog("Dataset, IsShared statistics")
-        writeLog(str(test_df.groupby('IsShared').size()))
-    else:
-        writeLog("\nTrain dataset, IsShared statistics")
-        writeLog(str(train_df.groupby('IsShared').size()))
-
-        writeLog("\nTest dataset, IsShared statistics")
-        writeLog(str(train_df.groupby('IsShared').size()))
-
-    # -------------------------------------------------------
     # Create the dataset of pairs for the couple prediction task
-    # Eventually - ballancing the dataset on the label column
+    # Ballancing the training dataset on the label column
     # -------------------------------------------------------
     
     cp_train_df = create_pairs(train_df)
+    cp_train_df = balance_dataset(cp_train_df, "label", oversample=True)
+
     cp_test_df = create_pairs(test_df)
 
     del train_df, test_df
 
     writeLog("Preview of the train dataset for the couple prediction taks:\n")
     writeLog(cp_train_df.head(10).to_markdown())
-    
-    if balance:
-        cp_train_df = balance_dataset(cp_train_df, "label")
-        writeLog("\n\nBalancing the new train dataset on the labels column")
-        writeLog("Dataset, label statistics")
-        writeLog(str(cp_train_df.groupby('label').size()))
-
-        cp_test_df = balance_dataset(cp_test_df, "label")
-        writeLog("\n\nBalancing the new test dataset on the labels column")
-        writeLog("Dataset, label statistics")
-        writeLog(str(cp_test_df.groupby('label').size()))
-    else:
-        writeLog("\nTrain dataset, label statistics")
-        writeLog(str(cp_train_df.groupby('label').size()))
-
-        writeLog("\nTest dataset, label statistics")
-        writeLog(str(cp_test_df.groupby('label').size()))
 
     writeLog("\n\n- Preview of the dataset before the tokenization step:")
     writeLog(cp_train_df['text'].head(5).to_markdown())
@@ -232,7 +192,7 @@ def create_couple_dataframe(train_path: str, test_path: str, balance: bool) -> T
     return cp_train_df, cp_test_df
 
 
-def couple_prediction(model, tokenizer, train_path: str, test_path: str, balance: bool, parameters: dict, train: Callable, test: Callable, name_wandb: str):
+def couple_prediction(model, tokenizer, train_path: str, test_path: str, parameters: dict, train: Callable, test: Callable, name_wandb: str):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model.to(device)
 
@@ -242,7 +202,7 @@ def couple_prediction(model, tokenizer, train_path: str, test_path: str, balance
     writeLog(str(model))
     writeLog("\n")
 
-    cp_train_df, cp_test_df = create_couple_dataframe(train_path, test_path, balance)
+    cp_train_df, cp_test_df = create_couple_dataframe(train_path, test_path)
 
     model_name = model. __class__. __name__
     X_train, y_train = extract_x_and_y(df=cp_train_df, model_name=model_name, tokenizer=tokenizer)
@@ -314,7 +274,7 @@ def couple_prediction(model, tokenizer, train_path: str, test_path: str, balance
     writeLog("You can see the model .pt file at the link: " + BEST_MODEL_PATH)
 
 
-def main(model_name: str, train_path: str, test_path: str, config_path: str, balance: bool, name_wandb: str):
+def main(model_name: str, train_path: str, test_path: str, config_path: str, name_wandb: str):
     # Loads parameters
     config_file = open(config_path)
     parameters = json.load(config_file)
@@ -323,13 +283,13 @@ def main(model_name: str, train_path: str, test_path: str, config_path: str, bal
     tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
 
     if model_name == "CBertClassif":
-        couple_prediction(model=cbert.CBertClassif(), tokenizer=tokenizer, train_path=train_path, test_path=test_path, balance=balance, parameters=parameters,
+        couple_prediction(model=cbert.CBertClassif(), tokenizer=tokenizer, train_path=train_path, test_path=test_path, parameters=parameters,
                           train=cbert.train, test=cbert.test, name_wandb=name_wandb)
     elif model_name == "CBertClassifFrz":
-        couple_prediction(model=cbertfr.CBertClassifFrz(), tokenizer=tokenizer, train_path=train_path, test_path=test_path, balance=balance, parameters=parameters,
+        couple_prediction(model=cbertfr.CBertClassifFrz(), tokenizer=tokenizer, train_path=train_path, test_path=test_path, parameters=parameters,
                           train=cbertfr.train, test=cbertfr.test, name_wandb=name_wandb)
     elif model_name == "CBertClassifFrzSep":
-        couple_prediction(model=cbertfrsp.CBertClassifFrzSep(), tokenizer=tokenizer, train_path=train_path, test_path=test_path, balance=balance, parameters=parameters,
+        couple_prediction(model=cbertfrsp.CBertClassifFrzSep(), tokenizer=tokenizer, train_path=train_path, test_path=test_path, parameters=parameters,
                           train=cbertfrsp.train, test=cbertfrsp.test, name_wandb=name_wandb)
     else:
         print("Error: unknown model.")
@@ -350,11 +310,6 @@ if __name__ == "__main__":
     model_name = sys.argv[3]
     config_path = sys.argv[4]
     name_wandb = sys.argv[5]
-
-    balance = True
-    if len(sys.argv) == 7:
-        if(sys.argv[6] == "unbalance"):
-            balance = False
     
     main(model_name=model_name, train_path=train_path, test_path=test_path,
-          config_path=config_path, balance=balance, name_wandb=name_wandb)
+          config_path=config_path, name_wandb=name_wandb)
