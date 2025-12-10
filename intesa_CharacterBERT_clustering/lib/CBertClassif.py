@@ -115,12 +115,9 @@ def test(model, X_test, y_test, batch_size, criterion):
 
     with torch.no_grad():
         for i in tqdm(range(0, len(X_test), batch_size), desc="Testing"):
-            batch_X = X_test[i:i+batch_size]
-            batch_y = y_test[i:i+batch_size]
+            input_ids= X_test[i:i+batch_size]
+            labels = y_test[i:i+batch_size]
             
-            # Convert batch to tensors  
-            input_ids = indexer.as_padded_tensor(batch_X)
-            labels = torch.tensor(batch_y)
             input_ids = input_ids.to(device)
             labels = labels.to(device)
             
