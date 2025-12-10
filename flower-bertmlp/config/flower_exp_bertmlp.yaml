@@ -1,0 +1,48 @@
+# Dataset configuration  
+data:
+    dataset:
+        # Path agli split pre-processati per ogni client
+        client_train_paths:
+            - ./dataset/split_dataset/client1_train_pp.csv
+            - ./dataset/split_dataset/client2_train_pp.csv
+            - ./dataset/split_dataset/client3_train_pp.csv
+            - ./dataset/split_dataset/client4_train_pp.csv
+        test_path: ./dataset/split_dataset/df_test_pp.csv
+        seed: 81789
+        balance_train: true   # Bilancia i dati di training (oversample)
+        balance_test: false   # Non bilanciare i dati di test
+# Evaluation configuration
+eval:
+    # The task to perform which determines the evaluation metric (only classification is currently supported)
+    task: classification
+    # Whether to evaluate the client model before the client local training starts
+    pre_fit: true
+    # Whether to evaluate the client model after the client local training
+    post_fit: true
+    # Whether to evaluate the global model on the server-side test set
+    server: true
+    # Whether to evaluate the client local models on the server-side test set
+    locals: false
+# Logger configuration
+logger:
+    name: WandBLog
+    project: fl-ner
+    entity: mlgroup
+    group: flower-bert-mlp-R10-E2
+    tags: ["flner", "flower-federation", 'mlp', 'bert', '81789', "2 local epochs", '10 rounds', 'server-test', 'lr-1e-6']
+# FL protocol configuration
+protocol:
+    # % of eligible clients, i.e., participants, in each round
+    eligible_perc: 1
+    # Total number of clients partcipating in the federation
+    n_clients: 4
+    # Total number of rounds
+    n_rounds: 10
+    # Local epochs for each client
+    local_epochs: 2
+# Training configuration
+training:
+    learning_rate: 0.000001  # 1e-6
+    weight_decay: 0.01
+    max_grad_norm: 1.0
+    batch_size: 256

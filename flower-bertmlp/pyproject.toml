@@ -1,0 +1,49 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "flower-bertmlp"
+version = "1.0.0"
+description = "BERT-based federated learning with Flower"
+license = "Apache-2.0"
+requires-python = ">=3.11"
+dependencies = [
+    "flwr>=1.18.0",
+    "torch==2.6.0",
+    "transformers==4.51.3",
+    "scikit-learn>=1.3.0",
+    "gdown>=5.2.0",
+    "requests>=2.25.0",
+    "regex>=2024.11.6",
+    "unidecode>=1.3.8",
+    "pandas>=1.5.0",
+    "numpy>=1.24.0",
+    "pyyaml>=6.0",
+    "wandb>=0.15.0",
+    "torchmetrics>=0.11.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[tool.flwr.app]
+publisher = "matteo"
+
+[tool.flwr.app.components]
+serverapp = "flower_bertmlp.server_app:app"
+clientapp = "flower_bertmlp.client_app:app"
+
+[tool.flwr.app.config]
+num-server-rounds = 30
+fraction-fit = 0.5
+local-epochs = 4
+# Timeout per i messaggi (in secondi)
+message-ttl = 3600
+# Timeout per la connessione
+connection-timeout = 600
+
+[tool.flwr.federations.local-deployment]
+address = "127.0.0.1:9093"
+insecure = true
+
