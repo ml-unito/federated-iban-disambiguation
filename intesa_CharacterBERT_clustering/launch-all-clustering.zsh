@@ -13,9 +13,17 @@
 # ./launchexp-clustering.zsh 67895 ./out/fl_models_unique_67895_eef73bbaba1745c38ac2627d86580d84/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-67895-unique--no-complex-iban
 
 
-# Flower model
-./launchexp-clustering.zsh 9046 ../flower-mlp/out/flwr_S9046_2025-07-01_19-03-50/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-9046-unique--no-complex-iban
-./launchexp-clustering.zsh 23517 ../flower-mlp/out/flwr_S23517_2025-07-01_18-34-33/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-23517-unique--no-complex-iban
-./launchexp-clustering.zsh 47874 ../flower-mlp/out/flwr_S47874_2025-07-01_18-52-00/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-47874-unique--no-complex-iban
-./launchexp-clustering.zsh 81789 ../flower-mlp/out/flwr_S81789_2025-07-01_19-27-19/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-81789-unique--no-complex-iban
-./launchexp-clustering.zsh 67895 ../flower-mlp/out/flwr_S67895_2025-07-01_19-15-22/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-67895-unique--no-complex-iban
+# Flower model with Kernel model with MLP
+# ./launchexp-clustering.zsh kernel-accounts-disambiguation 9046 ../flower-mlp/out/flwr_S9046_2025-07-01_19-03-50/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-9046-unique--no-complex-iban
+# ./launchexp-clustering.zsh kernel-accounts-disambiguation 23517 ../flower-mlp/out/flwr_S23517_2025-07-01_18-34-33/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-23517-unique--no-complex-iban
+# ./launchexp-clustering.zsh kernel-accounts-disambiguation 47874 ../flower-mlp/out/flwr_S47874_2025-07-01_18-52-00/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-47874-unique--no-complex-iban
+# ./launchexp-clustering.zsh kernel-accounts-disambiguation 81789 ../flower-mlp/out/flwr_S81789_2025-07-01_19-27-19/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-81789-unique--no-complex-iban
+# ./launchexp-clustering.zsh kernel-accounts-disambiguation 67895 ../flower-mlp/out/flwr_S67895_2025-07-01_19-15-22/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-67895-unique--no-complex-iban
+
+
+# Flower model Full CBert
+./launchexp-clustering.zsh cbert-accounts-disambiguation 9046 ../flower-mlp/out/cbert/flwr_S9046_20251204_230420/global_model_R10.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-cbert-9046-unique--no-complex-iban
+./launchexp-clustering.zsh cbert-accounts-disambiguation 23517 ../flower-mlp/out/cbert/flwr_S23517_20251204_200840/global_model_R10.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-cbert-23517-unique--no-complex-iban
+./launchexp-clustering.zsh cbert-accounts-disambiguation 47874 ../flower-mlp/out/cbert/flwr_S47874_20251204_162434/global_model_R10.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-cbert-47874-unique--no-complex-iban
+./launchexp-clustering.zsh cbert-accounts-disambiguation 67895 ../flower-mlp/out/cbert/flwr_S67895_20251205_082434/global_model_R10.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-cbert-67895-unique--no-complex-iban
+./launchexp-clustering.zsh cbert-accounts-disambiguation 81789 ../flower-mlp/out/cbert/flwr_S81789_20251205_111057/global_model_R10.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-cbert-81895-unique--no-complex-iban

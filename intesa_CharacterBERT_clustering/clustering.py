@@ -19,7 +19,7 @@ from lib.kernel_sim_data_utils import create_sim_data
 from sklearn.preprocessing import MinMaxScaler
 
 # download_pre_trained_model()
-import lib.CBertClassifFrz as cbertfrz
+import lib.CBertClassif as cbert
 
 app = Typer()
 
@@ -183,13 +183,13 @@ def clustering(couple_df: pd.DataFrame, df: pd.DataFrame, log) -> Tuple[dict, li
     return account_entities, excluded_ibans
 
 
-def extract_x_and_y(df: pd.DataFrame) -> Tuple[list, list]:
+def extract_x_and_y(df: pd.DataFrame) -> Tuple[torch.Tensor, torch.Tensor]:
     tokenizer = BertTokenizer.from_pretrained('./character_bert_model/pretrained-models/general_character_bert/')
-   
-    X = tokenize_dataset(df, tokenizer).tolist()
-    y = df['label'].tolist()
 
-    return X, y
+    tokenized_texts = tokenize_dataset(df, tokenizer)
+    x, y = cbert.lookup_table(tokenized_texts, df)
+
+    return x, y
 
 
 def create_pairs_for_clustering(dataset: pd.DataFrame) -> pd.DataFrame:
@@ -273,87 +273,114 @@ def create_pairs_kernel_clustering(dataset: pd.DataFrame):
 
 
 @app.command()
-def cbert_accounts_disambiguation(weights_path: str, dataset_path: str, name_wandb: str="clustering"):
+def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: str, name_wandb: str="clustering"):
     # Create output directory
-    path = DIR_OUTPUT_PATH + "clustering-cbert_" + DATE_NAME + "/"
+    path = DIR_OUTPUT_PATH + "clustering-cbert-S" + str(seed) + "_" + DATE_NAME + "/"
     os.makedirs(path)
 
     log = SaveOutput(path, "log.txt", printAll=True, debug=DEBUG_MODE)
+    log("Output Log " + str(datetime.now()) + "\n")
+    log("Dataset path (seed "+str(seed)+"): " + dataset_path)
+    log("Weights model path: "+ weights_path)
 
     # load dataset
-    dataset = pd.read_csv(dataset_path)
-    log("Output Log " + str(datetime.now()) + "\n")
-    log("Dataset path: " + dataset_path)
-    log("Loading dataset and model...")
-    log("Dataset loaded...\n")
+    dataset = pd.read_csv(dataset_path, index_col=0)
+
+    log("Info dataset: " 
+               + str(dataset[dataset['IsShared'] == 1]['AccountNumber'].nunique()) + " shared iban, " 
+               + str(dataset[dataset['IsShared'] == 0]['AccountNumber'].nunique()) + " unshared iban, "
+               + str(len(dataset)) + " entries")
     
+    original_dataset = dataset.copy(deep=True)
+    dataset = dataset.drop_duplicates(subset=["AccountNumber","Name","num occorrenze","IsShared","Holder","cluster"])
+
+    # Create pairs
+    pairs_df = create_pairs_for_clustering(dataset)
+
     # load model
-    model = cbertfrz.CBertClassifFrz().to(DEVICE)
-    weights = torch.load(weights_path, weights_only=True)["modopt"]["model"]
+    model = cbert.CBertClassif().to(DEVICE)
+    weights = torch.load(weights_path, weights_only=True)#["modopt"]["model"]
     model.load_state_dict(weights)
     model.eval()
-    
-    # Preprocess dataset
-    log("Pairing dataset...")
-    dataset = prepocess_dataset(dataset)
-    log("\ndataset, IsShared statistics")
-    log(str(dataset.groupby('IsShared').size()))
-    
-    # Create pairs
-    couple_df = create_pairs_for_clustering(dataset)
-    log("\nDataset Preview\n")
-    log(couple_df.drop("text",axis=1).head(30).to_markdown())
-    log("\ndataset, Label statistics")
-    log(str(couple_df.groupby('label').size()))
-    log("\nPreprocessed info:")
-    log(couple_df['text'][0])
-    log("")
 
     if LOG_WANDB:
         wandb.init(
             project="fl-ner",
             entity="mlgroup",
-            tags=["flner", "test", "clustering", "CBertClassiFrz"],
+            tags=["flner", "test", "clustering", "CBertClassif", str(seed)],
             name=name_wandb,
             config={
                 "model": model,
                 "weights_path": weights_path,
-                "test_dataset": {
-                    "size_original": len(dataset),
-                    "num_couple": len(couple_df)
-                }
+                "seed": seed,
+                "iban": {
+                    "total": str(len(original_dataset.groupby("AccountNumber"))),
+                    "shared": str(dataset[dataset['IsShared'] == 1]['AccountNumber'].nunique()),
+                    "unshared": str(dataset[dataset['IsShared'] == 0]['AccountNumber'].nunique())
+                },
+                "entries": len(original_dataset),
+                "output_path": path
             }
         )
     
+
     # Tokenize pairs
-    X, y = extract_x_and_y(couple_df)
-    couple_df = couple_df.drop('text', axis=1)
+    test_x, test_y = extract_x_and_y(pairs_df)
+    pairs_df = pairs_df.drop('text', axis=1)
     
     log("\nTokenized text:")
-    for i in range(10): log(str(X[i]))
+    for i in range(10): log(str(test_x[i]))
     log("")
-    log("dataset proportion: " + str(Counter(y)))
+    log("dataset proportion: " + str(Counter(test_y)))
 
 
     # Couple prediction task
-    log("Evaluation of the model on test set on the couple prediction task...")
+    log("\n\nEvaluation of the model on test set on the couple prediction task...") 
+    
     criterion = torch.nn.CrossEntropyLoss()
-    _, metrics, predictions, total_labels = cbertfrz.test(model, X, y, batch_size, criterion)
-    log("Couple prediction task metrics:")
-    for el in metrics: 
-        log("- Couple prediction - " + el +  ":" + str(metrics[el]))
+    _, metrics, predictions, total_labels = cbert.test(model, test_x, test_y, batch_size, criterion)
+    
+    predictions = torch.stack(predictions).argmax(dim=1).cpu().numpy()
+    cr_test = classification_report(
+            test_y.numpy(), predictions, output_dict=True)
+    cr_test_str = classification_report(
+            test_y.numpy(), predictions, output_dict=False)
+        
+    print(cr_test_str)
+    
+    test_accuracy = cr_test["accuracy"]
+    test_f1 = cr_test["macro avg"]["f1-score"]
+    f1_test_label_1 = cr_test["1"]["f1-score"]
+    f1_test_label_0 = cr_test["0"]["f1-score"]
+    precision_test_label_1 = cr_test["1"]["precision"]
+    precision_test_label_0 = cr_test["0"]["precision"]
+    recall_test_label_1 = cr_test["1"]["recall"]
+    recall_test_label_0 = cr_test["0"]["recall"]
 
-    del total_labels, X, y
-
-    couple_df['outputModel'] = predictions
-    couple_df['predicted'] = [torch.argmax(pred).item() for pred in predictions]
-
-    log("\nDataset Preview\n")
-    log(couple_df.head(30).to_markdown())
-    log("")
+    print("test_accuracy: "+str(test_accuracy)+"\n"+
+            "test_f1: "+str(test_f1)+"\n"+
+            "f1_test_label_1: "+str(f1_test_label_1)+"\n"+
+            "f1_test_label_0: "+str(f1_test_label_0)+"\n"+
+            "precision_test_label_1: "+str(precision_test_label_1)+"\n"+
+            "precision_test_label_0: "+str(precision_test_label_0)+"\n"+
+            "recall_test_label_1: "+str(recall_test_label_1)+"\n"+
+            "recall_test_label_0: "+str(recall_test_label_0))
+    if LOG_WANDB:
+        wandb.log({
+            "couple_prediction_accuracy": test_accuracy,
+            "couple_prediction_f1": test_f1,
+            "couple_prediction_f1_label_1": f1_test_label_1,
+            "couple_prediction_f1_label_0": f1_test_label_0,
+            "couple_prediction_precision_label_1": precision_test_label_1,
+            "couple_prediction_precision_label_0": precision_test_label_0,
+            "couple_prediction_recall_label_1": recall_test_label_1,
+            "couple_prediction_recall_label_0": recall_test_label_0
+        })
+    
+    pairs_df['predicted'] = predictions
 
     # Clustering
-    account_entities = clustering(couple_df, dataset, log)
+    account_entities, excluded_ibans = clustering(pairs_df, dataset, log)
     set_predicted_shared_value(dataset, account_entities)
     set_holder_predicted(dataset, account_entities)
     
@@ -361,58 +388,43 @@ def cbert_accounts_disambiguation(weights_path: str, dataset_path: str, name_wan
     real, predictions, num_iban_correct_pred_shared = eval_is_shared_pred(account_entities)
     
     # Evaluate method on transaction holder prediction / Exact Holder prediction
-    number_transaction_ok = eval_transaction_holder_pred(dataset, account_entities)
+    num_correct_transaction = eval_transaction_holder_pred(dataset, excluded_ibans)
     
     # Evaluate method on clustered Iban prediction
-    number_cluster_iban_ok, shared_not_clustered_iban = eval_cluster_iban_pred(dataset, log)
-
-    
+    correctly_clustered_iban, wrong_clustered_shared_iban = eval_cluster_iban_pred(dataset, excluded_ibans, log)
         
     # Print statistics
-    couple_df_groupby_iban = couple_df.groupby("iban")
+    log("\n"+str(len(excluded_ibans))+" complex ibans exluded (more than 20 holders):\n"+str(excluded_ibans))
 
-    log("\n\nEvaluation of the model on the IsShared classification task...")
-    log("Number prediction IsShared OK: " + str(num_iban_correct_pred_shared))
-    log("Number of iban: " + str(len(couple_df_groupby_iban)))    
-    metrics = compute_metrics(predictions, real)
-    for el in metrics: log("- " + el +  ":" + str(metrics[el]))
-    log("")
-
-    log("\n")
-    log("Evaluation of the model on the correct clustered iban prediction...")
-    log("Number of iban exactly predicted: " + str(number_cluster_iban_ok))
-    log("Number of iban: " + str(len(couple_df_groupby_iban)))    
-    if len(couple_df_groupby_iban) - number_cluster_iban_ok > 0:
-        log("Number of shared iban not correctly clustered: " + str(shared_not_clustered_iban))
-        log("Number of not shared iban not correctly clustered: " + str(len(couple_df_groupby_iban) - number_cluster_iban_ok - shared_not_clustered_iban))
-        
-    log("- Correct Clustered Iban Accuracy:" + str(number_cluster_iban_ok / len(couple_df_groupby_iban)))
-    log("")
-    
-    log("\n")
-    log("Evaluation of the model on the correct transaction prediction...")
-    log("Number of transaction exactly predicted: " + str(number_transaction_ok))
-    log("Number of transaction:" + str(len(dataset)))    
-    log("- Transaction Holder Accuracy:" + str(number_transaction_ok / len(dataset)))
-    log("")
+    num_iban = len(pairs_df.groupby("iban"))
+    num_filtered_iban = num_iban - len(excluded_ibans)
+    num_filtered_transaction = (~dataset['AccountNumber'].isin(excluded_ibans)).sum().item()
+    isshared_metrics = classification_report(real, predictions, output_dict=True)
+    isshared_metrics_str = {
+        "accuracy": round(isshared_metrics["accuracy"], 4),
+        "f1" : round(isshared_metrics["macro avg"]["f1-score"],4),
+        "f1_l1" : round(isshared_metrics["1"]["f1-score"],4),
+        "f1_l0" : round(isshared_metrics["0"]["f1-score"],4),
+        "precision_l1" : round(isshared_metrics["1"]["precision"],4),
+        "precision_l0" : round(isshared_metrics["0"]["precision"],4),
+        "recall_l1" : round(isshared_metrics["1"]["recall"],4),
+        "recall_l0" : round(isshared_metrics["0"]["recall"],4)
+    }
 
     results = {
         "is_shared_task": {
             "num_iban_correct_pred": num_iban_correct_pred_shared,
-            "num_iban": len(couple_df_groupby_iban),
-            "metrics": metrics
+            "metrics": isshared_metrics_str
         },
         "cluster_analysis": {
-            "num_iban_correct_pred": number_cluster_iban_ok,
-            "num_iban": len(couple_df_groupby_iban),
-            "num_shared_iban_not_correct_clustered": shared_not_clustered_iban,
-            "num_notshared_iban_not_correct_clustered": len(couple_df_groupby_iban) - number_cluster_iban_ok - shared_not_clustered_iban,
-            "accuracy": number_cluster_iban_ok / len(couple_df_groupby_iban)
+            "num_correctly_clustered_iban": correctly_clustered_iban,
+            "num_wrong_clustered_shared_iban": wrong_clustered_shared_iban,
+            "num_wrong_clustered_unshared_iban": num_filtered_iban - correctly_clustered_iban - wrong_clustered_shared_iban,
+            "accuracy": correctly_clustered_iban / num_filtered_iban
         },
         "transaction_analysis": {
-            "num_entry_correct_pred": number_transaction_ok,
-            "num_entry": len(dataset),
-            "accuracy": number_transaction_ok / len(dataset)
+            "num_entry_correct_pred": num_correct_transaction,
+            "accuracy": num_correct_transaction / num_filtered_transaction
         }
     }
 
@@ -421,11 +433,38 @@ def cbert_accounts_disambiguation(weights_path: str, dataset_path: str, name_wan
         wandb.summary = results
         wandb.finish()
 
+    log("\n\nEvaluation of the model on the IsShared classification task...")
+    log("Number of iban correctly predicted: " + str(num_iban_correct_pred_shared))
+    log("Number of iban: " + str(num_iban))
+
+    for el in isshared_metrics_str: log("- " + el +  ":" + str(isshared_metrics_str[el]))
+    
+    log("\n\nEvaluation of the model on the correct clustered iban prediction...")
+    log("Number of correctly clustered iban: " + str(correctly_clustered_iban))
+    log("Number of iban: " + str(num_filtered_iban))    
+    if num_filtered_iban - correctly_clustered_iban > 0:
+        log("Number of wrong clustered shared iban: " + str(wrong_clustered_shared_iban))
+        log("Number of wrong clustered not shared iban: " + str(results["cluster_analysis"]["num_wrong_clustered_unshared_iban"]))
+    log("- Correct Clustered Iban Accuracy (correctly clustered iban / iban): " + str(results["cluster_analysis"]["accuracy"]))
+    
+    log("\n\nEvaluation of the model on the correct transaction prediction...")
+    log("Number of transaction exactly predicted: " + str(num_correct_transaction))
+    log("Number of transaction: " + str(num_filtered_transaction))    
+    log("- Transaction Holder Accuracy (correct transaction / transaction): " + str(results["transaction_analysis"]["accuracy"]))
+
+
+    print("Exporting results...")
+
+    # Save couple prediction dataset
+    pairs_df.to_csv(path + "labeled_couple_dataset.csv", index=False)    
+
     # Save original labelled dataset
-    dataset.to_csv(DIR_OUTPUT_PATH + "labeled_dataset.csv", index=False)
+    set_predicted_shared_value(original_dataset, account_entities)
+    set_holder_predicted(original_dataset, account_entities)
+    original_dataset.to_csv(path + "labeled_original_dataset.csv", index=False)
 
     # Save clusters on json file
-    json.dump(account_entities, open(DIR_OUTPUT_PATH + "clusters.json", "w", encoding="utf-8"), ensure_ascii=False, indent=4)
+    json.dump(account_entities, open(path + "clusters.json", "w", encoding="utf-8"), ensure_ascii=False, indent=4)
 
     return results
     
