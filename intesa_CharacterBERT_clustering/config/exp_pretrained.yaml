@@ -7,8 +7,8 @@ data:
     #     #                      tiny_imagenet, shakespeare, fashion_mnist, cinic10
         name: federated_learning.create_ddc_cbert
         clients: 4
-        train_path: ./dataset/split_dataset/client%d_train_pp.csv
-        test_path: ./dataset/split_dataset/df_test_pp.csv
+        train_path: ./dataset/split_dataset_S9046/client%d_train_pp.csv
+        test_path: ./dataset/split_dataset_S9046/df_test_pp.csv
         client_test: true
         # Potential parameters for loading the dataset correctly
     #     # (see the documentation of fluke.data.datasets)

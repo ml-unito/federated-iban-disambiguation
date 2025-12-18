@@ -22,11 +22,12 @@ import wandb
 app = Typer()
 console = Console()
 
-DF_TRAIN_PATH = "dataset/split_dataset/df_train_pp.csv"
-DF_TEST_PATH = "dataset/split_dataset/df_test_pp.csv"
+DF_DIR_PATH = "dataset/split_dataset_S%d/"
+DF_TRAIN_PATH = "dataset/split_dataset_S%d/df_train_pp.csv"
+DF_TEST_PATH = "dataset/split_dataset_S%d/df_test_pp.csv"
+
 SIM_TRAIN_PATH = "dataset/similarity_train_seed_%d%s.csv"
 SIM_TEST_PATH = "dataset/similarity_test_seed_%d%s.csv"
-DF_DIR_PATH = "dataset/split_dataset/"
 
 
 def log_metrics(step, model, train_x, train_y, test_x, test_y, running_loss, print_classification_report=False):
@@ -96,8 +97,8 @@ def create_dataset(seed: int, n_features: int = 7, overwrite: bool = False, use_
     sim_test_path = SIM_TEST_PATH % (seed, "_w-bert" if use_bert else "")
 
     train, test = load_df(
-        train_path=DF_TRAIN_PATH,
-        test_path=DF_TEST_PATH
+        train_path=DF_TRAIN_PATH % seed,
+        test_path=DF_TEST_PATH % seed
     )
 
     if os.path.exists(sim_train_path) and not overwrite:
@@ -122,7 +123,7 @@ def create_clients_datasets(seed: int, clients: int, n_features: int = 7, overwr
             str(client) + "_train_seed_" + str(seed) + \
             ("_w-bert" if use_bert else "") + ".csv"
         df_client = load_client_df(
-            DF_DIR_PATH + "client" + str(client) + "_train_pp.csv")
+            DF_DIR_PATH % seed + "client" + str(client) + "_train_pp.csv")
         if os.path.exists(sim_path) and not overwrite:
             console.log(f"Client " + str(client) +
                         " train data already exists at {sim_path}")

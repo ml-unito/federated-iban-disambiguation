@@ -113,35 +113,31 @@ def dataset_preprocessing(dataset: pd.DataFrame, name_log: str) -> pd.DataFrame:
 
 
 @app.command()
-def split_dataset():
-  # dataset = pd.read_csv("./dataset/benchmark_intesa.csv")
-  # new_datasets = dataset_preprocessing(dataset=dataset)
-  # new_datasets.to_csv("./dataset/benchmark_intesa_preprocessed.csv")
-
-  df_client1 = pd.read_csv("./dataset/split_dataset/client1_train.csv").drop(columns=["Unnamed: 0"])
-  df_client2 = pd.read_csv("./dataset/split_dataset/client2_train.csv").drop(columns=["Unnamed: 0"])
-  df_client3 = pd.read_csv("./dataset/split_dataset/client3_train.csv").drop(columns=["Unnamed: 0"])
-  df_client4 = pd.read_csv("./dataset/split_dataset/client4_train.csv").drop(columns=["Unnamed: 0"])
-  df_test = pd.read_csv("./dataset/split_dataset/df_test.csv").drop(columns=["Unnamed: 0"])
-  df_train = pd.read_csv("./dataset/split_dataset/df_train.csv").drop(columns=["Unnamed: 0"])
+def split_dataset(path:str):
+  df_client1 = pd.read_csv(path + "/client1_train.csv").drop(columns=["Unnamed: 0"])
+  df_client2 = pd.read_csv(path + "/client2_train.csv").drop(columns=["Unnamed: 0"])
+  df_client3 = pd.read_csv(path + "/client3_train.csv").drop(columns=["Unnamed: 0"])
+  df_client4 = pd.read_csv(path + "/client4_train.csv").drop(columns=["Unnamed: 0"])
+  df_test = pd.read_csv(path + "/df_test.csv").drop(columns=["Unnamed: 0"])
+  df_train = pd.read_csv(path + "/df_train.csv").drop(columns=["Unnamed: 0"])
   
   df_client1_new = dataset_preprocessing(dataset=df_client1, name_log="log_df_client1")
-  df_client1_new.to_csv("./dataset/split_dataset/client1_train_pp.csv")
+  df_client1_new.to_csv(path + "/client1_train_pp.csv")
 
   df_client2_new = dataset_preprocessing(dataset=df_client2, name_log="log_df_client2")
-  df_client2_new.to_csv("./dataset/split_dataset/client2_train_pp.csv")
+  df_client2_new.to_csv(path + "/client2_train_pp.csv")
 
   df_client3_new = dataset_preprocessing(dataset=df_client3, name_log="log_df_client3")
-  df_client3_new.to_csv("./dataset/split_dataset/client3_train_pp.csv")
+  df_client3_new.to_csv(path + "/client3_train_pp.csv")
 
   df_client4_new = dataset_preprocessing(dataset=df_client4, name_log="log_df_client4")
-  df_client4_new.to_csv("./dataset/split_dataset/client4_train_pp.csv")
+  df_client4_new.to_csv(path + "/client4_train_pp.csv")
 
   df_test_new = dataset_preprocessing(dataset=df_test, name_log="log_df_test")
-  df_test_new.to_csv("./dataset/split_dataset/df_test_pp.csv")
+  df_test_new.to_csv(path + "/df_test_pp.csv")
 
   df_train_new = dataset_preprocessing(dataset=df_train, name_log="log_df_train")
-  df_train_new.to_csv("./dataset/split_dataset/df_train_pp.csv")
+  df_train_new.to_csv(path + "/df_train_pp.csv")
 
 
 @app.command()

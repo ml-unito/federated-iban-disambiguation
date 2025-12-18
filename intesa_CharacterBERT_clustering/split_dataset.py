@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from lib.datasetManipulation import *
 import typer
+import os
 
 app = typer.Typer()
 
@@ -78,13 +79,16 @@ def create_train_test_split(dataset, seed=42):
       
       # Save all dataset generated
       if SAVE_DATASETS:
-        df_client1.to_csv(DIR_PATH + "split_dataset/client1_train.csv")
-        df_client2.to_csv(DIR_PATH + "split_dataset/client2_train.csv")
-        df_client3.to_csv(DIR_PATH + "split_dataset/client3_train.csv")
-        df_client4.to_csv(DIR_PATH + "split_dataset/client4_train.csv")
-        df_test.to_csv(DIR_PATH + "split_dataset/df_test.csv")
-        df_train.to_csv(DIR_PATH + "split_dataset/df_train.csv")
-        print("Datasets saved into " + DIR_PATH + "split_dataset/ directory.")
+        new_dir = DIR_PATH + "split_dataset_S" + str(seed) + "/"
+        os.makedirs(new_dir)
+
+        df_client1.to_csv(new_dir + "/client1_train.csv")
+        df_client2.to_csv(new_dir + "/client2_train.csv")
+        df_client3.to_csv(new_dir + "/client3_train.csv")
+        df_client4.to_csv(new_dir + "/client4_train.csv")
+        df_test.to_csv(new_dir + "/df_test.csv")
+        df_train.to_csv(new_dir + "/df_train.csv")
+        print("Datasets saved into " + new_dir + " directory.")
 
 
 def generate_couple_datasets():
@@ -110,6 +114,10 @@ def generate_couple_datasets():
 
 @app.command()
 def split(seed: int = 42):
+  '''It splits the original dataset into a training set and a test set with a
+    ratio of 80-10. The training set is split among four clients with a ratio
+    of 40-40-10-10. It saves all created datasets in a new directory. The seed
+    is used for random splitting to ensure reproducibility.'''
   dataset = pd.read_csv(DIR_PATH + DATASET_PATH, index_col=0)
   create_train_test_split(dataset, seed=seed)
 
