@@ -139,18 +139,12 @@ def test(model, X_test, y_test, batch_size, criterion):
         for i in tqdm(range(0, len(X_test), batch_size), desc="Testing"):
         # for i in range(0, len(X_test), batch_size):
             batch_X = X_test[i:i+batch_size]
-            batch_y = y_test[i:i+batch_size]
+            labels = y_test[i:i+batch_size]
 
-            batch_X_first_names, batch_X_second_names = zip(*batch_X)
-            
-            # Convert batch to tensors  
-            input_ids_1 = indexer.as_padded_tensor(batch_X_first_names)
+            input_ids_1, input_ids_2 = zip(*batch_X)
             input_ids_1 = input_ids_1.to(device)
-
-            input_ids_2 = indexer.as_padded_tensor(batch_X_second_names)
             input_ids_2 = input_ids_2.to(device)
 
-            labels = torch.tensor(batch_y)
             labels = labels.to(device)
 
             # Forward pass
