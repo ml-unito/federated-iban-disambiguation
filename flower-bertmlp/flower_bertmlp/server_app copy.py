@@ -8,7 +8,7 @@ import torch
 from datetime import datetime
 from flwr.common import Context, ndarrays_to_parameters
 
-from flower_bertmlp.task import CharacterBertForClassification, get_parameters, weighted_average, set_system_seed, DEVICE
+from flower_bertmlp.task import CharacterBertForClassification, get_parameters, weighted_average, DEVICE
 
 
 def load_config(config_path):
@@ -136,10 +136,6 @@ def init_wandb(config, output_path):
 
 def server_fn(context: Context):
     config = load_config("config/flower_exp_bertmlp.yaml")
-    
-    # Fissa il seed di sistema per replicabilità (prima di creare il modello)
-    set_system_seed()
-    print("Server: system_seed=42 applicato")
     
     n_clients = config["protocol"]["n_clients"]
     n_rounds = config["protocol"]["n_rounds"]

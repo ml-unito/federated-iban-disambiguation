@@ -8,7 +8,7 @@ data:
             - ./dataset/split_dataset/client3_train_pp.csv
             - ./dataset/split_dataset/client4_train_pp.csv
         test_path: ./dataset/split_dataset/df_test_pp.csv
-        seed: 81789
+        seed: 81789            # Seed per identificare il dataset/split
         balance_train: true   # Bilancia i dati di training (oversample)
         balance_test: false   # Non bilanciare i dati di test
 # Evaluation configuration
@@ -43,6 +43,10 @@ protocol:
 # Training configuration
 training:
     learning_rate: 0.000001  # 1e-6
-    weight_decay: 0.01
+    weight_decay: 0.0005
     max_grad_norm: 1.0
     batch_size: 256
+# Reproducibility note:
+# - system_seed = 42 (hardcoded in task.py) per PyTorch, CUDA, NumPy, Random
+# - random_state = 42 (hardcoded in datasetManipulation.py) per bilanciamento dataset
+# - data.dataset.seed = 9046 per identificare il dataset/split

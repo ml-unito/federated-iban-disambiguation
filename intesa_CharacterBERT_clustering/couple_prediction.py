@@ -173,9 +173,25 @@ def create_couple_dataframe(train_path: str, test_path: str) -> Tuple[pd.DataFra
     # -------------------------------------------------------
     
     cp_train_df = create_pairs(train_df)
+    
+    # Conteggio coppie prima del bilanciamento
+    writeLog("\n--- Conteggio coppie PRIMA del bilanciamento ---")
+    writeLog(f"Totale coppie train: {len(cp_train_df)}")
+    writeLog(f"Distribuzione label train: {cp_train_df['label'].value_counts().to_dict()}")
+    
     cp_train_df = balance_dataset(cp_train_df, "label", oversample=True)
 
+    # Conteggio coppie dopo il bilanciamento
+    writeLog("\n--- Conteggio coppie DOPO il bilanciamento ---")
+    writeLog(f"Totale coppie train: {len(cp_train_df)}")
+    writeLog(f"Distribuzione label train: {cp_train_df['label'].value_counts().to_dict()}")
+
     cp_test_df = create_pairs(test_df)
+    
+    # Conteggio coppie test
+    writeLog("\n--- Conteggio coppie TEST ---")
+    writeLog(f"Totale coppie test: {len(cp_test_df)}")
+    writeLog(f"Distribuzione label test: {cp_test_df['label'].value_counts().to_dict()}")
 
     del train_df, test_df
 

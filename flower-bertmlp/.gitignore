@@ -169,4 +169,5 @@ __pycache__/
 *.csv
 dataset/
 out/
+out_old/
 venv*

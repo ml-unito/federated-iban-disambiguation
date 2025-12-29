@@ -4,6 +4,9 @@ import torch
 import yaml
 import flwr as fl
 from flwr.common import Context
+from transformers import get_linear_schedule_with_warmup
+
+from sklearn.metrics import classification_report
 
 from flower_bertmlp.task import (
     CharacterBertForClassification, 
@@ -11,7 +14,8 @@ from flower_bertmlp.task import (
     get_parameters, 
     train, 
     test, 
-    load_data, 
+    load_data,
+    set_system_seed,
     DEVICE
 )
 
@@ -22,14 +26,20 @@ def load_config(config_path):
 
 
 class FlowerClient(fl.client.NumPyClient):
-    def __init__(self, client_id, model, trainloader, valloader, eval_config, local_epochs, training_config):
+    def __init__(self, client_id, model, X_train, y_train, X_val, y_val, batch_size, eval_config, local_epochs, training_config):
         self.client_id = client_id
         self.model = model
-        self.trainloader = trainloader
-        self.valloader = valloader
+        self.X_train = X_train
+        self.y_train = y_train
+        self.X_val = X_val
+        self.y_val = y_val
+        self.batch_size = batch_size
         self.eval_config = eval_config
         self.local_epochs = local_epochs
         self.training_config = training_config
+        
+        # Criterion condiviso
+        self.criterion = torch.nn.CrossEntropyLoss()
 
     def get_parameters(self, config):
         return get_parameters(self.model)
@@ -45,51 +55,70 @@ class FlowerClient(fl.client.NumPyClient):
         # Pre-fit evaluation
         if self.eval_config.get("pre_fit", False):
             print(f"Client {self.client_id}: pre-fit evaluation...")
-            loss, accuracy, metrics = test(self.model, self.valloader, device=DEVICE)
-            print(f"Client {self.client_id}: pre-fit loss={loss:.4f}, acc={accuracy:.4f}")
+            loss, metrics, p, l = test(self.model, self.X_val, self.y_val, self.batch_size, self.criterion)
             
-            # Aggiungi metriche con prefisso prefit
+            metrics = classification_report(l, torch.stack(p).argmax(dim=1).numpy()
+, digits=4, output_dict=True)
+            print(f"Client {self.client_id} pre-fit Classification Report:\n{metrics}")
+            
+            #print(f"Client {self.client_id}: pre-fit loss={loss:.4f}, acc={metrics['accuracy']:.4f}")
+            
             for k, v in metrics.items():
                 fit_metrics[f"prefit_{k}"] = v
         
         # Training
         print(f"Client {self.client_id}: training {self.local_epochs} epochs...")
-        train_loss = train(
-            self.model, 
-            self.trainloader, 
-            epochs=self.local_epochs, 
-            device=DEVICE,
-            lr=self.training_config.get("learning_rate", 5e-6),
-            weight_decay=self.training_config.get("weight_decay", 0.01),
-            max_grad_norm=self.training_config.get("max_grad_norm", 1.0)
-        )
-        print(f"Client {self.client_id}: training done, loss={train_loss:.4f}")
-        fit_metrics["train_loss"] = train_loss
+        
+        # Crea optimizer e scheduler
+        lr = self.training_config.get("learning_rate", 5e-6)
+        weight_decay = self.training_config.get("weight_decay", 0.01)
+        optimizer = torch.optim.AdamW(self.model.parameters(), lr=lr, weight_decay=weight_decay)
+        
+        num_training_steps = (len(self.X_train) // self.batch_size) * self.local_epochs
+        scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=num_training_steps)
+        
+        total_loss = 0.0
+        for epoch in range(self.local_epochs):
+            loss, metrics = train(self.model, self.X_train, self.y_train, self.batch_size, optimizer, self.criterion, scheduler)
+            total_loss += loss
+        
+        avg_train_loss = total_loss / self.local_epochs
+        print(f"Client {self.client_id}: training done, loss={avg_train_loss:.4f}")
+        fit_metrics["train_loss"] = avg_train_loss
         
         # Post-fit evaluation
         if self.eval_config.get("post_fit", False):
             print(f"Client {self.client_id}: post-fit evaluation...")
-            loss, accuracy, metrics = test(self.model, self.valloader, device=DEVICE)
-            print(f"Client {self.client_id}: post-fit loss={loss:.4f}, acc={accuracy:.4f}")
+            loss, metrics, p, l = test(self.model, self.X_val, self.y_val, self.batch_size, self.criterion)
             
-            # Aggiungi metriche con prefisso postfit
+            # ricalcola classification report usando p e l (predictions e labels)
+            # sapendo che p è fatto predictions += outputs.cpu() per ogni batch
+            
+            metrics = classification_report(l, torch.stack(p).argmax(dim=1).numpy()
+, digits=4, output_dict=True)
+            print(f"Client {self.client_id} Classification Report:\n{metrics}")
+            
+            #print(f"Client {self.client_id}: post-fit loss={loss:.4f}, acc={metrics['accuracy']:.4f}")
+            
             for k, v in metrics.items():
                 fit_metrics[f"postfit_{k}"] = v
         
-        return get_parameters(self.model), len(self.trainloader.dataset), fit_metrics
+        return get_parameters(self.model), len(self.X_train), fit_metrics
 
     def evaluate(self, parameters, config):
         """Valutazione chiamata dal server per aggregare metriche globali."""
         self.set_parameters(parameters)
         
-        # Questa evaluate viene usata per la valutazione "server" aggregata
         if not self.eval_config.get("server", True):
             return 0.0, 1, {}
         
-        loss, accuracy, metrics = test(self.model, self.valloader, device=DEVICE)
-        print(f"Client {self.client_id}: server eval loss={loss:.4f}, acc={accuracy:.4f}")
+        loss, metrics, p, l = test(self.model, self.X_val, self.y_val, self.batch_size, self.criterion)
+        metrics = classification_report(l, torch.stack(p).argmax(dim=1).numpy()
+, digits=4, output_dict=True)
+        print(f"Client {self.client_id} server Classification Report:\n{metrics}")
+        #print(f"Client {self.client_id}: server eval loss={loss:.4f}, acc={metrics['accuracy']:.4f}")
         
-        return loss, len(self.valloader.dataset), metrics
+        return loss, len(self.X_val), metrics
 
 
 def client_fn(context: Context):
@@ -99,13 +128,17 @@ def client_fn(context: Context):
     client_id = int(context.node_config["partition-id"]) + 1
     print(f"Inizializzazione client {client_id}")
     
+    # Fissa il seed di sistema per replicabilità (prima di creare il modello)
+    set_system_seed()
+    print(f"Client {client_id}: system_seed=42 applicato")
+    
     # Training config
     training_config = config.get("training", {})
     
-    # Carica dati (senza raw_data)
-    trainloader, valloader = load_data(client_id, config["data"], training_config)
+    # Carica dati (liste raw)
+    X_train, y_train, X_val, y_val, batch_size = load_data(client_id, config["data"], training_config)
     
-    # Crea modello
+    # Crea modello (dopo aver fissato il seed)
     model = CharacterBertForClassification(num_labels=2).to(DEVICE)
     
     # Epoche locali
@@ -114,8 +147,11 @@ def client_fn(context: Context):
     client = FlowerClient(
         client_id=client_id,
         model=model,
-        trainloader=trainloader,
-        valloader=valloader,
+        X_train=X_train,
+        y_train=y_train,
+        X_val=X_val,
+        y_val=y_val,
+        batch_size=batch_size,
         eval_config=config["eval"],
         local_epochs=local_epochs,
         training_config=training_config
