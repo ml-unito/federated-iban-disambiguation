@@ -36,6 +36,20 @@ with open('./config/parameters.json', "r") as data_file:
 batch_size = parameters['batch_size']
 
 
+SYSTEM_SEED = 12345  # Seed per replicabilità del sistema (modello, CUDA, ecc.)
+def set_system_seed(seed: int = SYSTEM_SEED):
+    """Fissa tutti i seed di sistema per garantire replicabilità."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)  # Per multi-GPU
+    # Rende le operazioni CUDA deterministiche
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    # Variabile d’ambiente per hash deterministico
+    os.environ["PYTHONHASHSEED"] = str(seed)
+
 
 def eval_cluster_iban_pred(dataset: pd.DataFrame, excluded_ibans: list, log) -> Tuple[int, int]:
     '''It returns how many ibans have been correctly clustered, that is when
@@ -193,7 +207,9 @@ def extract_x_and_y(df: pd.DataFrame) -> Tuple[torch.Tensor, torch.Tensor]:
 
 
 def create_pairs_for_clustering(dataset: pd.DataFrame) -> pd.DataFrame:
-    """Create pairs of names with their labels"""
+    """Create pairs of names with their labels. In the returned dataframe, the
+     following columns are present: "iban", "text", "name1", "name2", "label",
+     "IsShared". """
     
     pairs = []
     labels = [] # The “label” column indicates whether the couple refers to the same holder (label 0) or not (label 1)
@@ -205,20 +221,20 @@ def create_pairs_for_clustering(dataset: pd.DataFrame) -> pd.DataFrame:
 
     for iban, group in grouped:
         names = group['Name'].tolist()
-        holders = group['Holder'].tolist()
+        clusters = group['cluster'].tolist()
         shared = group['IsShared'].iloc[0]
         
         if(len(names)) == 1:
-            pairs.append(" @ ".join([names[0], names[0]]))
+            pairs.append("@".join([names[0], names[0]]))
             labels.append(0)
             ibans.append(iban)
             isShared.append(shared)
             names1.append(names[0])
             names2.append(names[0])
         else:
-            for (name1, holder1), (name2, holder2) in combinations(zip(names, holders), 2):
-                pairs.append(" @ ".join([name1, name2]))
-                labels.append(0 if holder1 == holder2 else 1)
+            for (name1, cluster1), (name2, cluster2) in combinations(zip(names, clusters), 2):
+                pairs.append("@".join([name1, name2]))
+                labels.append(0 if cluster1 == cluster2 else 1)
                 ibans.append(iban)
                 isShared.append(shared)
                 names1.append(name1)
@@ -235,7 +251,7 @@ def create_pairs_for_clustering(dataset: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def create_pairs_kernel_clustering(dataset: pd.DataFrame):
+def create_pairs_kernel_clustering(dataset: pd.DataFrame) -> pd.DataFrame:
     labels = [] # The “label” column indicates whether the couple refers to the same cluster (label 0) or not (label 1)
     ibans = []
     names1 = []
@@ -274,6 +290,8 @@ def create_pairs_kernel_clustering(dataset: pd.DataFrame):
 
 @app.command()
 def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: str, name_wandb: str="clustering"):
+    set_system_seed()
+    
     # Create output directory
     path = DIR_OUTPUT_PATH + "clustering-cbert-S" + str(seed) + "_" + DATE_NAME + "/"
     os.makedirs(path)
@@ -292,20 +310,23 @@ def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: st
                + str(len(dataset)) + " entries")
     
     original_dataset = dataset.copy(deep=True)
-    dataset = dataset.drop_duplicates(subset=["AccountNumber","Name","num occorrenze","IsShared","Holder","cluster"])
+    #dataset = dataset.drop_duplicates(subset=["AccountNumber","Name","num occorrenze","IsShared","Holder","cluster"])
 
     # Create pairs
     pairs_df = create_pairs_for_clustering(dataset)
 
     # load model
     model = cbert.CBertClassif().to(DEVICE)
-    weights = torch.load(weights_path, weights_only=True)#["modopt"]["model"]
-    model.load_state_dict(weights)
+    weights = torch.load(weights_path, weights_only=True)
+    if "model" in weights:
+        model.load_state_dict(weights["model"]) #fluke
+    else:
+        model.load_state_dict(weights)          #flower
     model.eval()
 
     if LOG_WANDB:
         wandb.init(
-            project="fl-ner",
+            project="fl-ner-final",
             entity="mlgroup",
             tags=["flner", "test", "clustering", "CBertClassif", str(seed)],
             name=name_wandb,
@@ -319,6 +340,7 @@ def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: st
                     "unshared": str(dataset[dataset['IsShared'] == 0]['AccountNumber'].nunique())
                 },
                 "entries": len(original_dataset),
+                "pairs": len(pairs_df),
                 "output_path": path
             }
         )
@@ -331,21 +353,19 @@ def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: st
     log("\nTokenized text:")
     for i in range(10): log(str(test_x[i]))
     log("")
-    log("dataset proportion: " + str(Counter(test_y)))
+    #log("dataset proportion: " + str(Counter(test_y)))
 
 
     # Couple prediction task
     log("\n\nEvaluation of the model on test set on the couple prediction task...") 
     
     criterion = torch.nn.CrossEntropyLoss()
-    _, metrics, predictions, total_labels = cbert.test(model, test_x, test_y, batch_size, criterion)
+    _, metrics, predictions, total_labels = cbert.test(model, test_x, test_y, 256, criterion)
+    log(str(metrics))
     
     predictions = torch.stack(predictions).argmax(dim=1).cpu().numpy()
-    cr_test = classification_report(
-            test_y.numpy(), predictions, output_dict=True)
-    cr_test_str = classification_report(
-            test_y.numpy(), predictions, output_dict=False)
-        
+    cr_test = classification_report(total_labels, predictions, output_dict=True)
+    cr_test_str = classification_report(total_labels, predictions, output_dict=False)
     print(cr_test_str)
     
     test_accuracy = cr_test["accuracy"]
@@ -365,6 +385,7 @@ def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: st
             "precision_test_label_0: "+str(precision_test_label_0)+"\n"+
             "recall_test_label_1: "+str(recall_test_label_1)+"\n"+
             "recall_test_label_0: "+str(recall_test_label_0))
+    
     if LOG_WANDB:
         wandb.log({
             "couple_prediction_accuracy": test_accuracy,
@@ -498,9 +519,12 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
     pairs_df = pd.concat([pairs_df, similarity.drop(columns=["label"])], axis=1)
 
     # load model
-    weights = torch.load(weights_path, weights_only=True)#["model"]
+    weights = torch.load(weights_path, weights_only=True)
     model = MLP(input_dim=7).to(DEVICE)
-    model.load_state_dict(weights)
+    if "model" in weights:
+        model.load_state_dict(weights["model"]) #fluke
+    else:
+        model.load_state_dict(weights)          #flower
     model.eval()
 
     if LOG_WANDB:

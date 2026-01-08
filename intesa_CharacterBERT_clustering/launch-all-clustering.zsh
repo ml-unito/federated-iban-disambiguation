@@ -22,8 +22,11 @@
 
 
 # Flower model Full CBert
-./launchexp-clustering.zsh cbert-accounts-disambiguation 9046 ../flower-mlp/out/cbert/flwr_S9046_20251204_230420/global_model_R10.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-cbert-9046--no-complex-iban
-# ./launchexp-clustering.zsh cbert-accounts-disambiguation 23517 ../flower-mlp/out/cbert/flwr_S23517_20251204_200840/global_model_R10.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-cbert-23517--no-complex-iban
-# ./launchexp-clustering.zsh cbert-accounts-disambiguation 47874 ../flower-mlp/out/cbert/flwr_S47874_20251204_162434/global_model_R10.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-cbert-47874--no-complex-iban
-# ./launchexp-clustering.zsh cbert-accounts-disambiguation 67895 ../flower-mlp/out/cbert/flwr_S67895_20251205_082434/global_model_R10.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-cbert-67895--no-complex-iban
-# ./launchexp-clustering.zsh cbert-accounts-disambiguation 81789 ../flower-mlp/out/cbert/flwr_S81789_20251205_111057/global_model_R10.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-cbert-81895--no-complex-iban
+./launchexp-clustering.zsh cbert-accounts-disambiguation 9046 ../flower-bertmlp/out/flwr_S9046_20251230_124849/global_model_R10.pt ./dataset/split_dataset_S9046/df_test_pp.csv clustering-flwr-cbert-9046--no-complex-iban
+./launchexp-clustering.zsh cbert-accounts-disambiguation 23517 ../flower-bertmlp/out/flwr_S23517_20251230_153945/global_model_R10.pt ./dataset/split_dataset_S23517/df_test_pp.csv clustering-flwr-cbert-23517--no-complex-iban
+./launchexp-clustering.zsh cbert-accounts-disambiguation 47874 ../flower-bertmlp/out/flwr_S47874_20251230_173914/global_model_R10.pt ./dataset/split_dataset_S47874/df_test_pp.csv clustering-flwr-cbert-47874--no-complex-iban
+./launchexp-clustering.zsh cbert-accounts-disambiguation 67895 ../flower-bertmlp/out/flwr_S67895_20251230_224540/global_model_R10.pt ./dataset/split_dataset_S67895/df_test_pp.csv clustering-flwr-cbert-67895--no-complex-iban
+./launchexp-clustering.zsh cbert-accounts-disambiguation 81789 ../flower-bertmlp/out/flwr_S81789_20251230_105248/global_model_R10.pt ./dataset/split_dataset_S81789/df_test_pp.csv clustering-flwr-cbert-81895--no-complex-iban
+
+
+#./launchexp-clustering.zsh cbert-accounts-disambiguation 81789 ./out/fl_bert_models_S81789_eef4241792b847a4b913640c15210c65/r0010_server.pth ./dataset/split_dataset_S81789/df_test_pp.csv clustering-fl-cbert-81895
