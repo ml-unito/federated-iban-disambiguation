@@ -9,7 +9,7 @@ data:
         clients: 4
         sim_train_path: dataset/similarity_client%d_train_seed_%d%s.csv
         sim_test_path: dataset/similarity_test_seed_%d%s.csv
-        seed: 81789
+        seed: SEED
         bert: false
         client_test: true
         # Potential parameters for loading the dataset correctly
@@ -59,7 +59,7 @@ exp:
     # The device to load the tensors (auto, cpu, cuda, mps, cuda:0, etc.)
     device: cuda:0
     # The seed (reproducibility)
-    seed: 81789
+    seed: SEED
     inmemory: true
 # Evaluation configuration
 eval:
@@ -76,10 +76,10 @@ eval:
 # Logger configuration
 logger:
     name: WandBLog
-    project: fl-ner
+    project: fl-ner-final
     entity: mlgroup
-    group: giulia-1
-    tags: ["flner", "fluke-federation", 'lr', 'spectrum-kernel', 'SEED', "2 local epochs", '20 rounds', 'server-test']
+    group: FedAVG-fluke-kernel-lr-R20-E4
+    tags: ["flner", "fluke-federation", 'lr', 'spectrum-kernel', 'SEED', "2 local epochs", '20 rounds', 'server-test', 'lr001', 'batch 1024']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log

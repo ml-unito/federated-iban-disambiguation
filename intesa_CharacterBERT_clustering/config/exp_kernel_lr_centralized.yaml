@@ -8,7 +8,7 @@ data:
         name: federated_learning.create_dc_kernel
         sim_train_path: dataset/similarity_train_seed_%d%s.csv
         sim_test_path: dataset/similarity_test_seed_%d%s.csv
-        seed: 81789
+        seed: 23517
         bert: false
         # Potential parameters for loading the dataset correctly
     #     # (see the documentation of fluke.data.datasets)
@@ -57,7 +57,7 @@ exp:
     # The device to load the tensors (auto, cpu, cuda, mps, cuda:0, etc.)
     device: cuda:0
     # The seed (reproducibility)
-    seed: 81789
+    seed: 23517
     inmemory: true
 # Evaluation configuration
 eval:
@@ -74,10 +74,10 @@ eval:
 # Logger configuration
 logger:
     name: WandBLog
-    project: fl-ner
+    project: fl-ner-final
     entity: mlgroup
-    group: giulia-1
-    tags: ["flner", "fluke-centralized", 'lr', 'spectrum-kernel', 'dataset preprocessed', 'SEED', '100 rounds']
+    group: kernel-lr-centralized-fluke
+    tags: ["flner", "fluke-centralized", 'lr', 'spectrum-kernel', '23517', '100 rounds', 'lr001', 'batch 1024']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log
