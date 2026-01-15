@@ -29,6 +29,8 @@ DF_TEST_PATH = "dataset/split_dataset_S%d/df_test_pp.csv"
 SIM_TRAIN_PATH = "dataset/similarity_train_seed_%d%s.csv"
 SIM_TEST_PATH = "dataset/similarity_test_seed_%d%s.csv"
 
+SIM_TRAIN_CLIENT_PATH = "dataset/similarity_client%d_train_seed_%d%s.csv"
+
 
 def log_metrics(step, model, train_x, train_y, test_x, test_y, running_loss, print_classification_report=False):
     with torch.no_grad():
@@ -214,9 +216,9 @@ def classify(seed: int):
 
 
 @app.command()
-def nn_classify(seed: int, bert: bool = False):
+def nn_classify(seed: int, bert: bool = False, client: int = None):
     train, test = load_sim_data(
-        train_path=SIM_TRAIN_PATH % (seed, "_w-bert" if bert else ""),
+        train_path=SIM_TRAIN_PATH % (seed, "_w-bert" if bert else "") if client is None else SIM_TRAIN_CLIENT_PATH % (client, seed, "_w-bert" if bert else ""),
         test_path=SIM_TEST_PATH % (seed, "_w-bert" if bert else "")
     )
 
@@ -224,20 +226,22 @@ def nn_classify(seed: int, bert: bool = False):
     train.iloc[:, :-1] = scaler.fit_transform(train.iloc[:, :-1])
     test.iloc[:, :-1] = scaler.transform(test.iloc[:, :-1])
 
+
     wandb.init(
-        project="fl-ner",
+        project="fl-ner-final",
         entity="mlgroup",
-        name=f"kernel-mlp-{seed}" if not bert else f"kernel-mlp-{seed}-w-bert",
-        group="w-bert" if bert else "no-bert",
+        name="kernel-mlp" + (f"-C{client}-" if client is not None else "-") + (f"S{seed}" if not bert else f"S{seed}-w-bert"),
+        group="kernel-mlp-centralized-" + "client-only-" if client is not None else "" + "w-bert" if bert else "no-bert",
         tags=["flner", "centralized", "spectrum-kernel",
-              "mlp", "w-bert" if bert else "no-bert"],
+              "mlp", "w-bert" if bert else "no-bert", str(seed), "lr001", "10 epochs", "CrossEntropyLoss"],
         config={
             "seed": seed,
             "train_size": len(train),
             "test_size": len(test),
             "kernel": "spectrum + w-bert",
             "n_features": train.shape[1] - 1,
-            "model": "MLP"
+            "model": "MLP",
+            "client": client
         }
     )
 
