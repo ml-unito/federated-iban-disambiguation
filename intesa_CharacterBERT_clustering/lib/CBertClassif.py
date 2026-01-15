@@ -52,10 +52,11 @@ def train(model, X_train, y_train, batch_size, optimizer, criterion, scheduler):
 
     accs, precs, recs, f1s = [], [], [], []
 
-    accuracy = Accuracy(task="multiclass", num_classes=2, top_k=1, average="micro")
-    precision = Precision(task="multiclass", num_classes=2, top_k=1, average="micro")
-    recall = Recall(task="multiclass", num_classes=2, top_k=1, average="micro")
-    f1 = F1Score(task="multiclass", num_classes=2, top_k=1, average="micro")
+    accuracy = Accuracy(task="multiclass", num_classes=2, top_k=1, average="macro")
+    precision = Precision(task="multiclass", num_classes=2, top_k=1, average="macro")
+    recall = Recall(task="multiclass", num_classes=2, top_k=1, average="macro")
+    f1 = F1Score(task="multiclass", num_classes=2, top_k=1, average="macro")
+    
 
     for i in tqdm(range(0, len(X_train), batch_size), desc="Training"):
         input_ids = X_train[i:i+batch_size]
@@ -108,11 +109,11 @@ def test(model, X_test, y_test, batch_size, criterion):
     total_labels = []
 
     accs, precs, recs, f1s = [], [], [], []
-    accuracy = Accuracy(task="multiclass", num_classes=2, top_k=1, average="micro")
-    precision = Precision(task="multiclass", num_classes=2, top_k=1, average="micro")
-    recall = Recall(task="multiclass", num_classes=2, top_k=1, average="micro")
-    f1 = F1Score(task="multiclass", num_classes=2, top_k=1, average="micro")
-
+    accuracy = Accuracy(task="multiclass", num_classes=2, top_k=1, average="macro")
+    precision = Precision(task="multiclass", num_classes=2, top_k=1, average="macro")
+    recall = Recall(task="multiclass", num_classes=2, top_k=1, average="macro")
+    f1 = F1Score(task="multiclass", num_classes=2, top_k=1, average="macro")
+    
     with torch.no_grad():
         for i in tqdm(range(0, len(X_test), batch_size), desc="Testing"):
             input_ids= X_test[i:i+batch_size]
