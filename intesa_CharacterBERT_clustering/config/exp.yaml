@@ -55,7 +55,7 @@ exp:
     # The device to load the tensors (auto, cpu, cuda, mps, cuda:0, etc.)
     device: cuda:0
     # The seed (reproducibility)
-    seed: 81789
+    seed: SEED
     inmemory: true
 # Evaluation configuration
 eval:
@@ -72,7 +72,7 @@ eval:
 # Saving configuration
 save:
     # The path where to save the models
-    path: ./out/fl_bert_models_S81789
+    path: ./out/fl_bert_models_SSEED
     # The frequency of saving the models (in rounds)
     save_every: 10
     # Whether to save only the global model
@@ -80,9 +80,9 @@ save:
 # Logger configuration
 logger:
     name: WandBLog
-    project: fl-ner
+    project: fl-ner-final
     entity: mlgroup
-    tags: ["flner", "test", "fluke", "2 epochs", "4 clients", "10 rounds", "CBertClassif", '81789', 'server-test', 'post-fit', 'pre-fit']
+    tags: ["flner", "test", "fluke", "2 epochs", "4 clients", "10 rounds", "CBertClassif", 'SEED', 'server-test', 'post-fit', 'pre-fit']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log
