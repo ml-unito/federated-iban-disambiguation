@@ -9,7 +9,8 @@ data:
         sim_train_path: dataset/similarity_train_seed_%d%s.csv
         sim_test_path: dataset/similarity_test_seed_%d%s.csv
         seed: SEED
-        bert: true
+        bert: false
+        client: None
         # Potential parameters for loading the dataset correctly
     #     # (see the documentation of fluke.data.datasets)
     #     # if no parameters are needed, simply do not specify anything
@@ -76,7 +77,7 @@ logger:
     name: WandBLog
     project: fl-ner-final
     entity: mlgroup
-    group: kernel-mlp-centralized-fluke-w-bert
+    group: kernel-mlp-centralized-fluke
     tags: ["flner", "fluke-centralized", 'mlp', 'spectrum-kernel', 'SEED', 'w-bert', '20 epochs', 'lr001', 'CrossEntropyLoss']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
