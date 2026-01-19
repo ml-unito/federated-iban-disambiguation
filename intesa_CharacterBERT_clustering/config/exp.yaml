@@ -7,8 +7,8 @@ data:
     #     #                      tiny_imagenet, shakespeare, fashion_mnist, cinic10
         name: federated_learning.create_ddc_cbert
         clients: 4
-        train_path: ./dataset/split_dataset_S81789/client%d_train_pp.csv
-        test_path: ./dataset/split_dataset_S81789/df_test_pp.csv
+        train_path: ./dataset/split_dataset_SSEED/client%d_train_pp.csv
+        test_path: ./dataset/split_dataset_SSEED/df_test_pp.csv
         client_test: true
         # Potential parameters for loading the dataset correctly
     #     # (see the documentation of fluke.data.datasets)
@@ -82,7 +82,8 @@ logger:
     name: WandBLog
     project: fl-ner-final
     entity: mlgroup
-    tags: ["flner", "test", "fluke", "2 epochs", "4 clients", "10 rounds", "CBertClassif", 'SEED', 'server-test', 'post-fit', 'pre-fit']
+    group: FedAVG-bert-fluke-R10
+    tags: ["flner", "fluke-federation", "2 epochs", "4 clients", "10 rounds", "CBertClassif", 'SEED', 'lr-1e-6', 'full model']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
 #     lname: Log

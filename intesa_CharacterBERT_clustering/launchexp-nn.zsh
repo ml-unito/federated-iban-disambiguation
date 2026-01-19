@@ -17,7 +17,7 @@ then
 
     echo -e "\033[0;32mUpdating config files...\033[0m"
     sed -i "s/seed: .*/seed: $seed/" $exp
-    sed -i "s/'SEED'/'$seed'/" $exp
+    sed -i "s/SEED/$seed/" $exp
     sed -i "s/bert: .*/bert: true/" $exp
     sed -i "s/input_dim: .*/input_dim: 8/" $alg
 
@@ -53,4 +53,4 @@ else
 fi
 
 sed -i "s/'$seed'/'SEED'/" $exp 
-sed -i "s/fl_models_$seed/fl_models_SEED/" $exp 
+sed -i "s/fl_models_S$seed/fl_models_SSEED/" $exp 
