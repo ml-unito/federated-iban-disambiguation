@@ -7,8 +7,8 @@ data:
     #     #                      tiny_imagenet, shakespeare, fashion_mnist, cinic10
         name: federated_learning.create_ddc_cbert
         clients: 4
-        train_path: ./dataset/split_dataset_S67895/client%d_train_pp.csv
-        test_path: ./dataset/split_dataset_S67895/df_test_pp.csv
+        train_path: ./dataset/split_dataset_SSEED/client%d_train_pp.csv
+        test_path: ./dataset/split_dataset_SSEED/df_test_pp.csv
         client_test: true
         # Potential parameters for loading the dataset correctly
     #     # (see the documentation of fluke.data.datasets)
@@ -57,7 +57,7 @@ exp:
     # The device to load the tensors (auto, cpu, cuda, mps, cuda:0, etc.)
     device: cuda:0
     # The seed (reproducibility)
-    seed: 67895
+    seed: SEED
     inmemory: true
 # Evaluation configuration
 eval:
@@ -74,15 +74,15 @@ eval:
 # Logger configuration
 logger:
     name: WandBLog
-    project: fl-ner
+    project: fl-ner-final
     entity: mlgroup
-    group: FedAVG-FrozenBert-R10-E2-LR01-oversampling
-    tags: ["flner", "federated", "NERClassifier", 'BertFrozen', '10 rounds', '2 local epochs', '4 clients', 'SEED', '0.01 learning rate', 'pre-fit', 'post-fit']
+    group: FedAVG-FrozenBert-fluke-R10-E2
+    tags: ["flner", "fluke-federation", 'BertFrozen', '10 rounds', '2 local epochs', '4 clients', 'SEED', 'lr01', 'batch512']
 # logger:
 #     # `Log` is the standard output, `WandBLog` logs everything on weights and bias
-#     lname: Log
+#     name: Log
 #     # `wandb` parameters. Leave empty if `name` is `Log`
-#     params: null
+#     # params: null
 # FL protocol configuration
 protocol:
     # % of eligible clients, i.e., participants, in each round
@@ -90,4 +90,4 @@ protocol:
     # Total number of clients partcipating in the federation
     n_clients: 4
     # Total number of rounds
-    n_rounds: 11
+    n_rounds: 10
