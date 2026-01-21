@@ -328,7 +328,7 @@ def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: st
         wandb.init(
             project="fl-ner-final",
             entity="mlgroup",
-            tags=["flner", "test", "clustering", "CBertClassif", str(seed)],
+            tags=["flner", "clustering", "CBertClassif", str(seed)],
             name=name_wandb,
             config={
                 "model": model,
@@ -368,35 +368,8 @@ def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: st
     cr_test_str = classification_report(total_labels, predictions, output_dict=False)
     print(cr_test_str)
     
-    test_accuracy = cr_test["accuracy"]
-    test_f1 = cr_test["macro avg"]["f1-score"]
-    f1_test_label_1 = cr_test["1"]["f1-score"]
-    f1_test_label_0 = cr_test["0"]["f1-score"]
-    precision_test_label_1 = cr_test["1"]["precision"]
-    precision_test_label_0 = cr_test["0"]["precision"]
-    recall_test_label_1 = cr_test["1"]["recall"]
-    recall_test_label_0 = cr_test["0"]["recall"]
-
-    print("test_accuracy: "+str(test_accuracy)+"\n"+
-            "test_f1: "+str(test_f1)+"\n"+
-            "f1_test_label_1: "+str(f1_test_label_1)+"\n"+
-            "f1_test_label_0: "+str(f1_test_label_0)+"\n"+
-            "precision_test_label_1: "+str(precision_test_label_1)+"\n"+
-            "precision_test_label_0: "+str(precision_test_label_0)+"\n"+
-            "recall_test_label_1: "+str(recall_test_label_1)+"\n"+
-            "recall_test_label_0: "+str(recall_test_label_0))
-    
     if LOG_WANDB:
-        wandb.log({
-            "couple_prediction_accuracy": test_accuracy,
-            "couple_prediction_f1": test_f1,
-            "couple_prediction_f1_label_1": f1_test_label_1,
-            "couple_prediction_f1_label_0": f1_test_label_0,
-            "couple_prediction_precision_label_1": precision_test_label_1,
-            "couple_prediction_precision_label_0": precision_test_label_0,
-            "couple_prediction_recall_label_1": recall_test_label_1,
-            "couple_prediction_recall_label_0": recall_test_label_0
-        })
+        wandb.log({"couple_prediction": cr_test})
     
     pairs_df['predicted'] = predictions
 
@@ -531,7 +504,7 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
         wandb.init(
             project="fl-ner",
             entity="mlgroup",
-            tags=["flner", "test", "clustering", str(seed), "kernel-mlp"],
+            tags=["flner", "clustering", str(seed), "kernel-mlp"],
             name=name_wandb,
             config={
                 "model": model,
@@ -564,36 +537,9 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
             test_y.numpy(), test_preds, output_dict=False)
         
         print(cr_test_str)
-        
-        test_accuracy = cr_test["accuracy"]
-        test_f1 = cr_test["macro avg"]["f1-score"]
-        f1_test_label_1 = cr_test["1"]["f1-score"]
-        f1_test_label_0 = cr_test["0"]["f1-score"]
-        precision_test_label_1 = cr_test["1"]["precision"]
-        precision_test_label_0 = cr_test["0"]["precision"]
-        recall_test_label_1 = cr_test["1"]["recall"]
-        recall_test_label_0 = cr_test["0"]["recall"]
-
-        print("test_accuracy: "+str(test_accuracy)+"\n"+
-              "test_f1: "+str(test_f1)+"\n"+
-              "f1_test_label_1: "+str(f1_test_label_1)+"\n"+
-              "f1_test_label_0: "+str(f1_test_label_0)+"\n"+
-              "precision_test_label_1: "+str(precision_test_label_1)+"\n"+
-              "precision_test_label_0: "+str(precision_test_label_0)+"\n"+
-              "recall_test_label_1: "+str(recall_test_label_1)+"\n"+
-              "recall_test_label_0: "+str(recall_test_label_0))
 
         if LOG_WANDB:
-            wandb.log({
-                "couple_prediction_accuracy": test_accuracy,
-                "couple_prediction_f1": test_f1,
-                "couple_prediction_f1_label_1": f1_test_label_1,
-                "couple_prediction_f1_label_0": f1_test_label_0,
-                "couple_prediction_precision_label_1": precision_test_label_1,
-                "couple_prediction_precision_label_0": precision_test_label_0,
-                "couple_prediction_recall_label_1": recall_test_label_1,
-                "couple_prediction_recall_label_0": recall_test_label_0
-            })
+            wandb.log({"couple_prediction": cr_test})
         
         pairs_df['predicted'] = test_preds
     
