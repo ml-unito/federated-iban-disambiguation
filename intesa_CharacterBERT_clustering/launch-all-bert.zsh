@@ -2,9 +2,9 @@
 seeds=(9046 23517 67895 47874 81789)
 
 ### Full CharacterBert ###
-# for seed in $seeds; do
-#     ./launchexp.zsh $seed exp alg
-# done
+for seed in $seeds; do
+    ./launchexp.zsh $seed exp alg
+done
 
 ### Frozen Bert ###
 for seed in $seeds; do
@@ -12,6 +12,6 @@ for seed in $seeds; do
 done
 
 ### Pretrained Bert ###
-# for seed in $seeds; do
-#     ./launchexp.zsh $seed exp_pretrained alg_pretrained
-# done
+for seed in $seeds; do
+    ./launchexp.zsh $seed exp_pretrained alg_pretrained
+done

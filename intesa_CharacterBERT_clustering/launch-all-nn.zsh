@@ -1,46 +1,92 @@
-
-# uv run kernel-classify.py nn-classify 9046
-# uv run kernel-classify.py nn-classify 23517
-# uv run kernel-classify.py nn-classify 30921
-# uv run kernel-classify.py nn-classify 47874
-# uv run kernel-classify.py nn-classify 81789
-
-# uv run kernel-classify.py nn-classify 9046 --bert
-# uv run kernel-classify.py nn-classify 23517 --bert
-# uv run kernel-classify.py nn-classify 30921 --bert
-# uv run kernel-classify.py nn-classify 47874 --bert
-# uv run kernel-classify.py nn-classify 81789 --bert
+#!/bin/zsh
+seeds=(9046 23517 67895 47874 81789)
+features=(use-bert no-use-bert)
+clients=(1 2 3 4)
 
 
 ### MLP MODEL ###
+# Runs on fluke federation mode
+for seed in $seeds; do
+  echo -e "\033[0;32mSeed $seed\033[0m"
+  for feature in $features; do
+    ./launchexp-nn.zsh $seed exp_kernel_nn alg_kernel_nn $feature federation
+  done
+done
 
-# Runs mlp model on fluke federation mode with bert feature
-# ./launchexp-nn.zsh 23517 exp_kernel_nn alg_kernel_nn use-bert federation
-# ./launchexp-nn.zsh 47874 exp_kernel_nn alg_kernel_nn use-bert federation
-# ./launchexp-nn.zsh 9046 exp_kernel_nn alg_kernel_nn use-bert federation
-# ./launchexp-nn.zsh 30921 exp_kernel_nn alg_kernel_nn use-bert federation
-# ./launchexp-nn.zsh 81789 exp_kernel_nn alg_kernel_nn use-bert federation
+# Runs on fluke centralize mode
+for seed in $seeds; do
+  echo -e "\033[0;32mSeed $seed\033[0m"
+  for feature in $features; do
+    ./launchexp-nn.zsh $seed exp_kernel_nn_centralized alg_kernel_lr $feature federation
+  done
+done
 
-# Runs mlp model on fluke federation mode
-# ./launchexp-nn.zsh 23517 exp_kernel_nn alg_kernel_nn no-use-bert federation
-# ./launchexp-nn.zsh 47874 exp_kernel_nn alg_kernel_nn no-use-bert federation
-# ./launchexp-nn.zsh 9046 exp_kernel_nn alg_kernel_nn no-use-bert federation
-# ./launchexp-nn.zsh 30921 exp_kernel_nn alg_kernel_nn no-use-bert federation
-# ./launchexp-nn.zsh 81789 exp_kernel_nn alg_kernel_nn no-use-bert federation
-# ./launchexp-nn.zsh 67895 exp_kernel_nn alg_kernel_nn no-use-bert federation
+# Centralized (client only) kernel mlp 
+for seed in $seeds; do
+  echo -e "\033[0;32mSeed $seed\033[0m"
+  for feature in $features; do
+    for client in $clients; do
+      echo -e "\033[0;32mClient $client\033[0m"
+      ./launchexp-nn-only-clients.zsh $seed exp_kernel_nn_centralized alg_kernel_nn $feature $client
+    done
+  done
+done
+
+
 
 ### LR MODEL ###
+# Runs on fluke federation mode
+for seed in $seeds; do
+  echo -e "\033[0;32mSeed $seed\033[0m"
+  for feature in $features; do
+    ./launchexp-nn.zsh $seed exp_kernel_lr alg_kernel_lr $feature federation
+  done
+done
 
-# Runs lr model on fluke federation mode with bert feature
-# ./launchexp-nn.zsh 23517 exp_kernel_lr alg_kernel_lr use-bert federation
-# ./launchexp-nn.zsh 47874 exp_kernel_lr alg_kernel_lr use-bert federation
-# ./launchexp-nn.zsh 9046 exp_kernel_lr alg_kernel_lr use-bert federation
-# ./launchexp-nn.zsh 30921 exp_kernel_lr alg_kernel_lr use-bert federation
-# ./launchexp-nn.zsh 81789 exp_kernel_lr alg_kernel_lr use-bert federation
+# Runs on fluke centralize mode
+for seed in $seeds; do
+  echo -e "\033[0;32mSeed $seed\033[0m"
+  for feature in $features; do
+    ./launchexp-nn.zsh $seed exp_kernel_lr_centralized alg_kernel_lr $feature federation
+  done
+done
 
-# Runs lr model on fluke federation mode
-./launchexp-nn.zsh 23517 exp_kernel_lr alg_kernel_lr no-use-bert federation
-./launchexp-nn.zsh 47874 exp_kernel_lr alg_kernel_lr no-use-bert federation
-./launchexp-nn.zsh 9046 exp_kernel_lr alg_kernel_lr no-use-bert federation
-./launchexp-nn.zsh 67895 exp_kernel_lr alg_kernel_lr no-use-bert federation
-./launchexp-nn.zsh 81789 exp_kernel_lr alg_kernel_lr no-use-bert federation
+# Centralized (client only) kernel lr
+for seed in $seeds; do
+  echo -e "\033[0;32mSeed $seed\033[0m"
+  for feature in $features; do
+    for client in $clients; do
+      echo -e "\033[0;32mClient $client\033[0m"
+      ./launchexp-nn-only-clients.zsh $seed exp_kernel_lr_centralized alg_kernel_lr $feature $client
+    done
+  done
+done
+
+
+
+
+### Runs without Fluke ###
+
+# uv run kernel-classify.py nn-classify 23517 --no-bert
+# uv run kernel-classify.py nn-classify 47874 --no-bert
+# uv run kernel-classify.py nn-classify 9046 --no-bert
+# uv run kernel-classify.py nn-classify 67895 --no-bert
+# uv run kernel-classify.py nn-classify 81789 --no-bert
+
+# uv run kernel-classify.py nn-classify 23517 --bert
+# uv run kernel-classify.py nn-classify 47874 --bert
+# uv run kernel-classify.py nn-classify 9046 --bert
+# uv run kernel-classify.py nn-classify 67895 --bert
+# uv run kernel-classify.py nn-classify 81789 --bert
+
+# uv run kernel-classify.py classify 23517 --no-bert
+# uv run kernel-classify.py classify 47874 --no-bert
+# uv run kernel-classify.py classify 9046 --no-bert
+# uv run kernel-classify.py classify 67895 --no-bert
+# uv run kernel-classify.py classify 81789 --no-bert
+
+# uv run kernel-classify.py classify 23517 --bert
+# uv run kernel-classify.py classify 47874 --bert
+# uv run kernel-classify.py classify 9046 --bert
+# uv run kernel-classify.py classify 67895 --bert
+# uv run kernel-classify.py classify 81789 --bert
