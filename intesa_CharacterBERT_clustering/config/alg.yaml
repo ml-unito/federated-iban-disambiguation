@@ -8,7 +8,7 @@ hyperparameters:
     # HPs of the clients
     client:
         # Batch size
-        batch_size: 512
+        batch_size: 256
         # Number of local epochs
         local_epochs: 2
         # The loss function (loss name from torch.nn)
@@ -35,4 +35,3 @@ hyperparameters:
     # This can be the name of a neural network included in `fluke.nets` or
     # the fully qualified name of an user defined class
     model: lib.CBertClassif.CBertClassif
-    # model: lib.CBertClassifFrz.CBertClassifFrz

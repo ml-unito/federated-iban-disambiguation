@@ -328,7 +328,7 @@ def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: st
         wandb.init(
             project="fl-ner-final",
             entity="mlgroup",
-            tags=["flner", "clustering", "CBertClassif", str(seed)],
+            tags=["flner", "clustering", "CBertClassif", str(seed), "no-complex-iban"],
             name=name_wandb,
             config={
                 "model": model,
@@ -360,7 +360,8 @@ def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: st
     log("\n\nEvaluation of the model on test set on the couple prediction task...") 
     
     criterion = torch.nn.CrossEntropyLoss()
-    _, metrics, predictions, total_labels = cbert.test(model, test_x, test_y, 256, criterion)
+    batch = 256
+    _, metrics, predictions, total_labels = cbert.test(model, test_x, test_y, batch, criterion)
     log(str(metrics))
     
     predictions = torch.stack(predictions).argmax(dim=1).cpu().numpy()
@@ -502,9 +503,9 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
 
     if LOG_WANDB:
         wandb.init(
-            project="fl-ner",
+            project="fl-ner-final",
             entity="mlgroup",
-            tags=["flner", "clustering", str(seed), "kernel-mlp"],
+            tags=["flner", "clustering", str(seed), "kernel-mlp", "no-complex-iban"],
             name=name_wandb,
             config={
                 "model": model,
@@ -535,7 +536,6 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
             test_y.numpy(), test_preds, output_dict=True)
         cr_test_str = classification_report(
             test_y.numpy(), test_preds, output_dict=False)
-        
         print(cr_test_str)
 
         if LOG_WANDB:
