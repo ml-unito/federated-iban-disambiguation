@@ -29,11 +29,7 @@ DEBUG_MODE = False
 DEVICE = "cuda:0"
 LOG_WANDB = True
 DIR_OUTPUT_PATH = "./out/clustering/"
-
-# parameters
-with open('./config/parameters.json', "r") as data_file:
-    parameters = json.load(data_file)
-batch_size = parameters['batch_size']
+BATCH_SIZE = 256
 
 
 SYSTEM_SEED = 12345  # Seed per replicabilità del sistema (modello, CUDA, ecc.)
@@ -360,8 +356,7 @@ def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: st
     log("\n\nEvaluation of the model on test set on the couple prediction task...") 
     
     criterion = torch.nn.CrossEntropyLoss()
-    batch = 256
-    _, metrics, predictions, total_labels = cbert.test(model, test_x, test_y, batch, criterion)
+    _, metrics, predictions, total_labels = cbert.test(model, test_x, test_y, BATCH_SIZE, criterion)
     log(str(metrics))
     
     predictions = torch.stack(predictions).argmax(dim=1).cpu().numpy()
