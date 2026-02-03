@@ -3,6 +3,7 @@ import torch
 import sys
 import os
 import wandb
+import yaml
 import pandas as pd
 from typer import Typer
 from typing import Tuple, Callable
@@ -23,13 +24,20 @@ import lib.CBertClassif as cbert
 
 app = Typer()
 
+with open('./config/cluster_params.yaml', "r") as file:
+	params = yaml.safe_load(file)
+
 
 DATE_NAME = str(datetime.now()).split(".")[0].replace(" ", "_").replace(":", "-") 
-DEBUG_MODE = False
-DEVICE = "cuda:0"
-LOG_WANDB = True
-DIR_OUTPUT_PATH = "./out/clustering/"
-BATCH_SIZE = 256
+DEBUG_MODE = params["debug_mode"]
+DEVICE = params["device"]
+DIR_OUTPUT_PATH = params["dir_output_path"]
+BATCH_SIZE = params["batch_size"]
+
+LOG_WANDB = params["wandb"]["log_wandb"]
+PROJECT = params["wandb"]["project"]
+ENTITY = params["wandb"]["entity"]
+TAGS = params["wandb"]["tags"]
 
 
 SYSTEM_SEED = 12345  # Seed per replicabilità del sistema (modello, CUDA, ecc.)
@@ -322,9 +330,9 @@ def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: st
 
     if LOG_WANDB:
         wandb.init(
-            project="fl-ner-final",
-            entity="mlgroup",
-            tags=["flner", "clustering", "CBertClassif", str(seed), "no-complex-iban"],
+            project=PROJECT,
+            entity=ENTITY,
+            tags=["flner", "clustering", "CBertClassif", str(seed), "no-complex-iban"] + TAGS,
             name=name_wandb,
             config={
                 "model": model,
@@ -498,9 +506,9 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
 
     if LOG_WANDB:
         wandb.init(
-            project="fl-ner-final",
-            entity="mlgroup",
-            tags=["flner", "clustering", str(seed), "kernel-mlp", "no-complex-iban"],
+            project=PROJECT,
+            entity=ENTITY,
+            tags=["flner", "clustering", str(seed), "kernel-mlp", "no-complex-iban"] + TAGS,
             name=name_wandb,
             config={
                 "model": model,
