@@ -3,10 +3,12 @@ import torch
 import os
 import wandb
 import yaml
+import random
 import pandas as pd
+import numpy as np
+import networkx as nx
 from typer import Typer
 from typing import Tuple
-from lib.plot import *
 from lib.saveOutput import *
 from lib.download import download_pre_trained_model
 from itertools import combinations
@@ -105,7 +107,7 @@ def set_holder_predicted(dataset: pd.DataFrame, account_entities: dict):
                 dataset.loc[index,"Representative_name"] = representative_names[row['Name']]
 
 
-def eval_is_shared_pred(account_entities: dict):
+def eval_is_shared_pred(account_entities: dict) -> Tuple[list, list, int]:
     '''It calculates the number of correctly predicted ibans on is shared task.'''
     
     predictions = [account_entities[iban]['predicted_shared'] for iban in account_entities]
