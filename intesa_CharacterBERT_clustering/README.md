@@ -28,3 +28,13 @@ where:
 - `DATASET_PATH`: the path of the dataset;
 - `[OPTIONS]`:
     - `--name-wandb TEXT`: name for execution on Weights & Biases  
+
+The output is saved in the folder specified in the configuration file. It will contain:
+- `cluster.json`: a JSON file containing the following details for each IBAN:
+    - _“IsShared”_: true label indicating whether the IBAN is shared or not;
+    - “predicted_shared”: predicted label indicating whether the IBAN is shared or not;
+    - “real_holders”: list containing the names of the true holders;
+    - “holders”: list containing the clusters predicted from the connected components of the graph. It includes information on the name chosen to represent the cluster, the names of the entities included in the cluster, and the real name of the holder associated with the chosen name of the cluster.  
+- `labeled_couple_dataset.csv`: a CSV file containing the following information for each pair generated from the original dataset: _"iban", "name1", "name2", "label", "IsShared", "predicted"_.
+- `labeled_original_dataset.csv`: the original dataset labeled with predictions. It contains the following columns: _"index", "AccountNumber", "Name", "num occorrenze", "IsShared", "Holder", "cluster", "OldName", "IsShared_pred", "Predicted_Holder", "Representative_name"_.
+- `log.txt`: files containing log information.

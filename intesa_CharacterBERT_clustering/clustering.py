@@ -1,25 +1,23 @@
 import json
 import torch
-import sys
 import os
 import wandb
 import yaml
 import pandas as pd
 from typer import Typer
-from typing import Tuple, Callable
+from typing import Tuple
 from lib.plot import *
 from lib.saveOutput import *
-from collections import Counter
+from lib.download import download_pre_trained_model
 from itertools import combinations
 from lib.datasetManipulation import *
 from transformers import BertTokenizer
-from lib.trainingUtilities import compute_metrics
 from lib.mlp import MLP
 from sklearn.metrics import classification_report
 from lib.kernel_sim_data_utils import create_sim_data
 from sklearn.preprocessing import MinMaxScaler
 
-# download_pre_trained_model()
+download_pre_trained_model()
 import lib.CBertClassif as cbert
 
 app = Typer()
