@@ -8,23 +8,27 @@ source .venv/bin/activate
 uv sync
 ```
 
-## Run with the Simulation Engine
+## Logger informations
 
-In the `flower-mlp` directory, use `flwr run` to run a local simulation:
+In the config/flower_exp_bertmlp.yaml file, you can find the logger section that contains
 
-```bash
-flwr run .
+```yaml
+enabled: false
 ```
 
-Refer to the [How to Run Simulations](https://flower.ai/docs/framework/how-to-run-simulations.html) guide in the documentation for advice on how to optimize your simulations.
+if set to true, WandB will be used as logger, and  
 
-## Run with the Deployment Engine
+```yaml
+project: #YOUR WANDB PROJECT NAME#
+entity: #YOUR WANDB ENTITY NAME#
+```
+should be setted.
 
-Follow this [how-to guide](https://flower.ai/docs/framework/how-to-run-flower-with-deployment-engine.html) to run the same app in this example but with Flower's Deployment Engine. After that, you might be interested in setting up [secure TLS-enabled communications](https://flower.ai/docs/framework/how-to-enable-tls-connections.html) and [SuperNode authentication](https://flower.ai/docs/framework/how-to-authenticate-supernodes.html) in your federation.
+## seed information
 
-You can run Flower on Docker too! Check out the [Flower with Docker](https://flower.ai/docs/framework/docker/index.html) documentation.
+In the config/flower_exp_bertmlp.yaml file, seed should be changed accordingly to the ones in the dataset folders names.
 
-### Run example with 4 clients
+### Run with 4 clients
 
 In the `flower-mlp` directory, you need to open six terminals: 1 for server process, 4 for clients process, 1 for Flower App. 
 
@@ -82,3 +86,5 @@ At the end of federation the global model will be saved in the _.out/_ directory
 - Join the Flower community!
   - [Flower Slack](https://flower.ai/join-slack/)
   - [Flower Discuss](https://discuss.flower.ai/)
+
+

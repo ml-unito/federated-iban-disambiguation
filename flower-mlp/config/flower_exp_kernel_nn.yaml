@@ -1,9 +1,9 @@
 # Dataset configuration
 data:
     dataset:
-        sim_train_path: ../intesa_CharacterBERT_clustering/dataset/similarity_client%d_train_seed_%d%s.csv
-        sim_test_path: ../intesa_CharacterBERT_clustering/dataset/similarity_test_seed_%d%s.csv
-        seed: 23517
+        sim_train_path: ./dataset/similarity_client%d_train_seed_%d%s.csv
+        sim_test_path: ./dataset/similarity_test_seed_%d%s.csv
+        seed: 81789
 # Evaluation configuration
 eval:
     # The task to perform which determines the evaluation metric (only classification is currently supported)
@@ -19,10 +19,10 @@ eval:
 # Logger configuration
 logger:
     name: WandBLog
-    project: fl-ner
+    project: fl-ner-final
     entity: mlgroup
     group: flower-kernel-mlp-R30-E4
-    tags: ["flner", "flower-federation", 'mlp', 'spectrum-kernel', '23517', "4 local epochs", '30 rounds', 'server-test']
+    tags: ["flner", "flower-federation", 'mlp', 'spectrum-kernel', '81789', "4 local epochs", '30 rounds', 'server-test']
 # FL protocol configuration
 protocol:
     # % of eligible clients, i.e., participants, in each round

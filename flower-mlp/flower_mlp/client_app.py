@@ -5,7 +5,7 @@ import yaml
 import flwr as fl
 from flwr.common import Context
 
-from flower_mlp.task import MLP, set_parameters, get_parameters, train, test, log_detailed_metrics, load_data, DEVICE
+from flower_mlp.task import MLP, set_parameters, get_parameters, train, test, log_detailed_metrics, load_data, DEVICE, set_system_seed
 
 
 def load_config(config_path):
@@ -107,6 +107,10 @@ def client_fn(context: Context):
 
     # Ottieni l'ID del client dalla configurazione del nodo
     client_id = int(context.node_config["partition-id"]) + 1
+    
+    # Fissa il seed di sistema per replicabilità (prima di creare il modello)
+    set_system_seed()
+    print(f"Client {client_id}: system_seed=42 applicato")
 
     # Carica i dati
     trainloader, valloader = load_data(client_id, config["data"])

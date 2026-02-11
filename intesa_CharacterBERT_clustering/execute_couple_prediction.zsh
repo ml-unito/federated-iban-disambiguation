@@ -1,3 +1,4 @@
+uv run couple_prediction.py ./dataset/split_dataset_9046/client1_train_pp.csv ./dataset/split_dataset_9046/df_test_pp.csv CBertClassif ./config/parameters_FullCBert.json CentralizedBert_9046_Client1
 uv run couple_prediction.py ./dataset/split_dataset_9046/client2_train_pp.csv ./dataset/split_dataset_9046/df_test_pp.csv CBertClassif ./config/parameters_FullCBert.json CentralizedBert_9046_Client2
 uv run couple_prediction.py ./dataset/split_dataset_9046/client3_train_pp.csv ./dataset/split_dataset_9046/df_test_pp.csv CBertClassif ./config/parameters_FullCBert.json CentralizedBert_9046_Client3
 uv run couple_prediction.py ./dataset/split_dataset_9046/client4_train_pp.csv ./dataset/split_dataset_9046/df_test_pp.csv CBertClassif ./config/parameters_FullCBert.json CentralizedBert_9046_Client4

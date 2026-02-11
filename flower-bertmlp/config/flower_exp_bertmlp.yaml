@@ -23,11 +23,12 @@ eval:
     server: true
     # Whether to evaluate the client local models on the server-side test set
     locals: false
-# Logger configuration
+# Logger configuration # WE USED WANDB, YOU NEED TO ADD A WANDB PROJECT NAME AND ENTITY TO LOG
 logger:
+    enabled: false
     name: WandBLog
-    project: fl-ner
-    entity: mlgroup
+    project: #YOUR WANDB PROJECT NAME#
+    entity: #YOUR WANDB ENTITY NAME#
     group: flower-bert-mlp-R10-E2
     tags: ["flner", "flower-federation", 'mlp', 'bert', '81789', "2 local epochs", '10 rounds', 'server-test', 'lr-1e-6']
 # FL protocol configuration

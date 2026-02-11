@@ -25,6 +25,20 @@ def load_config(config_path):
         return yaml.safe_load(file)
 
 
+def flatten_metrics(metrics_dict, prefix=""):
+    
+    flat = {}
+    for key, value in metrics_dict.items():
+        full_key = f"{prefix}{key}" if prefix else key
+        if isinstance(value, dict):
+            # Ricorsione per dizionari annidati
+            nested = flatten_metrics(value, prefix=f"{full_key}_")
+            flat.update(nested)
+        else:
+            flat[full_key] = value
+    return flat
+
+
 class FlowerClient(fl.client.NumPyClient):
     def __init__(self, client_id, model, X_train, y_train, X_val, y_val, batch_size, eval_config, local_epochs, training_config):
         self.client_id = client_id
@@ -48,77 +62,88 @@ class FlowerClient(fl.client.NumPyClient):
         set_parameters(self.model, parameters)
 
     def fit(self, parameters, config):
-        self.set_parameters(parameters)
         
-        fit_metrics = {}
+        # ####################
+        # # LOCK PER FIT CONCURRENCY
         
-        # Pre-fit evaluation
-        if self.eval_config.get("pre_fit", False):
-            print(f"Client {self.client_id}: pre-fit evaluation...")
-            loss, metrics, p, l = test(self.model, self.X_val, self.y_val, self.batch_size, self.criterion)
+        # from flower_bertmlp.task import acquire_fit_lock, release_fit_lock
+    
+        # lock_file = acquire_fit_lock(self.client_id)
+        
+        # print(f"Client {self.client_id}: acquisito lock")
+        # ####################
+        
+        # try:
+            self.set_parameters(parameters)
             
-            metrics = classification_report(l, torch.stack(p).argmax(dim=1).numpy()
-, digits=4, output_dict=True)
-            print(f"Client {self.client_id} pre-fit Classification Report:\n{metrics}")
+            fit_metrics = {}
             
-            #print(f"Client {self.client_id}: pre-fit loss={loss:.4f}, acc={metrics['accuracy']:.4f}")
+            # Pre-fit evaluation
+            if self.eval_config.get("pre_fit", False):
+                print(f"Client {self.client_id}: pre-fit evaluation...")
+                loss, metrics, p, l = test(self.model, self.X_val, self.y_val, self.batch_size, self.criterion)
+                
+                cr = classification_report(l, torch.stack(p).argmax(dim=1).numpy(), output_dict=True)
+                print(f"Client {self.client_id} pre-fit Classification Report:\n{cr}")
+                
+                # Appiattisci e aggiungi prefisso
+                flat_cr = flatten_metrics(cr)
+                for k, v in flat_cr.items():
+                    fit_metrics[f"prefit_{k}"] = v
+                    
+            # Training
+            print(f"Client {self.client_id}: training {self.local_epochs} epochs...")
             
-            for k, v in metrics.items():
-                fit_metrics[f"prefit_{k}"] = v
-        
-        # Training
-        print(f"Client {self.client_id}: training {self.local_epochs} epochs...")
-        
-        # Crea optimizer e scheduler
-        lr = self.training_config.get("learning_rate", 5e-6)
-        weight_decay = self.training_config.get("weight_decay", 0.01)
-        optimizer = torch.optim.AdamW(self.model.parameters(), lr=lr, weight_decay=weight_decay)
-        
-        num_training_steps = (len(self.X_train) // self.batch_size) * self.local_epochs
-        scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=num_training_steps)
-        
-        total_loss = 0.0
-        for epoch in range(self.local_epochs):
-            loss, metrics = train(self.model, self.X_train, self.y_train, self.batch_size, optimizer, self.criterion, scheduler)
-            total_loss += loss
-        
-        avg_train_loss = total_loss / self.local_epochs
-        print(f"Client {self.client_id}: training done, loss={avg_train_loss:.4f}")
-        fit_metrics["train_loss"] = avg_train_loss
-        
-        # Post-fit evaluation
-        if self.eval_config.get("post_fit", False):
-            print(f"Client {self.client_id}: post-fit evaluation...")
-            loss, metrics, p, l = test(self.model, self.X_val, self.y_val, self.batch_size, self.criterion)
+            # Crea optimizer e scheduler
+            lr = self.training_config.get("learning_rate", 5e-6)
+            weight_decay = self.training_config.get("weight_decay", 0.01)
+            optimizer = torch.optim.AdamW(self.model.parameters(), lr=lr, weight_decay=weight_decay)
             
-            # ricalcola classification report usando p e l (predictions e labels)
-            # sapendo che p è fatto predictions += outputs.cpu() per ogni batch
+            num_training_steps = (len(self.X_train) // self.batch_size) * self.local_epochs
+            scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=num_training_steps)
             
-            metrics = classification_report(l, torch.stack(p).argmax(dim=1).numpy()
-, digits=4, output_dict=True)
-            print(f"Client {self.client_id} Classification Report:\n{metrics}")
+            total_loss = 0.0
+            for epoch in range(self.local_epochs):
+                loss, metrics = train(self.model, self.X_train, self.y_train, self.batch_size, optimizer, self.criterion, scheduler)
+                total_loss += loss
             
-            #print(f"Client {self.client_id}: post-fit loss={loss:.4f}, acc={metrics['accuracy']:.4f}")
+            avg_train_loss = total_loss / self.local_epochs
+            print(f"Client {self.client_id}: training done, loss={avg_train_loss:.4f}")
+            fit_metrics["train_loss"] = avg_train_loss
             
-            for k, v in metrics.items():
-                fit_metrics[f"postfit_{k}"] = v
-        
-        return get_parameters(self.model), len(self.X_train), fit_metrics
+            # Post-fit evaluation
+            if self.eval_config.get("post_fit", False):
+                print(f"Client {self.client_id}: post-fit evaluation...")
+                loss, metrics, p, l = test(self.model, self.X_val, self.y_val, self.batch_size, self.criterion)
+                
+                cr = classification_report(l, torch.stack(p).argmax(dim=1).numpy(), output_dict=True)
+                print(f"Client {self.client_id} post-fit Classification Report:\n{cr}")
+                
+                # Appiattisci e aggiungi prefisso
+                flat_cr = flatten_metrics(cr)
+                for k, v in flat_cr.items():
+                    fit_metrics[f"postfit_{k}"] = v
+            
+            return get_parameters(self.model), len(self.X_train), fit_metrics
+        # finally:
+        #     release_fit_lock(lock_file)
+        #     print(f"Client {self.client_id}: rilasciato lock")
 
     def evaluate(self, parameters, config):
-        """Valutazione chiamata dal server per aggregare metriche globali."""
         self.set_parameters(parameters)
         
         if not self.eval_config.get("server", True):
             return 0.0, 1, {}
         
         loss, metrics, p, l = test(self.model, self.X_val, self.y_val, self.batch_size, self.criterion)
-        metrics = classification_report(l, torch.stack(p).argmax(dim=1).numpy()
-, digits=4, output_dict=True)
-        print(f"Client {self.client_id} server Classification Report:\n{metrics}")
-        #print(f"Client {self.client_id}: server eval loss={loss:.4f}, acc={metrics['accuracy']:.4f}")
         
-        return loss, len(self.X_val), metrics
+        cr = classification_report(l, torch.stack(p).argmax(dim=1).numpy(), output_dict=True)
+        print(f"Client {self.client_id} server Classification Report:\n{cr}")
+        
+        # Appiattisci il classification report
+        flat_cr = flatten_metrics(cr)
+        
+        return loss, len(self.X_val), flat_cr
 
 
 def client_fn(context: Context):

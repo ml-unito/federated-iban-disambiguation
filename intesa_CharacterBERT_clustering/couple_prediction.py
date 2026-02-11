@@ -14,6 +14,8 @@ from transformers import get_linear_schedule_with_warmup
 from lib.download import download_pre_trained_model
 from lib.trainingUtilities import EarlyStopping, SaveBestModel
 
+from sklearn.metrics import classification_report
+
 download_pre_trained_model()
 
 import lib.CBertClassif as cbert
@@ -31,17 +33,60 @@ LOG_WANDB = True
 
 writeLog = SaveOutput('./out/couple_prediction/log/', LOG_NAME, printAll=False, debug=DEBUG)
 
+SYSTEM_SEED = 12345  # Seed per replicabilità del sistema (modello, CUDA, ecc.)
 
+
+def set_system_seed(seed: int = SYSTEM_SEED):
+    """Fissa tutti i seed di sistema per garantire replicabilità."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)  # Per multi-GPU
+    
+    # Rende le operazioni CUDA deterministiche
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    
+    # Variabile d'ambiente per hash deterministico
+    os.environ["PYTHONHASHSEED"] = str(seed)
+
+set_system_seed()
+
+def flatten_metrics(metrics_dict, prefix=""):
+    """
+    Appiattisce un dizionario annidato per renderlo compatibile con Flower.
+    
+    Esempio:
+        {'0': {'precision': 0.91, 'recall': 0.95}, 'accuracy': 0.87}
+        ->
+        {'0_precision': 0.91, '0_recall': 0.95, 'accuracy': 0.87}
+    """
+    flat = {}
+    for key, value in metrics_dict.items():
+        full_key = f"{prefix}{key}" if prefix else key
+        if isinstance(value, dict):
+            # Ricorsione per dizionari annidati
+            nested = flatten_metrics(value, prefix=f"{full_key}_")
+            flat.update(nested)
+        else:
+            flat[full_key] = value
+    return flat
 
 def test_model(model, X_test, y_test, criterion, batch_size: int, test):
     writeLog("\nTesting on Test Set\n")
     
-    _, metrics, predictions, total_labels = test(model, X_test, y_test, batch_size, criterion)
+    _, metrics, p, l = test(model, X_test, y_test, batch_size, criterion)
     
-    for el in metrics: writeLog("- " + el +  ":" + str(metrics[el]))
+    cr = classification_report(l, torch.stack(p).argmax(dim=1).numpy(), output_dict=True)
+    
+    # Appiattisci e aggiungi prefisso
+    flat_cr = flatten_metrics(cr)
+    
+    for el in flat_cr: writeLog("- " + el +  ":" + str(flat_cr[el]))
     # if not DEBUG: plot_confusion_matrix(total_labels, predictions, ['Same name (0)', 'Different name(1)'], (7,4), saveName=PLOT_NAME) 
 
-    return metrics
+    return flat_cr
 
 
 def train_model(model, optimizer, scheduler, criterion, num_epochs: int, batch_size: int, X_train, y_train, X_test, y_test, train: Callable, test: Callable):
@@ -234,7 +279,7 @@ def couple_prediction(model, tokenizer, train_path: str, test_path: str, paramet
 
     if LOG_WANDB:
         wandb.init(
-            project="fl-ner",
+            project="fl-ner-final",
             entity="mlgroup",
             tags=["flner", "test", "centralize"],
             name=name_wandb,
@@ -267,19 +312,33 @@ def couple_prediction(model, tokenizer, train_path: str, test_path: str, paramet
     # --------------------------------------
 
     metrics = test_model(model, X_test, y_test, criterion, parameters['batch_size'], test)
-
+    
     if LOG_WANDB:
         wandb.log({
             "final_test_accuracy": metrics["accuracy"],
-            "final_test_precision": metrics["precision"],
-            "final_test_recall": metrics["recall"],
-            "final_test_f1": metrics["f1"]
+            "final_test_precision": metrics["weighted avg_precision"],
+            "final_test_recall": metrics["weighted avg_recall"],
+            "final_test_f1": metrics["weighted avg_f1-score"]
         })
         wandb.summary["test_accuracy"] = metrics["accuracy"]
-        wandb.summary["test_precision"] = metrics["precision"]
-        wandb.summary["test_recall"] = metrics["recall"]
-        wandb.summary["test_f1"] = metrics["f1"]
+        wandb.summary["test_precision"] = metrics["weighted avg_precision"]
+        wandb.summary["test_recall"] = metrics["weighted avg_recall"]
+        wandb.summary["test_f1"] = metrics["weighted avg_f1-score"]
         wandb.finish()
+    
+
+    # if LOG_WANDB:
+    #     wandb.log({
+    #         "final_test_accuracy": metrics["accuracy"],
+    #         "final_test_precision": metrics["precision"],
+    #         "final_test_recall": metrics["recall"],
+    #         "final_test_f1": metrics["f1"]
+    #     })
+    #     wandb.summary["test_accuracy"] = metrics["accuracy"]
+    #     wandb.summary["test_precision"] = metrics["precision"]
+    #     wandb.summary["test_recall"] = metrics["recall"]
+    #     wandb.summary["test_f1"] = metrics["f1"]
+    #     wandb.finish()
     
     # -------------------------------------------------------
     # Plot the metrics

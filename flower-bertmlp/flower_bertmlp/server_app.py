@@ -17,7 +17,7 @@ def load_config(config_path):
 
 
 def aggregate_metrics_by_prefix(metrics_list, prefix):
-    """Aggrega metriche filtrate per prefisso."""
+    
     if not metrics_list:
         return {}
     
@@ -153,7 +153,8 @@ def server_fn(context: Context):
     os.makedirs(output_path, exist_ok=True)
     
     # WandB
-    init_wandb(config, output_path)
+    if config["logger"]["enabled"]:
+        init_wandb(config, output_path)
     
     # Modello iniziale
     model = CharacterBertForClassification(num_labels=2)
@@ -176,7 +177,7 @@ def server_fn(context: Context):
     
     server_config = fl.server.ServerConfig(
         num_rounds=n_rounds,
-        round_timeout=3600
+        round_timeout=7200 # 2 hours timeout per round
     )
     
     return fl.server.ServerAppComponents(strategy=strategy, config=server_config)

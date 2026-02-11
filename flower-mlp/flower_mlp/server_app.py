@@ -8,7 +8,7 @@ import torch
 from datetime import datetime
 from flwr.common import Context, ndarrays_to_parameters
 
-from flower_mlp.task import MLP, get_parameters, weighted_average, DEVICE
+from flower_mlp.task import MLP, get_parameters, weighted_average, DEVICE, set_system_seed
 
 
 def load_config(config_path):
@@ -49,11 +49,11 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
             and self.eval_config["server"]
         ):
             # Usa lo stesso schema di naming per la fase global
-            global_metrics = {"global/train_loss": loss, "round": server_round}
+            global_metrics = {"train_loss": loss, "round": server_round}
 
             # Aggiungi tutte le metriche con il prefisso "global/"
             for k, v in metrics.items():
-                global_metrics[f"global/{k}"] = v
+                global_metrics[f"{k}"] = v
 
             # Log su WandB
             wandb.log(global_metrics)
@@ -100,8 +100,13 @@ def init_wandb(config: dict, path_model_dir: str):
 
 
 def server_fn(context: Context):
+    
     # Carica la configurazione
     config = load_config("config/flower_exp_kernel_nn.yaml")
+    
+    # Fissa il seed di sistema per replicabilità (prima di creare il modello)
+    set_system_seed()
+    print("Server: system_seed=42 applicato")
     
     # Debug per verificare i valori di configurazione compreso il seeding
     print(f"[DEBUG] Configurazione caricata: {config}")

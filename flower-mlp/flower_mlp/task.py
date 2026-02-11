@@ -4,6 +4,8 @@ import os
 import sys
 from collections import OrderedDict
 
+import random
+
 import numpy as np
 import pandas as pd
 import torch
@@ -23,6 +25,24 @@ from sklearn.preprocessing import MinMaxScaler
 # Definisci il device
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(f"Training on {DEVICE}")
+
+
+SYSTEM_SEED = 12345  # Seed per replicabilità del sistema (modello, CUDA, ecc.)
+
+def set_system_seed(seed: int = SYSTEM_SEED):
+    """Fissa tutti i seed di sistema per garantire replicabilità."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)  # Per multi-GPU
+    
+    # Rende le operazioni CUDA deterministiche
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    
+    # Variabile d'ambiente per hash deterministico
+    os.environ["PYTHONHASHSEED"] = str(seed)
 
 
 class MLP(nn.Module):
@@ -165,6 +185,25 @@ def test(model, testloader, device=DEVICE):
     
     return avg_loss, accuracy
 
+def flatten_metrics(metrics_dict, prefix=""):
+    """
+    Appiattisce un dizionario annidato per renderlo compatibile con Flower.
+    
+    Esempio:
+        {'0': {'precision': 0.91, 'recall': 0.95}, 'accuracy': 0.87}
+        ->
+        {'0_precision': 0.91, '0_recall': 0.95, 'accuracy': 0.87}
+    """
+    flat = {}
+    for key, value in metrics_dict.items():
+        full_key = f"{prefix}{key}" if prefix else key
+        if isinstance(value, dict):
+            # Ricorsione per dizionari annidati
+            nested = flatten_metrics(value, prefix=f"{full_key}_")
+            flat.update(nested)
+        else:
+            flat[full_key] = value
+    return flat
 
 def log_detailed_metrics(model, train_x, train_y, test_x, test_y, loss=None, round_num=0, phase="global"):
     """Log metriche dettagliate su WandB."""
@@ -181,19 +220,25 @@ def log_detailed_metrics(model, train_x, train_y, test_x, test_y, loss=None, rou
         cr_train = classification_report(train_y_np, train_preds, output_dict=True, zero_division=0)
         cr_test = classification_report(test_y_np, test_preds, output_dict=True, zero_division=0)
         
+        cr_train = flatten_metrics(cr_train, prefix="global.train.")
+        cr_test = flatten_metrics(cr_test, prefix="global.")
+        
+        #metrics è l'unione dei due dizionari
+        metrics = {**cr_train, **cr_test}
+        
         # Crea le metriche, ora anche con micro_f1
-        metrics = {
-            "train_accuracy": float(cr_train["accuracy"]),
-            "test_accuracy": float(cr_test["accuracy"]),
-            "train_macro_f1": float(cr_train["macro avg"]["f1-score"]),
-            "test_macro_f1": float(cr_test["macro avg"]["f1-score"]),
-            "train_micro_f1": float(cr_train["weighted avg"]["f1-score"]),  # utilizziamo weighted avg come micro_f1
-            "test_micro_f1": float(cr_test["weighted avg"]["f1-score"]),
-            "train_precision": float(cr_train["macro avg"]["precision"]),
-            "test_precision": float(cr_test["macro avg"]["precision"]),
-            "train_recall": float(cr_train["macro avg"]["recall"]),
-            "test_recall": float(cr_test["macro avg"]["recall"]),
-        }
+        # metrics = {
+        #     "train_accuracy": float(cr_train["accuracy"]),
+        #     "test_accuracy": float(cr_test["accuracy"]),
+        #     "train_macro_f1": float(cr_train["macro avg"]["f1-score"]),
+        #     "test_macro_f1": float(cr_test["macro avg"]["f1-score"]),
+        #     "train_micro_f1": float(cr_train["weighted avg"]["f1-score"]),  # utilizziamo weighted avg come micro_f1
+        #     "test_micro_f1": float(cr_test["weighted avg"]["f1-score"]),
+        #     "train_precision": float(cr_train["macro avg"]["precision"]),
+        #     "test_precision": float(cr_test["macro avg"]["precision"]),
+        #     "train_recall": float(cr_train["macro avg"]["recall"]),
+        #     "test_recall": float(cr_test["macro avg"]["recall"]),
+        # }
         
         # Aggiungi loss se disponibile
         if loss is not None:
