@@ -155,28 +155,6 @@ def train_model(model, optimizer, scheduler, criterion, num_epochs: int, batch_s
     return training_loss, test_loss, test_accuracy, test_f1
 
 
-# def split_dataset(X, y, train_proportion):
-#     writeLog("\n- Preview of the dataset after the tokenization step:")
-#     for i in range(5):writeLog(str(X[i]))
-#     writeLog("")
-    
-#     X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=train_proportion, random_state=42, stratify=y)
-#     X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, train_size=0.5, random_state=42, stratify=y_test)
-
-#     # Print the class distribution
-#     writeLog("Original data: " + str(Counter(y)))
-#     writeLog("Training data: " + str(Counter(y_train)))
-#     writeLog("Test data: " + str(Counter(y_test)))
-#     writeLog("Validation data: " + str(Counter(y_val)))
-#     writeLog("")
-#     writeLog("Training set size: " + str(len(X_train)))
-#     writeLog("Validation set size: " + str(len(X_val)))
-#     writeLog("Test set size: " + str(len(X_test)))
-#     writeLog("")
-
-#     return X_train, X_test, y_train, y_test, X_val, y_val
-
-
 def extract_x_and_y(df: pd.DataFrame, model_name: str, tokenizer) -> Tuple[list, list]:
     if model_name == "CBertClassifFrzSep":
         tokenized_texts = tokenize_dataset_pair(df, tokenizer).tolist()

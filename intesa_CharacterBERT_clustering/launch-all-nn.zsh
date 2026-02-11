@@ -17,7 +17,7 @@ done
 for seed in $seeds; do
   echo -e "\033[0;32mSeed $seed\033[0m"
   for feature in $features; do
-    ./launchexp-nn.zsh $seed exp_kernel_nn_centralized alg_kernel_lr $feature federation
+    ./launchexp-nn.zsh $seed exp_kernel_nn_centralized alg_kernel_nn $feature federation
   done
 done
 
