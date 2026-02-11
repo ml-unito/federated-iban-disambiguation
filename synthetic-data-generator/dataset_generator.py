@@ -1,9 +1,3 @@
-# install all necessary libraries
-#import os
-#try: import pipreqs
-#except ImportError as error: os.system('pip install pipreqs')
-#os.system("pip install -r ./requirements.txt")
-
 import re
 import sys
 import os
@@ -83,7 +77,7 @@ def check_parameters():
     raise Exception("Exception: the probability of an address being generated must be a number between 0 and 1.")
 
 
-def create_faker_objects():
+def create_faker_objects() -> dict:
   faker_objects = dict()
   for country_code in track(FAKER_COUNTRY_CODES, description="Faker objects generation"):
     faker_objects[country_code] = Faker(country_code)
@@ -123,7 +117,7 @@ def address_generator(faker_objects, country_code):
   return address
 
 
-def companies_info_generator(faker_objects, country_code, num_companies):
+def companies_info_generator(faker_objects, country_code, num_companies) -> dict:
   ''' Generates company names and their addresses, based on the country code
     and the number of companies specified in parameters.'''
   companies = dict()
@@ -139,7 +133,7 @@ def companies_info_generator(faker_objects, country_code, num_companies):
   return companies
 
 
-def generate_entry_number():
+def generate_entry_number() -> int:
   """ Random generation of the number of entries to be included in the dataset for a specific iban """
   
   if not STATS_FROM_DATASETS:
@@ -156,7 +150,7 @@ def generate_entry_number():
     return np.random.choice(IBAN_VALUES, p=IBAN_PROBA)
 
 
-def generate_holder_number(num_entries):
+def generate_holder_number(num_entries) -> int:
   max_low = 4
   max_middle = 10
   new_max_holders = MAX_RANGE_HOLDERS if MAX_RANGE_HOLDERS < num_entries else num_entries
@@ -193,7 +187,7 @@ def generate_holder_number(num_entries):
     return num_holders
 
 
-def get_address_number(info_address, country_code):
+def get_address_number(info_address, country_code) -> string:
   ''' It returns the address number and/or more information about that from the
     address if it is present, otherwise the empty string. '''
   index_number = FAKER_COUNTRY_CODES[country_code]["pos_elem"]["number"]
@@ -212,25 +206,25 @@ def get_address_number(info_address, country_code):
     return ""
 
 
-def get_address_street(info_address, country_code):
+def get_address_street(info_address, country_code) -> string:
   ''' It returns the address street if it is present, otherwise the empty string. '''
   street = info_address[FAKER_COUNTRY_CODES[country_code]["pos_elem"]["street"]]
   return street if street is not None else ""
 
 
-def get_address_city(info_address, country_code):
+def get_address_city(info_address, country_code) -> string:
   ''' It returns the address city if it is present, otherwise the empty string. '''
   city = info_address[FAKER_COUNTRY_CODES[country_code]["pos_elem"]["city"]]
   return city if city is not None else ""
 
 
-def get_address_postal_code(info_address, country_code):
+def get_address_postal_code(info_address, country_code) -> string:
   ''' It returns the address postal code if it is present, otherwise the empty string. '''
   postal_code = info_address[FAKER_COUNTRY_CODES[country_code]["pos_elem"]["postal_code"]]
   return postal_code if postal_code is not None else ""
 
 
-def get_address_state(info_address, country_code):
+def get_address_state(info_address, country_code) -> string:
   ''' It returns the address state if it is present, otherwise the empty string. '''
   index = FAKER_COUNTRY_CODES[country_code]["pos_elem"]["state"]
   state = info_address[index] if index != -1 else None
@@ -242,7 +236,7 @@ def get_country(country_code):
   return FAKER_COUNTRY_CODES[country_code]["country"]
 
 
-def change_address_format(address, country_code):
+def change_address_format(address, country_code) -> string:
   ''' Randomly it changes the address format and possibly introduces write errors. '''
 
   # With regular expression, it extracts all informations from the address.
@@ -330,7 +324,7 @@ def change_address_format(address, country_code):
   return address
 
 
-def data_generator(faker_objects):
+def data_generator(faker_objects) -> pd.DataFrame:
   data = []
   for i in track(range(NUM_IBAN), description="Dataset generation"):
     # Generation of BIC code
@@ -396,7 +390,7 @@ def save_dataset(dataset, filePath):
   dataset.to_csv(filePath)
 
 
-def get_dataset_filePath():
+def get_dataset_filePath() -> string:
   """ return a new dataset name including actual datetime """
   now = datetime.now()
   if not os.path.exists(PATH_OUTPUT_DIR):
