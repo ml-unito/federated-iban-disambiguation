@@ -1,5 +1,21 @@
 # Intra-accounts disambiguation
 
+## Table of Contents
+- [Create virtual environment and install dependencies](#create-virtual-environment-and-install-dependencies)
+- [Information on runs for dataset generation](#information-on-runs-for-dataset-generation)
+  - [Kernel version](#kernel-version)
+- [Step 1: Predict if a pair refers to the same entity](#step-1-predict-if-a-pair-refers-to-the-same-entity)
+  - [Centralized runs](#centralized-runs)
+    - [Character Bert](#character-bert)
+    - [Spectrum Kernel](#spectrum-kernel)
+  - [Federated learning with Fluke](#federated-learning-with-fluke)
+    - [CharacterBert Full Model FL](#characterbert-full-model-fl)
+    - [CharacterBert Partial FL 1](#characterbert-partial-fl-1)
+    - [CharacterBert Partial FL 2](#characterbert-partial-fl-2)
+    - [Spectrum Kernel with MLP](#spectrum-kernel-with-mlp)
+    - [Spectrum Kernel with Logistic Regression](#spectrum-kernel-with-logistic-regression)
+- [Step 2: Community detection](#step-2-community-detection)
+
 ## Create virtual environment and install dependencies
 To create the virtual environment and install dependencies, you can use UV, a pyhton package manager. First, install UV:
 ```bash
