@@ -4,7 +4,7 @@ seed=$1
 exp=config/$2.yaml
 alg=config/$3.yaml
 bert=$4
-mode=$5
+client=$5
 
 if [ -z "$seed" ]; then
     echo "Usage: $0 <seed>"
@@ -40,17 +40,14 @@ else
     fi
 fi
 
+sed -i "s/client: .*/client: $client/" $exp
+sed -i "s/sim_train_path: .*/sim_train_path: dataset\/similarity_client%d_train_seed_%d%s.csv/" $exp
+
 echo -e "\033[0;32mStarting federation...\033[0m"
 
-if [[ "$mode" == "federation" ]]
-then
-    uv run fluke federation $exp $alg
-elif [[ "$mode" == "centralized" ]]
-then
-    uv run fluke centralized $exp $alg
-else
-    uv run fluke clients-only $exp $alg
-fi
+uv run fluke centralized $exp $alg
 
 sed -i "s/'$seed'/'SEED'/" $exp 
 sed -i "s/fl_models_S$seed/fl_models_SSEED/" $exp 
+sed -i "s/client: .*/client: None/" $exp
+sed -i "s/sim_train_path: .*/sim_train_path: dataset\/similarity_train_seed_%d%s.csv/" $exp

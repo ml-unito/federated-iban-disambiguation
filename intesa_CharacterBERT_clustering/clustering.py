@@ -1,39 +1,43 @@
 import json
 import torch
-import sys
 import os
 import wandb
+import yaml
+import random
 import pandas as pd
+import numpy as np
+import networkx as nx
 from typer import Typer
-from typing import Tuple, Callable
-from lib.plot import *
+from typing import Tuple
 from lib.saveOutput import *
-from collections import Counter
+from lib.download import download_pre_trained_model
 from itertools import combinations
 from lib.datasetManipulation import *
 from transformers import BertTokenizer
-from lib.trainingUtilities import compute_metrics
 from lib.mlp import MLP
 from sklearn.metrics import classification_report
 from lib.kernel_sim_data_utils import create_sim_data
 from sklearn.preprocessing import MinMaxScaler
 
-# download_pre_trained_model()
+download_pre_trained_model()
 import lib.CBertClassif as cbert
 
 app = Typer()
 
+with open('./config/cluster_params.yaml', "r") as file:
+	params = yaml.safe_load(file)
+
 
 DATE_NAME = str(datetime.now()).split(".")[0].replace(" ", "_").replace(":", "-") 
-DEBUG_MODE = False
-DEVICE = "cuda:0"
-LOG_WANDB = True
-DIR_OUTPUT_PATH = "./out/clustering/"
+DEBUG_MODE = params["debug_mode"]
+DEVICE = params["device"]
+DIR_OUTPUT_PATH = params["dir_output_path"]
+BATCH_SIZE = params["batch_size"]
 
-# parameters
-with open('./config/parameters.json', "r") as data_file:
-    parameters = json.load(data_file)
-batch_size = parameters['batch_size']
+LOG_WANDB = params["wandb"]["log_wandb"]
+PROJECT = params["wandb"]["project"]
+ENTITY = params["wandb"]["entity"]
+TAGS = params["wandb"]["tags"]
 
 
 SYSTEM_SEED = 12345  # Seed per replicabilità del sistema (modello, CUDA, ecc.)
@@ -103,7 +107,7 @@ def set_holder_predicted(dataset: pd.DataFrame, account_entities: dict):
                 dataset.loc[index,"Representative_name"] = representative_names[row['Name']]
 
 
-def eval_is_shared_pred(account_entities: dict):
+def eval_is_shared_pred(account_entities: dict) -> Tuple[list, list, int]:
     '''It calculates the number of correctly predicted ibans on is shared task.'''
     
     predictions = [account_entities[iban]['predicted_shared'] for iban in account_entities]
@@ -326,9 +330,9 @@ def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: st
 
     if LOG_WANDB:
         wandb.init(
-            project="fl-ner-final",
-            entity="mlgroup",
-            tags=["flner", "test", "clustering", "CBertClassif", str(seed)],
+            project=PROJECT,
+            entity=ENTITY,
+            tags=["flner", "clustering", "CBertClassif", str(seed), "no-complex-iban"] + TAGS,
             name=name_wandb,
             config={
                 "model": model,
@@ -360,7 +364,7 @@ def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: st
     log("\n\nEvaluation of the model on test set on the couple prediction task...") 
     
     criterion = torch.nn.CrossEntropyLoss()
-    _, metrics, predictions, total_labels = cbert.test(model, test_x, test_y, 256, criterion)
+    _, metrics, predictions, total_labels = cbert.test(model, test_x, test_y, BATCH_SIZE, criterion)
     log(str(metrics))
     
     predictions = torch.stack(predictions).argmax(dim=1).cpu().numpy()
@@ -368,35 +372,8 @@ def cbert_accounts_disambiguation(seed: int, weights_path: str, dataset_path: st
     cr_test_str = classification_report(total_labels, predictions, output_dict=False)
     print(cr_test_str)
     
-    test_accuracy = cr_test["accuracy"]
-    test_f1 = cr_test["macro avg"]["f1-score"]
-    f1_test_label_1 = cr_test["1"]["f1-score"]
-    f1_test_label_0 = cr_test["0"]["f1-score"]
-    precision_test_label_1 = cr_test["1"]["precision"]
-    precision_test_label_0 = cr_test["0"]["precision"]
-    recall_test_label_1 = cr_test["1"]["recall"]
-    recall_test_label_0 = cr_test["0"]["recall"]
-
-    print("test_accuracy: "+str(test_accuracy)+"\n"+
-            "test_f1: "+str(test_f1)+"\n"+
-            "f1_test_label_1: "+str(f1_test_label_1)+"\n"+
-            "f1_test_label_0: "+str(f1_test_label_0)+"\n"+
-            "precision_test_label_1: "+str(precision_test_label_1)+"\n"+
-            "precision_test_label_0: "+str(precision_test_label_0)+"\n"+
-            "recall_test_label_1: "+str(recall_test_label_1)+"\n"+
-            "recall_test_label_0: "+str(recall_test_label_0))
-    
     if LOG_WANDB:
-        wandb.log({
-            "couple_prediction_accuracy": test_accuracy,
-            "couple_prediction_f1": test_f1,
-            "couple_prediction_f1_label_1": f1_test_label_1,
-            "couple_prediction_f1_label_0": f1_test_label_0,
-            "couple_prediction_precision_label_1": precision_test_label_1,
-            "couple_prediction_precision_label_0": precision_test_label_0,
-            "couple_prediction_recall_label_1": recall_test_label_1,
-            "couple_prediction_recall_label_0": recall_test_label_0
-        })
+        wandb.log({"couple_prediction": cr_test})
     
     pairs_df['predicted'] = predictions
 
@@ -529,9 +506,9 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
 
     if LOG_WANDB:
         wandb.init(
-            project="fl-ner",
-            entity="mlgroup",
-            tags=["flner", "test", "clustering", str(seed), "kernel-mlp"],
+            project=PROJECT,
+            entity=ENTITY,
+            tags=["flner", "clustering", str(seed), "kernel-mlp", "no-complex-iban"] + TAGS,
             name=name_wandb,
             config={
                 "model": model,
@@ -562,38 +539,10 @@ def kernel_accounts_disambiguation(seed: int, weights_path: str, dataset_path: s
             test_y.numpy(), test_preds, output_dict=True)
         cr_test_str = classification_report(
             test_y.numpy(), test_preds, output_dict=False)
-        
         print(cr_test_str)
-        
-        test_accuracy = cr_test["accuracy"]
-        test_f1 = cr_test["macro avg"]["f1-score"]
-        f1_test_label_1 = cr_test["1"]["f1-score"]
-        f1_test_label_0 = cr_test["0"]["f1-score"]
-        precision_test_label_1 = cr_test["1"]["precision"]
-        precision_test_label_0 = cr_test["0"]["precision"]
-        recall_test_label_1 = cr_test["1"]["recall"]
-        recall_test_label_0 = cr_test["0"]["recall"]
-
-        print("test_accuracy: "+str(test_accuracy)+"\n"+
-              "test_f1: "+str(test_f1)+"\n"+
-              "f1_test_label_1: "+str(f1_test_label_1)+"\n"+
-              "f1_test_label_0: "+str(f1_test_label_0)+"\n"+
-              "precision_test_label_1: "+str(precision_test_label_1)+"\n"+
-              "precision_test_label_0: "+str(precision_test_label_0)+"\n"+
-              "recall_test_label_1: "+str(recall_test_label_1)+"\n"+
-              "recall_test_label_0: "+str(recall_test_label_0))
 
         if LOG_WANDB:
-            wandb.log({
-                "couple_prediction_accuracy": test_accuracy,
-                "couple_prediction_f1": test_f1,
-                "couple_prediction_f1_label_1": f1_test_label_1,
-                "couple_prediction_f1_label_0": f1_test_label_0,
-                "couple_prediction_precision_label_1": precision_test_label_1,
-                "couple_prediction_precision_label_0": precision_test_label_0,
-                "couple_prediction_recall_label_1": recall_test_label_1,
-                "couple_prediction_recall_label_0": recall_test_label_0
-            })
+            wandb.log({"couple_prediction": cr_test})
         
         pairs_df['predicted'] = test_preds
     

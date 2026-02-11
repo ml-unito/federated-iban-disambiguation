@@ -1,0 +1,17 @@
+# The information about log with Weights & Biases. If log_wandb is true, the
+# calculated metrics are saved on wandb, otherwise it is ignored.
+wandb: 
+    log_wandb: true
+    project: fl-ner-final
+    entity: mlgroup
+    # Additional tags on wandb run. Leave [] if you do not want to add any other tags.
+    tags: []
+# The path of the directory where the output of the script is saved.
+dir_output_path: ./out/clustering/
+# The batch size used by model.
+batch_size: 256
+# The device type to use.
+device: cuda:0
+# If it true the logs are printed in the log file and in the terminal, else only
+# in the log file.
+debug_mode: false

@@ -23,7 +23,7 @@ from rich.progress import track
 from lib.kernel_sim_data_utils import load_sim_data
 from sklearn.preprocessing import MinMaxScaler
 
-# from lib.CBertClassif import *
+#from lib.CBertClassif import *
 from lib.CBertClassifFrz import *
 # from lib.CBertClassifFrzSep import *
 
@@ -102,9 +102,9 @@ def create_ddc_cbert(clients: int, train_path: str, test_path: str, client_test=
                               num_classes=2)
 
 
-def create_dc_kernel(sim_train_path: str, sim_test_path: str, seed: int, bert: bool) -> DataContainer:
+def create_dc_kernel(sim_train_path: str, sim_test_path: str, seed: int, bert: bool, client: int=None) -> DataContainer:
   train, test = load_sim_data(
-      train_path=sim_train_path % (seed, "_w-bert" if bert else ""),
+      train_path=sim_train_path % (seed, "_w-bert" if bert else "") if client is None else sim_train_path % (client, seed, "_w-bert" if bert else ""),
       test_path=sim_test_path % (seed, "_w-bert" if bert else "")
   )
   

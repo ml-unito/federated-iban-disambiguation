@@ -1,32 +1,80 @@
+#!/bin/zsh
 
-# ./launchexp-clustering.zsh 9046 ./out/fl_models_9046_afb1bdd45bfa4c62a58aa14122450a9a/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-9046
-# ./launchexp-clustering.zsh 23517 ./out/fl_models_23517_5ebf65a2dbc14769aa0250bfe9ed488a/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-23517
-# ./launchexp-clustering.zsh 47874 ./out/fl_models_47874_c194c115e1034b208a3122f156e66090/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-47874
-# ./launchexp-clustering.zsh 81789 ./out/fl_models_81789_beae0be00c444c30bcfa62caccd2806a/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-81789
-# ./launchexp-clustering.zsh 67895 ./out/fl_models_67895_6b6da2a609cc42b4bfcdba5c26ec3d51/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-67895
+seeds=(9046 23517 67895 47874 81789)
 
-# unique version of server
-# ./launchexp-clustering.zsh 9046 ./out/fl_models_unique_9046_16658f8372f14bb58cb5b39b10387990/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-9046-unique--no-complex-iban
-# ./launchexp-clustering.zsh 23517 ./out/fl_models_unique_23517_aa38960e87884a2694cbc1ea4880cf75/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-23517-unique--no-complex-iban
-# ./launchexp-clustering.zsh 47874 ./out/fl_models_unique_47874_fb3600173d3c4af88279d76ec578473a/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-47874-unique--no-complex-iban
-# ./launchexp-clustering.zsh 81789 ./out/fl_models_unique_81789_b71a5f5202fb4e0c9b17a99ad4d96c11/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-81789-unique--no-complex-iban
-# ./launchexp-clustering.zsh 67895 ./out/fl_models_unique_67895_eef73bbaba1745c38ac2627d86580d84/r0030_server.pth ./dataset/split_dataset/df_test_pp.csv clustering-kernel-mlp-67895-unique--no-complex-iban
+## Fluke models of Full CBert (batch 512) ##
+# fl_framework="fluke"
+# model="cbert"
+# weights_paths=(
+#   "./out/fl_bert_models_S9046_9eb503ed7c2b4556abb4df916163581e/r0010_server.pth"
+#   "./out/fl_bert_models_S23517_89c01d149c104f83918dc0144051ccd5/r0010_server.pth"
+#   "./out/fl_bert_models_S67895_bf5d821bee144924a67c1e6c545d2e78/r0010_server.pth"
+#   "./out/fl_bert_models_S47874_61bb95aee8b44302a6422405e5555ac9/r0010_server.pth"
+#   "./out/fl_bert_models_S81789_e1f33b9b63d64fdbb0d14f5d355ed89c/r0010_server.pth"
+# )
+
+## Fluke models of Full CBert (batch 256) ##
+# fl_framework="fluke"
+# model="cbert"
+# weights_paths=(
+#   "./out/fluke-cbert-B256/fl_bert_models_S9046_2939e09d850844ecb0f2dc30c80dcbed/r0010_server.pth"
+#   "./out/fluke-cbert-B256/fl_bert_models_S23517_737119ef348140fba66958d42015055d/r0010_server.pth"
+#   "./out/fluke-cbert-B256/fl_bert_models_S67895_f5cebb21d6894805966f007b2a7e642c/r0010_server.pth"
+#   "./out/fluke-cbert-B256/fl_bert_models_S47874_1c78416ba587403489a6fc597f94da6e/r0010_server.pth"
+#   "./out/fluke-cbert-B256/fl_bert_models_S81789_1340cecc5f634bbb875edac873c88315/r0010_server.pth"
+# )
+
+## Flower models of Full CBert (batch 128) ##
+# fl_framework="flwr"
+# model="cbert"
+# weights_paths=(
+#   "../flower-bertmlp/out/flwr_S9046_20260123_185447/global_model_R10.pt"
+#   "../flower-bertmlp/out/flwr_S23517_20260124_115448/global_model_R10.pt"
+#   "../flower-bertmlp/out/flwr_S67895_20260124_233918/global_model_R10.pt"
+#   "../flower-bertmlp/out/flwr_S47874_20260124_152245/global_model_R10.pt"
+#   "../flower-bertmlp/out/flwr_S81789_20260125_163619/global_model_R10.pt"
+# )
+
+## Flower models of Full CBert (batch 256) ##
+fl_framework="flwr"
+model="cbert"
+weights_paths=(
+  "../flower-bertmlp/out/flwr-bert-B256/flwr_S9046_20260127_142403/global_model_R10.pt"
+  "../flower-bertmlp/out/flwr-bert-B256/flwr_S23517_20260128_002018/global_model_R10.pt"
+  "../flower-bertmlp/out/flwr-bert-B256/flwr_S67895_20260128_141402/global_model_R10.pt"
+  "../flower-bertmlp/out/flwr-bert-B256/flwr_S47874_20260128_075941/global_model_R10.pt"
+  "../flower-bertmlp/out/flwr-bert-B256/flwr_S81789_20260129_000535/global_model_R10.pt"
+)
 
 
-# Flower model with Kernel model with MLP
-# ./launchexp-clustering.zsh kernel-accounts-disambiguation 9046 ../flower-mlp/out/flwr_S9046_2025-07-01_19-03-50/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-9046-unique--no-complex-iban
-# ./launchexp-clustering.zsh kernel-accounts-disambiguation 23517 ../flower-mlp/out/flwr_S23517_2025-07-01_18-34-33/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-23517-unique--no-complex-iban
-# ./launchexp-clustering.zsh kernel-accounts-disambiguation 47874 ../flower-mlp/out/flwr_S47874_2025-07-01_18-52-00/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-47874-unique--no-complex-iban
-# ./launchexp-clustering.zsh kernel-accounts-disambiguation 81789 ../flower-mlp/out/flwr_S81789_2025-07-01_19-27-19/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-81789-unique--no-complex-iban
-# ./launchexp-clustering.zsh kernel-accounts-disambiguation 67895 ../flower-mlp/out/flwr_S67895_2025-07-01_19-15-22/global_model_R30.pt ./dataset/split_dataset/df_test_pp.csv clustering-flwr-kernel-mlp-67895-unique--no-complex-iban
+## Fluke models of Kernel MLP no bert ##
+# fl_framework="fluke"
+# model="kernel"
+# weights_paths=(
+#   "./out/fl_models_S9046_6df8dd20ef664ab8b1fa08527f563e81/r0030_server.pth"
+#   "./out/fl_models_S23517_20141fdf304642eebcdbb68f26a7b444/r0030_server.pth"
+#   "./out/fl_models_S67895_3fea22fd59dd497791636098ff566320/r0030_server.pth"
+#   "./out/fl_models_S47874_58b4fd8ff53d46639ef1c088771f078f/r0030_server.pth"
+#   "./out/fl_models_S81789_684278c8abec4ab9baf043dea2abe4a9/r0030_server.pth"
+# )
 
+## Flower models of Kernel MLP no bert ##
+# fl_framework="flwr"
+# model="kernel"
+# weights_paths=(
+#   "../flower-mlp/out/flwr_S9046_2026-01-27_11-50-50/global_model_R30.pt"
+#   "../flower-mlp/out/flwr_S23517_2026-01-27_12-01-53/global_model_R30.pt"
+#   "../flower-mlp/out/flwr_S67895_2026-01-27_11-39-38/global_model_R30.pt"
+#   "../flower-mlp/out/flwr_S47874_2026-01-27_13-10-42/global_model_R30.pt"
+#   "../flower-mlp/out/flwr_S81789_2026-01-27_13-27-21/global_model_R30.pt"
+# )
 
-# Flower model Full CBert
-./launchexp-clustering.zsh cbert-accounts-disambiguation 9046 ../flower-bertmlp/out/flwr_S9046_20251230_124849/global_model_R10.pt ./dataset/split_dataset_S9046/df_test_pp.csv clustering-flwr-cbert-9046--no-complex-iban
-./launchexp-clustering.zsh cbert-accounts-disambiguation 23517 ../flower-bertmlp/out/flwr_S23517_20251230_153945/global_model_R10.pt ./dataset/split_dataset_S23517/df_test_pp.csv clustering-flwr-cbert-23517--no-complex-iban
-./launchexp-clustering.zsh cbert-accounts-disambiguation 47874 ../flower-bertmlp/out/flwr_S47874_20251230_173914/global_model_R10.pt ./dataset/split_dataset_S47874/df_test_pp.csv clustering-flwr-cbert-47874--no-complex-iban
-./launchexp-clustering.zsh cbert-accounts-disambiguation 67895 ../flower-bertmlp/out/flwr_S67895_20251230_224540/global_model_R10.pt ./dataset/split_dataset_S67895/df_test_pp.csv clustering-flwr-cbert-67895--no-complex-iban
-./launchexp-clustering.zsh cbert-accounts-disambiguation 81789 ../flower-bertmlp/out/flwr_S81789_20251230_105248/global_model_R10.pt ./dataset/split_dataset_S81789/df_test_pp.csv clustering-flwr-cbert-81895--no-complex-iban
+for i in {1..5}; do
+  seed=${seeds[i]}
+  echo -e "\033[0;32mSeed $seed\033[0m"
+  weights_path=${weights_paths[i]}
+  dataset="./dataset/split_dataset_S$seed/df_test_pp.csv"
+  name_wandb="clustering-$fl_framework-$model-S$seed--no-complex-iban"
 
-
-#./launchexp-clustering.zsh cbert-accounts-disambiguation 81789 ./out/fl_bert_models_S81789_eef4241792b847a4b913640c15210c65/r0010_server.pth ./dataset/split_dataset_S81789/df_test_pp.csv clustering-fl-cbert-81895
+  uv run clustering.py $model-accounts-disambiguation $seed $weights_path $dataset --name-wandb $name_wandb
+done
