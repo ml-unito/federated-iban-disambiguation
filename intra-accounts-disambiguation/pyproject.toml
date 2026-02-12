@@ -1,5 +1,5 @@
 [project]
-name = "intesa-characterbert-clustering"
+name = "characterbert-clustering"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"

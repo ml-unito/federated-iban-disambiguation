@@ -528,8 +528,6 @@ def export_results(total_finetuning_metrics, total_clustering_metrics, folds):
 
 
 def main():
-    # dataset = pd.read_csv("./Dataset/benchmark_intesa_final_correct.csv")
-    
     DATE_NAME = str(datetime.now()).split(".")[0].replace(" ", "_") 
     JSON_NAME = "./cross_validation_results/Test_" + DATE_NAME + ".json"
     
@@ -538,10 +536,7 @@ def main():
     test_proportion = 0.0
     num_epochs = 5
     
-    dataset_path = "./Dataset/benchmark_intesa_preprocessed.csv"
-    # dataset_path = "./Dataset/benchmark_intesa_final_correct.csv"
-    # dataset_path = "./Dataset/prova.csv"
-    
+    dataset_path = "./Dataset/DATASETPLACEHOLDER"
     
     print("Starting Cross validation...")
     print("Dataset: " + dataset_path)

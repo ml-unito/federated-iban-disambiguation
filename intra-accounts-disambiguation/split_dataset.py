@@ -7,7 +7,7 @@ import os
 app = typer.Typer()
 
 DIR_PATH = "./dataset/"
-DATASET_PATH = "benchmark_intesa.csv"
+DATASET_PATH = "BENCHMARK_DATASET_PLACEHOLDER.csv"
 SAVE_DATASETS = True
 
 

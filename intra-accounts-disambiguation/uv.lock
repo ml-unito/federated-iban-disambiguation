@@ -819,7 +819,7 @@ wheels = [
 ]
 
 [[package]]
-name = "intesa-characterbert-clustering"
+name = characterbert-clustering"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

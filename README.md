@@ -1,4 +1,5 @@
-# Intesa NER
+# CN1 spoke 1 - Federated Learning in Finance
+
 This repository contains the following directory:
 - `./synthetic-data-generator/`: contains the script for generating synthetic data;
 - `./politecnico-code-reproduction/`: contains the script with the reproduction of the code described in the Politecnico di Torino article for solving the problem;
